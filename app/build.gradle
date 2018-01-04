@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
     defaultConfig {
-        applicationId "videoeditor.bhuvnesh.com.ffmpegvideoeditor"
+        applicationId "protect.videoeditor"
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
