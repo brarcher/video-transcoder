@@ -1,4 +1,10 @@
 apply plugin: 'com.android.application'
+apply plugin: 'findbugs'
+
+findbugs {
+    sourceSets = []
+    ignoreFailures = false
+}
 
 android {
     compileSdkVersion 27
@@ -33,4 +39,23 @@ dependencies {
     compile 'com.android.support:cardview-v7:27.0.2'
     compile 'commons-io:commons-io:2.5'
     testCompile 'junit:junit:4.12'
+}
+
+task findbugs(type: FindBugs, dependsOn: 'assembleDebug') {
+
+    description 'Run findbugs'
+    group 'verification'
+
+    classes = fileTree('build/intermediates/classes/debug/')
+    source = fileTree('src/main/java')
+    classpath = files()
+
+    effort = 'max'
+
+    excludeFilter = file("./config/findbugs/exclude.xml")
+
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
 }
