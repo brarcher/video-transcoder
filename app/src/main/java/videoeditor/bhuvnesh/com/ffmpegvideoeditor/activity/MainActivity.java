@@ -719,9 +719,14 @@ public class MainActivity extends AppCompatActivity {
         );
         File srcDir = new File(moviesDir, ".VideoPartsReverse");
         File[] files = srcDir.listFiles();
-        if (files != null && files.length > 1) {
-            Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
+        if(files == null || files.length == 0)
+        {
+            Toast.makeText(this, "There are no files to reverse", Toast.LENGTH_LONG).show();
+            return;
         }
+
+        Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
+
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder filterComplex = new StringBuilder();
         filterComplex.append("-filter_complex,");
