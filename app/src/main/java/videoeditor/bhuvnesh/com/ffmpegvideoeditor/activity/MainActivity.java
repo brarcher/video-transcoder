@@ -764,6 +764,14 @@ public class MainActivity extends AppCompatActivity {
      * Executing ffmpeg binary
      */
     private void execFFmpegBinary(final String[] command) {
+        final StringBuilder commandBuilder = new StringBuilder();
+        for(String part : command)
+        {
+            commandBuilder.append(part);
+            commandBuilder.append(" ");
+        }
+        final String commandString = commandBuilder.toString().trim();
+
         try {
             ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
                 @Override
@@ -811,7 +819,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onProgress(String s) {
-                    Log.d(TAG, "Started command : ffmpeg " + command);
+                    Log.d(TAG, "Started command : ffmpeg " + commandString);
                     if (choice == 8)
                         progressDialog.setMessage("progress : splitting video " + s);
                     else if (choice == 9)
@@ -825,14 +833,14 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onStart() {
-                    Log.d(TAG, "Started command : ffmpeg " + command);
+                    Log.d(TAG, "Started command : ffmpeg " + commandString);
                     progressDialog.setMessage("Processing...");
                     progressDialog.show();
                 }
 
                 @Override
                 public void onFinish() {
-                    Log.d(TAG, "Finished command : ffmpeg " + command);
+                    Log.d(TAG, "Finished command : ffmpeg " + commandString);
                     if (choice != 8 && choice != 9 && choice != 10) {
                         progressDialog.dismiss();
                     }
