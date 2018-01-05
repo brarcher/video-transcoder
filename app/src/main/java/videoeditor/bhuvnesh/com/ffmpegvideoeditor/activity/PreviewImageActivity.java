@@ -46,13 +46,14 @@ public class PreviewImageActivity extends AppCompatActivity {
             tvInstruction.setText("Images stored at path "+filePath);
             File[] listFile;
 
-                listFile = dir.listFiles();
+            listFile = dir.listFiles();
 
-
-
-            for(File e:listFile)
+            if(listFile != null)
             {
-                f.add(e.getAbsolutePath());
+                for(File e:listFile)
+                {
+                    f.add(e.getAbsolutePath());
+                }
             }
 
             PreviewImageAdapter rcAdapter = new PreviewImageAdapter( f);
