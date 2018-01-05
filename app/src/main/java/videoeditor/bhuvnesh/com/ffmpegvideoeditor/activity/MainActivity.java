@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
@@ -513,7 +514,14 @@ public class MainActivity extends AppCompatActivity {
             dir = new File(moviesDir, "VideoEditor" + fileNo);
 
         }
-        dir.mkdir();
+
+        boolean result = dir.mkdir();
+        if(result == false)
+        {
+            Toast.makeText(this, "Failed to create directory", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         filePath = dir.getAbsolutePath();
         File dest = new File(dir, filePrefix + "%03d" + fileExtn);
 
@@ -656,7 +664,14 @@ public class MainActivity extends AppCompatActivity {
         File dir = new File(moviesDir, ".VideoSplit");
         if (dir.exists())
             deleteDir(dir);
-        dir.mkdir();
+
+        boolean result = dir.mkdir();
+        if(result == false)
+        {
+            Toast.makeText(this, "Failed to create directory", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         File dest = new File(dir, filePrefix + "%03d" + fileExtn);
 
         String[] complexCommand = {"-i", yourRealPath, "-c:v", "libx264", "-crf", "22", "-map", "0", "-segment_time", "6", "-g", "9", "-sc_threshold", "0", "-force_key_frames", "expr:gte(t,n_forced*6)", "-f", "segment", dest.getAbsolutePath()};
@@ -677,7 +692,13 @@ public class MainActivity extends AppCompatActivity {
         File destDir = new File(moviesDir, ".VideoPartsReverse");
         if (destDir.exists())
             deleteDir(destDir);
-        destDir.mkdir();
+        boolean result = destDir.mkdir();
+        if(result == false)
+        {
+            Toast.makeText(this, "Failed to create directory", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         for (int i = 0; i < files.length; i++) {
             File dest = new File(destDir, filePrefix + i + fileExtn);
             String command[] = {"-i", files[i].getAbsolutePath(), "-vf", "reverse", "-af", "areverse", dest.getAbsolutePath()};
