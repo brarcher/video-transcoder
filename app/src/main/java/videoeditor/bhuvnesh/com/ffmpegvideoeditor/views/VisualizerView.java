@@ -38,7 +38,7 @@ public class VisualizerView extends View {
     }
 
     public void updateVisualizer(byte[] bytes) {
-        mBytes = bytes;
+        mBytes = bytes.clone();
         invalidate();
     }
 
