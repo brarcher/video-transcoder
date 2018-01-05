@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private Context mContext;
     private String[] lastReverseCommand;
 
+    private static final int READ_WRITE_PERMISSION_REQUEST = 1;
+    private static final int AUDIO_PERMISSION_REQUEST = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -247,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
         if (params != null && params.length > 0) {
             ActivityCompat.requestPermissions(MainActivity.this,
                     params,
-                    100);
+                    READ_WRITE_PERMISSION_REQUEST);
         } else
             uploadVideo();
     }
@@ -272,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
         if (params != null && params.length > 0) {
             ActivityCompat.requestPermissions(MainActivity.this,
                     params,
-                    200);
+                    AUDIO_PERMISSION_REQUEST);
         } else
             extractAudioVideo();
     }
@@ -284,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case 100: {
+            case READ_WRITE_PERMISSION_REQUEST: {
 
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -292,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             break;
-            case 200: {
+            case AUDIO_PERMISSION_REQUEST: {
 
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
