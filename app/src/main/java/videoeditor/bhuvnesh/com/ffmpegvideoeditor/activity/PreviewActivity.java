@@ -21,7 +21,6 @@ public class PreviewActivity extends AppCompatActivity {
     private VideoView videoView;
     private SeekBar seekBar;
     private int stopPosition;
-    private static final String POSITION = "position";
     private static final String FILEPATH = "filepath";
 
     @Override

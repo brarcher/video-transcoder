@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private Uri selectedVideoUri;
     private static final String TAG = "BHUVNESH";
-    private static final String POSITION = "position";
     private static final String FILEPATH = "filepath";
     private int choice = 0;
     private int stopPosition;
