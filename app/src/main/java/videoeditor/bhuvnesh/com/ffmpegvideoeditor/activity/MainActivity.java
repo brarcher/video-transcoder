@@ -339,7 +339,6 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onPrepared(MediaPlayer mp) {
-                        // TODO Auto-generated method stub
                         duration = mp.getDuration() / 1000;
                         tvLeft.setText("00:00:00");
 
