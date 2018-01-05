@@ -25,6 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -983,8 +984,12 @@ public class MainActivity extends AppCompatActivity {
 
     private Dialog showSingleOptionTextDialog(Context mContext) {
         Dialog textDialog = new Dialog(mContext, R.style.DialogAnimation);
-        textDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        textDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        Window window = textDialog.getWindow();
+        if(window != null)
+        {
+            window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
         textDialog.setContentView(R.layout.dialog_singleoption_text);
         textDialog.setCancelable(false);
         return textDialog;
