@@ -621,60 +621,8 @@ public class MainActivity extends AppCompatActivity
         String[] complexCommand = {"-y", "-i", yourRealPath, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "256k", "-f", "mp3", filePath};
 
         execFFmpegBinary(complexCommand);
-    }
 
-    /**
-     * Command for concating reversed segmented videos
-     */
-    private void concatVideoCommand()
-    {
-        File moviesDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_MOVIES
-        );
-        File srcDir = new File(moviesDir, ".VideoPartsReverse");
-        File[] files = srcDir.listFiles();
-        if(files == null || files.length == 0)
-        {
-            Toast.makeText(this, "There are no files to reverse", Toast.LENGTH_LONG).show();
-            return;
-        }
 
-        Arrays.sort(files, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
-
-        StringBuilder stringBuilder = new StringBuilder();
-        StringBuilder filterComplex = new StringBuilder();
-        filterComplex.append("-filter_complex,");
-        for (int i = 0; i < files.length; i++)
-        {
-            stringBuilder.append("-i" + "," + files[i].getAbsolutePath() + ",");
-            filterComplex.append("[").append(i).append(":v").append(i).append("] [").append(i).append(":a").append(i).append("] ");
-
-        }
-        filterComplex.append("concat=n=").append(files.length).append(":v=1:a=1 [v] [a]");
-        String[] inputCommand = stringBuilder.toString().split(",");
-        String[] filterCommand = filterComplex.toString().split(",");
-
-        String filePrefix = "reverse_video";
-        String fileExtn = ".mp4";
-        File dest = new File(moviesDir, filePrefix + fileExtn);
-        int fileNo = 0;
-        while (dest.exists())
-        {
-            fileNo++;
-            dest = new File(moviesDir, filePrefix + fileNo + fileExtn);
-        }
-        filePath = dest.getAbsolutePath();
-        String[] destinationCommand = {"-map", "[v]", "-map", "[a]", dest.getAbsolutePath()};
-        execFFmpegBinary(combine(inputCommand, filterCommand, destinationCommand));
-    }
-
-    public static String[] combine(String[] arg1, String[] arg2, String[] arg3)
-    {
-        String[] result = new String[arg1.length + arg2.length + arg3.length];
-        System.arraycopy(arg1, 0, result, 0, arg1.length);
-        System.arraycopy(arg2, 0, result, arg1.length, arg2.length);
-        System.arraycopy(arg3, 0, result, arg1.length + arg2.length, arg3.length);
-        return result;
     }
 
     /**
