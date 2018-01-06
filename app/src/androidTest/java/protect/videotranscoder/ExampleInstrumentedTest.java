@@ -1,4 +1,4 @@
-package protect.videoeditor;
+package protect.videotranscoder;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

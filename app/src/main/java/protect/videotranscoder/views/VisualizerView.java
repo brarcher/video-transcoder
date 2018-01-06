@@ -1,4 +1,4 @@
-package protect.videoeditor.views;
+package protect.videotranscoder.views;
 
 import android.content.Context;
 import android.graphics.Canvas;

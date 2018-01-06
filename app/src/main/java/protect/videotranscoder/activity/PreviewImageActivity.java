@@ -1,4 +1,4 @@
-package protect.videoeditor.activity;
+package protect.videotranscoder.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,8 +12,8 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 
-import protect.videoeditor.R;
-import protect.videoeditor.adapter.PreviewImageAdapter;
+import protect.videotranscoder.R;
+import protect.videotranscoder.adapter.PreviewImageAdapter;
 
 public class PreviewImageActivity extends AppCompatActivity
 {

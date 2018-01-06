@@ -1,4 +1,4 @@
-package protect.videoeditor.activity;
+package protect.videotranscoder.activity;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -10,8 +10,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
-import protect.videoeditor.views.VisualizerView;
-import protect.videoeditor.R;
+import protect.videotranscoder.views.VisualizerView;
+import protect.videotranscoder.R;
 
 public class AudioPreviewActivity extends AppCompatActivity
 {

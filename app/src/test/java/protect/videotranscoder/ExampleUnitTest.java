@@ -1,4 +1,4 @@
-package protect.videoeditor;
+package protect.videotranscoder;
 
 import org.junit.Test;
 

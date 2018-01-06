@@ -1,4 +1,4 @@
-package protect.videoeditor.adapter;
+package protect.videotranscoder.adapter;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 
-import protect.videoeditor.R;
+import protect.videotranscoder.R;
 
 public class PreviewImageAdapter extends RecyclerView.Adapter<PreviewImageAdapter.MyViewHolder> {
 

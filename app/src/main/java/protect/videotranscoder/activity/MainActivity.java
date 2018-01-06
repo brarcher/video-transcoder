@@ -1,4 +1,4 @@
-package protect.videoeditor.activity;
+package protect.videotranscoder.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -48,7 +48,58 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import protect.videoeditor.R;
+import protect.videotranscoder.R;
+
+/*
+ffmpeg version n3.0.1 Copyright (c) 2000-2016 the FFmpeg developers
+built with gcc 4.8 (GCC)
+configuration: --target-os=linux
+               --cross-prefix=/home/vagrant/SourceCode/ffmpeg-android/toolchain-android/bin/arm-linux-androideabi-
+               --arch=arm
+               --cpu=cortex-a8
+               --enable-runtime-cpudetect
+               --sysroot=/home/vagrant/SourceCode/ffmpeg-android/toolchain-android/sysroot
+               --enable-pic
+               --enable-libx264
+               --enable-libass
+               --enable-libfreetype
+               --enable-libfribidi
+               --enable-libmp3lame
+               --enable-fontconfig
+               --enable-pthreads
+               --disable-debug
+               --disable-ffserver
+               --enable-version3
+               --enable-hardcoded-tables
+               --disable-ffplay
+               --disable-ffprobe
+               --enable-gpl
+               --enable-yasm
+               --disable-doc
+               --disable-shared
+               --enable-static
+               --pkg-config=/home/vagrant/SourceCode/ffmpeg-android/ffmpeg-pkg-config
+               --prefix=/home/vagrant/SourceCode/ffmpeg-android/build/armeabi-v7a
+               --extra-cflags='-I/home/vagrant/SourceCode/ffmpeg-android/toolchain-android/include
+                -U_FORTIFY_SOURCE
+               -D_FORTIFY_SOURCE=2
+               -fno-strict-overflow
+               -fstack-protector-all'
+               --extra-ldflags='-L/home/vagrant/SourceCode/ffmpeg-android/toolchain-android/lib
+               -Wl,-z,relro
+               -Wl,-z,now -pie'
+               --extra-libs='-lpng -lexpat -lm' --extra-cxxflags=
+libavutil      55. 17.103 / 55. 17.103
+libavcodec     57. 24.102 / 57. 24.102
+libavformat    57. 25.100 / 57. 25.100
+libavdevice    57.  0.101 / 57.  0.101
+libavfilter     6. 31.100 /  6. 31.100
+libswscale      4.  0.100 /  4.  0.100
+libswresample   2.  0.101 /  2.  0.101
+libpostproc    54.  0.100 / 54.  0.100
+
+
+ */
 
 public class MainActivity extends AppCompatActivity
 {
@@ -405,6 +456,7 @@ public class MainActivity extends AppCompatActivity
                 public void onSuccess()
                 {
                     Log.d(TAG, "ffmpeg : correct Loaded");
+                    execFFmpegBinary(new String []{"ffmpeg", "-formats"});
                 }
             });
         }
@@ -650,7 +702,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onSuccess(String s)
                 {
-                    Log.d(TAG, "SUCCESS with output : " + s);
+                    Log.d(TAG, "SUCCESS with output : " + s.replace("\r", "\n"));
                     if (choice == 1 || choice == 2)
                     {
                         Intent intent = new Intent(MainActivity.this, PreviewActivity.class);

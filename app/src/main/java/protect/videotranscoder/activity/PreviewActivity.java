@@ -1,4 +1,4 @@
-package protect.videoeditor.activity;
+package protect.videotranscoder.activity;
 
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
-import protect.videoeditor.R;
+import protect.videotranscoder.R;
 
 public class PreviewActivity extends AppCompatActivity
 {
