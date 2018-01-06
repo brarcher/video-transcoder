@@ -13,14 +13,13 @@ import android.widget.TextView;
 import protect.videoeditor.views.VisualizerView;
 import protect.videoeditor.R;
 
-public class AudioPreviewActivity extends AppCompatActivity {
-
+public class AudioPreviewActivity extends AppCompatActivity
+{
     private VisualizerView mVisualizerView;
 
     private MediaPlayer mMediaPlayer;
     private Visualizer mVisualizer;
     private static final String FILEPATH = "filepath";
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)

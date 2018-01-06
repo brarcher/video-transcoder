@@ -105,12 +105,16 @@ public class MainActivity extends AppCompatActivity
         uploadVideo.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 if (Build.VERSION.SDK_INT >= 23)
+                {
                     getPermission();
+                }
                 else
+                {
                     uploadVideo();
-
+                }
             }
         });
 

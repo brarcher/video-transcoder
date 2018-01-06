@@ -10,7 +10,6 @@ import android.view.View;
 
 public class VisualizerView extends View
 {
-
     private byte[] mBytes;
     private float[] mPoints;
     private Rect mRect = new Rect();
