@@ -85,14 +85,6 @@ public class MainActivity extends AppCompatActivity
         tvRight = findViewById(R.id.tvRight);
 
         final TextView extractAudio = findViewById(R.id.extractAudio);
-        if (Build.VERSION.SDK_INT == 16)
-        {
-            extractAudio.setVisibility(View.GONE);
-        }
-        else
-        {
-            extractAudio.setVisibility(View.VISIBLE);
-        }
         videoView =  findViewById(R.id.videoView);
         rangeSeekBar =  findViewById(R.id.rangeSeekBar);
         mainlayout =  findViewById(R.id.mainlayout);
