@@ -1,5 +1,7 @@
-<resources>
-    <string name="app_name">FFmpeg Video Editor</string>
+<resources
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">Video Editor</string>
     <string name="rangeSeekBarText">Use RangeSeekbar to select time range for cutting video or extracting images from video(rangeseekbar ineffective for other options)</string>
     <string name="uploadVideo">Upload\nVideo</string>
     <string name="compressVideo">Compress\nVideo</string>
@@ -11,5 +13,17 @@
     <string name="decreaseSpeed">Slow\nMotion</string>
     <string name="reverseVideo">Reverse\nVideo</string>
     <string name="dialogMessage">The process will take some time.Please be patient.</string>
+
+    <string name="ok">OK</string>
+
+    <string name="about">About</string>
+    <string name="app_copyright_fmt">Copyright 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
+    <string name="app_license">Licensed under the GPLv2.</string>
+    <string name="about_title_fmt">About <xliff:g id="app_name">%s</xliff:g></string>
+    <string name="debug_version_fmt">Version: <xliff:g id="version">%s</xliff:g></string>
+    <string name="app_revision_fmt">Revision Information: <xliff:g id="app_revision_url">%s</xliff:g></string>
+    <string name="app_libraries"><xliff:g id="app_name">%s</xliff:g> uses the following third-party libraries: <xliff:g id="app_libraries_list">%s</xliff:g></string>
+    <string name="app_resources"><xliff:g id="app_name">%s</xliff:g> uses the following third-party resources: <xliff:g id="app_resources_list">%s</xliff:g></string>
+
 
 </resources>
