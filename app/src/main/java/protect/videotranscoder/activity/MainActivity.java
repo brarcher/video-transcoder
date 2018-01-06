@@ -31,24 +31,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
-import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
-import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
-import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
-import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.google.common.collect.ImmutableMap;
 
-import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+import protect.videotranscoder.FFmpegResponseHandler;
+import protect.videotranscoder.FFmpegUtil;
 import protect.videotranscoder.R;
+import protect.videotranscoder.ResultCallbackHandler;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -56,12 +52,10 @@ public class MainActivity extends AppCompatActivity
     private VideoView videoView;
     private RangeSeekBar rangeSeekBar;
     private Runnable r;
-    private FFmpeg ffmpeg;
     private ProgressDialog progressDialog;
     private Uri selectedVideoUri;
     private static final String TAG = "VideoTranscoder";
     private static final String FILEPATH = "filepath";
-    private int choice = 0;
     private int stopPosition;
     private ScrollView mainlayout;
     private TextView tvLeft, tvRight;
@@ -92,7 +86,18 @@ public class MainActivity extends AppCompatActivity
         progressDialog.setTitle(null);
         progressDialog.setCancelable(false);
         rangeSeekBar.setEnabled(false);
-        loadFFMpegBinary();
+
+        FFmpegUtil.init(this, new ResultCallbackHandler<Boolean>()
+        {
+            @Override
+            public void onResult(Boolean result)
+            {
+                if(result == false)
+                {
+                    showUnsupportedExceptionDialog();
+                }
+            }
+        });
 
         uploadVideo.setOnClickListener(new View.OnClickListener()
         {
@@ -115,9 +120,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-
-                choice = 1;
-
                 if (selectedVideoUri != null)
                 {
                     executeCompressCommand();
@@ -134,9 +136,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-
-                choice = 2;
-
                 if (selectedVideoUri != null)
                 {
                     executeCutVideoCommand(rangeSeekBar.getSelectedMinValue().intValue() * 1000, rangeSeekBar.getSelectedMaxValue().intValue() * 1000);
@@ -153,9 +152,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-
-                choice = 3;
-
                 if (selectedVideoUri != null)
                 {
                     extractImagesVideo(rangeSeekBar.getSelectedMinValue().intValue() * 1000, rangeSeekBar.getSelectedMaxValue().intValue() * 1000);
@@ -172,9 +168,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-
-                choice = 4;
-
                 if (selectedVideoUri != null)
                 {
                     if (Build.VERSION.SDK_INT >= 23)
@@ -381,44 +374,6 @@ public class MainActivity extends AppCompatActivity
         return String.format("%02d", hr) + ":" + String.format("%02d", mn) + ":" + String.format("%02d", sec);
     }
 
-    /**
-     * Load FFmpeg binary
-     */
-    private void loadFFMpegBinary()
-    {
-        try
-        {
-            if (ffmpeg == null)
-            {
-                Log.d(TAG, "ffmpeg : era nulo");
-                ffmpeg = FFmpeg.getInstance(this);
-            }
-            ffmpeg.loadBinary(new LoadBinaryResponseHandler()
-            {
-                @Override
-                public void onFailure()
-                {
-                    showUnsupportedExceptionDialog();
-                }
-
-                @Override
-                public void onSuccess()
-                {
-                    Log.d(TAG, "ffmpeg : correct Loaded");
-                    execFFmpegBinary(new String []{"ffmpeg", "-formats"});
-                }
-            });
-        }
-        catch (FFmpegNotSupportedException e)
-        {
-            showUnsupportedExceptionDialog();
-        }
-        catch (Exception e)
-        {
-            Log.d(TAG, "EXception no controlada : " + e);
-        }
-    }
-
     private void showUnsupportedExceptionDialog()
     {
         new AlertDialog.Builder(MainActivity.this)
@@ -464,11 +419,14 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "startTrim: startMs: " + startMs);
         Log.d(TAG, "startTrim: endMs: " + endMs);
         filePath = dest.getAbsolutePath();
-        //String[] complexCommand = {"-i", yourRealPath, "-ss", "" + startMs / 1000, "-t", "" + endMs / 1000, dest.getAbsolutePath()};
-        String[] complexCommand = {"-ss", "" + startMs / 1000, "-y", "-i", yourRealPath, "-t", "" + (endMs - startMs) / 1000,"-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
 
-        execFFmpegBinary(complexCommand);
+        final String[] complexCommand = {"-ss", "" + startMs / 1000, "-y", "-i", yourRealPath, "-t", "" + (endMs - startMs) / 1000,"-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
 
+        Intent successIntent = new Intent(MainActivity.this, PreviewActivity.class);
+        successIntent.putExtra(FILEPATH, filePath);
+
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, progressDialog);
+        FFmpegUtil.call(complexCommand, handler);
     }
 
     /**
@@ -497,8 +455,12 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "startTrim: dest: " + dest.getAbsolutePath());
         filePath = dest.getAbsolutePath();
         String[] complexCommand = {"-y", "-i", yourRealPath, "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", "150k", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
-        execFFmpegBinary(complexCommand);
 
+        Intent successIntent = new Intent(MainActivity.this, PreviewActivity.class);
+        successIntent.putExtra(FILEPATH, filePath);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, progressDialog);
+
+        FFmpegUtil.call(complexCommand, handler);
     }
 
     /**
@@ -533,14 +495,18 @@ public class MainActivity extends AppCompatActivity
         filePath = dir.getAbsolutePath();
         File dest = new File(dir, filePrefix + "%03d" + fileExtn);
 
-
         Log.d(TAG, "startTrim: src: " + yourRealPath);
         Log.d(TAG, "startTrim: dest: " + dest.getAbsolutePath());
 
-        String[] complexCommand = {"-y", "-i", yourRealPath, "-an", "-r", "1", "-ss", "" + startMs / 1000, "-t", "" + (endMs - startMs) / 1000, dest.getAbsolutePath()};
-  /*   Remove -r 1 if you want to extract all video frames as images from the specified time duration.*/
-        execFFmpegBinary(complexCommand);
+        /* Remove -r 1 if you want to extract all video frames as images from the specified time duration.*/
 
+        String[] complexCommand = {"-y", "-i", yourRealPath, "-an", "-r", "1", "-ss", "" + startMs / 1000, "-t", "" + (endMs - startMs) / 1000, dest.getAbsolutePath()};
+
+        Intent successIntent = new Intent(MainActivity.this, PreviewImageActivity.class);
+        successIntent.putExtra(FILEPATH, filePath);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, progressDialog);
+
+        FFmpegUtil.call(complexCommand, handler);
     }
 
     /**
@@ -569,88 +535,11 @@ public class MainActivity extends AppCompatActivity
 
         String[] complexCommand = {"-y", "-i", yourRealPath, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "256k", "-f", "mp3", filePath};
 
-        execFFmpegBinary(complexCommand);
+        Intent successIntent = new Intent(MainActivity.this, AudioPreviewActivity.class);
+        successIntent.putExtra(FILEPATH, filePath);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, progressDialog);
 
-
-    }
-
-    /**
-     * Executing ffmpeg binary
-     */
-    private void execFFmpegBinary(final String[] command)
-    {
-        final StringBuilder commandBuilder = new StringBuilder();
-        for(String part : command)
-        {
-            commandBuilder.append(part);
-            commandBuilder.append(" ");
-        }
-        final String commandString = commandBuilder.toString().trim();
-
-        try
-        {
-            ffmpeg.execute(command, new ExecuteBinaryResponseHandler()
-            {
-                @Override
-                public void onFailure(String s) {
-                    Log.d(TAG, "FAILED with output : " + s);
-                }
-
-                @Override
-                public void onSuccess(String s)
-                {
-                    Log.d(TAG, "SUCCESS with output : " + s.replace("\r", "\n"));
-                    if (choice == 1 || choice == 2)
-                    {
-                        Intent intent = new Intent(MainActivity.this, PreviewActivity.class);
-                        intent.putExtra(FILEPATH, filePath);
-                        startActivity(intent);
-                    }
-                    else if (choice == 3)
-                    {
-                        Intent intent = new Intent(MainActivity.this, PreviewImageActivity.class);
-                        intent.putExtra(FILEPATH, filePath);
-                        startActivity(intent);
-                    }
-                    else if (choice == 4)
-                    {
-                        Intent intent = new Intent(MainActivity.this, AudioPreviewActivity.class);
-                        intent.putExtra(FILEPATH, filePath);
-                        startActivity(intent);
-                    }
-                }
-
-                @Override
-                public void onProgress(String s)
-                {
-                    Log.d(TAG, "Started command : ffmpeg " + commandString);
-                    progressDialog.setMessage("progress : " + s);
-                    Log.d(TAG, "progress : " + s);
-                }
-
-                @Override
-                public void onStart()
-                {
-                    Log.d(TAG, "Started command : ffmpeg " + commandString);
-                    progressDialog.setMessage("Processing...");
-                    progressDialog.show();
-                }
-
-                @Override
-                public void onFinish()
-                {
-                    Log.d(TAG, "Finished command : ffmpeg " + commandString);
-                    if (choice != 8 && choice != 9 && choice != 10)
-                    {
-                        progressDialog.dismiss();
-                    }
-                }
-            });
-        }
-        catch (FFmpegCommandAlreadyRunningException e)
-        {
-            // do nothing for now
-        }
+        FFmpegUtil.call(complexCommand, handler);
     }
 
     /**
