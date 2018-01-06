@@ -54,7 +54,6 @@ import java.util.Map;
 
 import protect.videoeditor.R;
 
-
 public class MainActivity extends AppCompatActivity {
 
 

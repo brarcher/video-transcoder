@@ -15,10 +15,6 @@ import java.util.ArrayList;
 import protect.videoeditor.R;
 import protect.videoeditor.adapter.PreviewImageAdapter;
 
-/**
- * Created by Bhuvnesh on 09-03-2017.
- */
-
 public class PreviewImageActivity extends AppCompatActivity {
 
     private static final String FILEPATH = "filepath";

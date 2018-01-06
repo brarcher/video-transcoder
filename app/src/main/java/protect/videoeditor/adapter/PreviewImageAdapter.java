@@ -13,11 +13,6 @@ import java.util.ArrayList;
 
 import protect.videoeditor.R;
 
-
-/**
- * Created by Bhuvnesh on 09-03-2017.
- */
-
 public class PreviewImageAdapter extends RecyclerView.Adapter<PreviewImageAdapter.MyViewHolder> {
 
     private ArrayList<String> paths;

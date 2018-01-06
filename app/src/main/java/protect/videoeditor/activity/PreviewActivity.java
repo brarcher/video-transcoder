@@ -12,11 +12,6 @@ import android.widget.TextView;
 import android.widget.VideoView;
 import protect.videoeditor.R;
 
-
-/**
- * Created by Bhuvnesh on 08-03-2017.
- */
-
 public class PreviewActivity extends AppCompatActivity {
     private VideoView videoView;
     private SeekBar seekBar;

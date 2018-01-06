@@ -13,11 +13,6 @@ import android.widget.TextView;
 import protect.videoeditor.views.VisualizerView;
 import protect.videoeditor.R;
 
-
-/**
- * Created by Bhuvnesh on 09-03-2017.
- */
-
 public class AudioPreviewActivity extends AppCompatActivity {
 
     private VisualizerView mVisualizerView;
