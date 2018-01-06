@@ -31,10 +31,10 @@ public class PreviewActivity extends AppCompatActivity
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        videoView = (VideoView) findViewById(R.id.videoView);
-        seekBar = (SeekBar) findViewById(R.id.seekBar);
+        videoView =  findViewById(R.id.videoView);
+        seekBar =  findViewById(R.id.seekBar);
 
-        TextView tvInstruction = (TextView) findViewById(R.id.tvInstruction);
+        TextView tvInstruction =  findViewById(R.id.tvInstruction);
         String filePath = getIntent().getStringExtra(FILEPATH);
 
         tvInstruction.setText("Video stored at path " + filePath);

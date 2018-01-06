@@ -51,7 +51,7 @@ public class PreviewImageAdapter extends RecyclerView.Adapter<PreviewImageAdapte
         {
             super(itemView);
 
-            ivPhoto = (ImageView) itemView.findViewById(R.id.ivPhoto);
+            ivPhoto = itemView.findViewById(R.id.ivPhoto);
         }
     }
 

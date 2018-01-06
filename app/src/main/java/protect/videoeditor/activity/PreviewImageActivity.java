@@ -31,10 +31,10 @@ public class PreviewImageActivity extends AppCompatActivity
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        TextView tvInstruction=(TextView)findViewById(R.id.tvInstruction) ;
+        TextView tvInstruction = findViewById(R.id.tvInstruction) ;
 
         GridLayoutManager lLayoutlLayout = new GridLayoutManager(PreviewImageActivity.this, 4);
-        RecyclerView rView = (RecyclerView)findViewById(R.id.recycler_view);
+        RecyclerView rView = findViewById(R.id.recycler_view);
         rView.setHasFixedSize(true);
         rView.setLayoutManager(lLayoutlLayout);
         String filePath = getIntent().getStringExtra(FILEPATH);

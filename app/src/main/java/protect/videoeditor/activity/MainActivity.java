@@ -76,15 +76,15 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final TextView uploadVideo = (TextView) findViewById(R.id.uploadVideo);
-        TextView cutVideo = (TextView) findViewById(R.id.cropVideo);
-        TextView compressVideo = (TextView) findViewById(R.id.compressVideo);
-        TextView extractImages = (TextView) findViewById(R.id.extractImages);
+        final TextView uploadVideo = findViewById(R.id.uploadVideo);
+        TextView cutVideo = findViewById(R.id.cropVideo);
+        TextView compressVideo = findViewById(R.id.compressVideo);
+        TextView extractImages = findViewById(R.id.extractImages);
 
-        tvLeft = (TextView) findViewById(R.id.tvLeft);
-        tvRight = (TextView) findViewById(R.id.tvRight);
+        tvLeft = findViewById(R.id.tvLeft);
+        tvRight = findViewById(R.id.tvRight);
 
-        final TextView extractAudio = (TextView) findViewById(R.id.extractAudio);
+        final TextView extractAudio = findViewById(R.id.extractAudio);
         if (Build.VERSION.SDK_INT == 16)
         {
             extractAudio.setVisibility(View.GONE);
@@ -93,9 +93,9 @@ public class MainActivity extends AppCompatActivity
         {
             extractAudio.setVisibility(View.VISIBLE);
         }
-        videoView = (VideoView) findViewById(R.id.videoView);
-        rangeSeekBar = (RangeSeekBar) findViewById(R.id.rangeSeekBar);
-        mainlayout = (ScrollView) findViewById(R.id.mainlayout);
+        videoView =  findViewById(R.id.videoView);
+        rangeSeekBar =  findViewById(R.id.rangeSeekBar);
+        mainlayout =  findViewById(R.id.mainlayout);
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle(null);
         progressDialog.setCancelable(false);

@@ -33,9 +33,7 @@ public class AudioPreviewActivity extends AppCompatActivity
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mVisualizerView = (VisualizerView) findViewById(R.id.visualizerView);
-
-
+        mVisualizerView = findViewById(R.id.visualizerView);
     }
 
     @Override
