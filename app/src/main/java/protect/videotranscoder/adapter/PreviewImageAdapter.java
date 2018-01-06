@@ -1,6 +1,5 @@
-package videoeditor.bhuvnesh.com.ffmpegvideoeditor.adapter;
+package protect.videotranscoder.adapter;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
@@ -11,23 +10,20 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 
-import videoeditor.bhuvnesh.com.ffmpegvideoeditor.R;
-
-
-/**
- * Created by Bhuvnesh on 09-03-2017.
- */
+import protect.videotranscoder.R;
 
 public class PreviewImageAdapter extends RecyclerView.Adapter<PreviewImageAdapter.MyViewHolder> {
 
     private ArrayList<String> paths;
 
-    public PreviewImageAdapter( ArrayList<String> paths) {
+    public PreviewImageAdapter( ArrayList<String> paths)
+    {
         this.paths = paths;
     }
 
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_gallery, parent, false);
 
@@ -35,23 +31,27 @@ public class PreviewImageAdapter extends RecyclerView.Adapter<PreviewImageAdapte
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, int position)
+    {
         Bitmap bmp = BitmapFactory.decodeFile(paths.get(position));
         holder.ivPhoto.setImageBitmap(bmp);
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()
+    {
         return paths.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder
+    {
         private ImageView ivPhoto;
 
-        public MyViewHolder(View itemView) {
+        public MyViewHolder(View itemView)
+        {
             super(itemView);
 
-            ivPhoto = (ImageView) itemView.findViewById(R.id.ivPhoto);
+            ivPhoto = itemView.findViewById(R.id.ivPhoto);
         }
     }
 
