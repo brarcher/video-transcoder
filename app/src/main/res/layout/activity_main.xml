@@ -139,56 +139,6 @@
                     android:textSize="@dimen/sp16" />
             </TableRow>
 
-            <TableRow>
-
-                <TextView
-                    android:id="@+id/fadeEffect"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/fade_video_selector"
-                    android:gravity="center"
-                    android:padding="@dimen/dp2"
-                    android:text="@string/addFade"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/sp16" />
-
-                <TextView
-                    android:id="@+id/increaseSpeed"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/increase_speed_selector"
-                    android:gravity="center"
-                    android:padding="@dimen/dp2"
-                    android:text="@string/increaseSpeed"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/sp16" />
-
-                <TextView
-                    android:id="@+id/decreaseSpeed"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/slow_video_selector"
-                    android:gravity="center"
-                    android:padding="@dimen/dp2"
-                    android:text="@string/decreaseSpeed"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/sp16" />
-
-                <TextView
-                    android:id="@+id/reverseVideo"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/reverse_video_selector"
-                    android:gravity="center"
-                    android:padding="@dimen/dp2"
-                    android:text="@string/reverseVideo"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/sp16" />
-            </TableRow>
         </TableLayout>
 
 
