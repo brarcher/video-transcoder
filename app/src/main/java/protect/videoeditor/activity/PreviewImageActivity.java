@@ -1,4 +1,4 @@
-package videoeditor.bhuvnesh.com.ffmpegvideoeditor.activity;
+package protect.videoeditor.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,8 +12,8 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 
-import videoeditor.bhuvnesh.com.ffmpegvideoeditor.R;
-import videoeditor.bhuvnesh.com.ffmpegvideoeditor.adapter.PreviewImageAdapter;
+import protect.videoeditor.R;
+import protect.videoeditor.adapter.PreviewImageAdapter;
 
 /**
  * Created by Bhuvnesh on 09-03-2017.

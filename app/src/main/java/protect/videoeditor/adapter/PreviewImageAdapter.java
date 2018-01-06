@@ -1,4 +1,4 @@
-package videoeditor.bhuvnesh.com.ffmpegvideoeditor.adapter;
+package protect.videoeditor.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,7 +11,7 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 
-import videoeditor.bhuvnesh.com.ffmpegvideoeditor.R;
+import protect.videoeditor.R;
 
 
 /**

@@ -1,4 +1,4 @@
-package videoeditor.bhuvnesh.com.ffmpegvideoeditor.activity;
+package protect.videoeditor.activity;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -10,8 +10,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
-import videoeditor.bhuvnesh.com.ffmpegvideoeditor.R;
-import videoeditor.bhuvnesh.com.ffmpegvideoeditor.views.VisualizerView;
+import protect.videoeditor.views.VisualizerView;
+import protect.videoeditor.R;
 
 
 /**

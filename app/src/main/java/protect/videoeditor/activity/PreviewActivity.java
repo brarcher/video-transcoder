@@ -1,4 +1,4 @@
-package videoeditor.bhuvnesh.com.ffmpegvideoeditor.activity;
+package protect.videoeditor.activity;
 
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
-import videoeditor.bhuvnesh.com.ffmpegvideoeditor.R;
+import protect.videoeditor.R;
 
 
 /**

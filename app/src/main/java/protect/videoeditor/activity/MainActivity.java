@@ -1,4 +1,4 @@
-package videoeditor.bhuvnesh.com.ffmpegvideoeditor.activity;
+package protect.videoeditor.activity;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -52,7 +52,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import videoeditor.bhuvnesh.com.ffmpegvideoeditor.R;
+import protect.videoeditor.R;
 
 
 public class MainActivity extends AppCompatActivity {

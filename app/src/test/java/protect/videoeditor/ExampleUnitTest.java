@@ -1,4 +1,4 @@
-package videoeditor.bhuvnesh.com.ffmpegvideoeditor;
+package protect.videoeditor;
 
 import org.junit.Test;
 

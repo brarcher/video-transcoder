@@ -1,4 +1,4 @@
-package videoeditor.bhuvnesh.com.ffmpegvideoeditor.views;
+package protect.videoeditor.views;
 
 import android.content.Context;
 import android.graphics.Canvas;
