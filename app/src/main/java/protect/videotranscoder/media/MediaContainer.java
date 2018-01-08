@@ -1,25 +1,38 @@
 package protect.videotranscoder.media;
 
+import android.provider.MediaStore;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * List of video and audio containers the application may support
  */
 public enum MediaContainer
 {
     // Video and audio:
-    FLV("flv"), // flv is compatible with vp6 (default) and h264 video, and aac (default) and mp3 audio. Valid values and file extensions: flv
-    MKV("matroska"), // mkv is compatible with h264 video and aac (default), mp3, ac3 or eac3 audio. Valid values and file extensions: mkv
-    MP4("mp4"), // compatible with h264 (default), hevc, and mpeg4 video, and aac (default), mp3, ac3, and eac3 audio. Valid values and file extensions: mp4, m4a, m4v, f4v, f4a, m4b, m4r, f4b
+    FLV("flv", "flv", Collections.singletonList(VideoCodec.H264), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3)),
+    MKV("matroska", "mkv", Collections.singletonList(VideoCodec.H264), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3)),
+    MP4("mp4", "mp4", Arrays.asList(VideoCodec.H264, VideoCodec.MPEG4), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3)),
 
     // Audio only
-    MP3("mp3"), // mp3 is compatible with mp3 audio and no video. Valid values and file extensions: mp3
-    OGG("ogg"), // ogg is compatible with theora video and vorbis audio. Valid values and file extensions: ogg, oga, ogv, ogx
+    MP3("mp3", "mp3", new ArrayList<VideoCodec>(), Collections.singletonList(AudioCodec.MP3)),
+    OGG("ogg", "ogg", new ArrayList<VideoCodec>(), Arrays.asList(AudioCodec.VORBIS)),
     ;
 
     public final String ffmpegName;
+    public final String extension;
+    public final List<VideoCodec> supportedVideoCodecs;
+    public final List<AudioCodec> supportedAudioCodecs;
 
-    MediaContainer(String ffmpegName)
+    MediaContainer(String ffmpegName, String extension, List<VideoCodec> videoCodecs, List<AudioCodec> audioCodecs)
     {
         this.ffmpegName = ffmpegName;
+        this.extension = extension;
+        this.supportedVideoCodecs = Collections.unmodifiableList(videoCodecs);
+        this.supportedAudioCodecs = Collections.unmodifiableList(audioCodecs);
     }
 
     public static MediaContainer fromName(String ffmpegName)
