@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import protect.videotranscoder.media.MediaInfo;
+import protect.videotranscoder.media.MediaContainer;
 
 /**
  * Utility class for executing ffmpeg
@@ -190,6 +191,7 @@ public class FFmpegUtil
 
         for(String line : string.split("\n"))
         {
+            line = line.trim();
             String [] split;
 
             if(line.startsWith("Duration:"))
@@ -237,8 +239,18 @@ public class FFmpegUtil
                 }
                 videoCodec = split[3];
 
-                // Looking for resolution
-                Pattern p = Pattern.compile("[0-9]+x[0-9]+");
+                // Looking for resolution. There are sometimes items such as:
+                //  (mp4a / 0x6134706D)
+                // that have numbers and an 'x', that need to be avoided.
+                Pattern p = Pattern.compile("[0-9]+x[0-9]+[ ,]{1}");
+                Matcher m = p.matcher(line);
+
+                if(m.find())
+                {
+                    videoResolution = m.group(0);
+                    // There will be an extra space or , at the end; strip it
+                    videoResolution = videoResolution.trim().replace(",","");
+                }
 
                 split = line.split(",");
                 for(String piece : split)
@@ -253,12 +265,6 @@ public class FFmpegUtil
                     if(piece.contains("fps"))
                     {
                         videoFramerate = piece;
-                    }
-
-                    Matcher m = p.matcher(piece);
-                    if(m.matches())
-                    {
-                        videoResolution = piece;
                     }
                 }
             }
@@ -306,5 +312,65 @@ public class FFmpegUtil
         MediaInfo info = new MediaInfo(mediaFile, durationMs, videoCodec, videoResolution,
                 videoBitrate, videoFramerate, audioCodec, audioSampleRate, audioBitrate, audioChannels);
         return info;
+    }
+
+    public static void getSupportedContainers(final ResultCallbackHandler<List<MediaContainer>> resultHandler)
+    {
+        if(ffmpeg == null)
+        {
+            resultHandler.onResult(null);
+            return;
+        }
+
+        String [] command = {"-formats"};
+
+        callGetOutput(command, new ResultCallbackHandler<String>()
+        {
+            @Override
+            public void onResult(String formatsStr)
+            {
+                List<MediaContainer> containers = parseSupportedFormats(formatsStr);
+
+                Log.d(TAG, "Supported containers: " + containers.size());
+
+                for(MediaContainer container : containers)
+                {
+                    Log.d(TAG, container.name());
+                }
+
+                resultHandler.onResult(containers);
+            }
+        });
+    }
+
+    @NonNull
+    static List<MediaContainer> parseSupportedFormats(String ffmpegOutput)
+    {
+        List<MediaContainer> containers = new ArrayList<>();
+
+        // The FFmpeg output has all the supported formats, but on one line.
+        // They appear as the following.
+        // Video containers:
+        // " DE avi             AVI (Audio Video Interleaved)"
+        // " DE flv             FLV (Flash Video)"
+        // "  E matroska        Matroska"
+        // "  E mov             QuickTime / MOV"
+        // "  E mp4             MP4 (MPEG-4 Part 14)"
+        // " DE mpeg            MPEG-1 Systems / MPEG program stream"
+        // Audio containers:
+        // " DE flac            raw FLAC"
+        // " DE mp3             MP3 (MPEG audio layer 3)"
+        // " DE ogg             Ogg"
+        // " DE wav             WAV / WAVE (Waveform Audio)"
+
+        for(MediaContainer video : MediaContainer.values())
+        {
+            if(ffmpegOutput.contains(video.ffmpegName))
+            {
+                containers.add(video);
+            }
+        }
+
+        return containers;
     }
 }
