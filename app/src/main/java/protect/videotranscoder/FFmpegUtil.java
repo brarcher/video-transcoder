@@ -132,6 +132,32 @@ public class FFmpegUtil
         return commandBuilder.toString().trim();
     }
 
+    /**
+     * Parses a FFmpeg timestamp and returns its value in milliseconds.
+     * If a timestamp could not be parsed, null is returned.
+     */
+    public static Long timestampToMs(String timestamp)
+    {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss.SS", Locale.US);
+        Date parsedTimestamp;
+        Date baseTimestamp;
+
+        try
+        {
+            parsedTimestamp = dateFormat.parse(timestamp);
+            baseTimestamp = dateFormat.parse("00:00:00.00");
+        }
+        catch (ParseException e)
+        {
+            Log.d(TAG, "Failed to parse timestamp: " + timestamp);
+            return null;
+        }
+
+        // The timestamps are from epoch, so subtracting out the time
+        // at midnight gets only the duration we are looking for.
+        return parsedTimestamp.getTime() - baseTimestamp.getTime();
+    }
+
     public static void getMediaDetails(final File mediaFile, final ResultCallbackHandler<MediaInfo> resultHandler)
     {
         if(ffmpeg == null)
@@ -207,24 +233,13 @@ public class FFmpegUtil
                 String valueStr = split[1];
                 valueStr = valueStr.replace(",", "");
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss.SS", Locale.US);
-                Date parsedTimestamp;
-                Date baseTimestamp;
-
-                try
+                Long time = timestampToMs(valueStr);
+                if(time == null)
                 {
-                    parsedTimestamp = dateFormat.parse(valueStr);
-                    baseTimestamp = dateFormat.parse("00:00:00.00");
-                }
-                catch (ParseException e)
-                {
-                    Log.d(TAG, "Failed to parse timestamp: " + valueStr);
                     continue;
                 }
 
-                // The timestamps are from epoch, so subtracting out the time
-                // at midnight gets only the duration we are looking for.
-                durationMs = parsedTimestamp.getTime() - baseTimestamp.getTime();
+                durationMs = time;
             }
 
             if(line.startsWith("Stream") && line.contains("Video:"))
