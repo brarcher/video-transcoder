@@ -425,7 +425,7 @@ public class MainActivity extends AppCompatActivity
         Intent successIntent = new Intent(MainActivity.this, PreviewActivity.class);
         successIntent.putExtra(FILEPATH, filePath);
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, progressDialog);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
         FFmpegUtil.call(complexCommand, handler);
     }
 
@@ -458,7 +458,7 @@ public class MainActivity extends AppCompatActivity
 
         Intent successIntent = new Intent(MainActivity.this, PreviewActivity.class);
         successIntent.putExtra(FILEPATH, filePath);
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, progressDialog);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
 
         FFmpegUtil.call(complexCommand, handler);
     }
@@ -504,7 +504,7 @@ public class MainActivity extends AppCompatActivity
 
         Intent successIntent = new Intent(MainActivity.this, PreviewImageActivity.class);
         successIntent.putExtra(FILEPATH, filePath);
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, progressDialog);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
 
         FFmpegUtil.call(complexCommand, handler);
     }
@@ -537,7 +537,7 @@ public class MainActivity extends AppCompatActivity
 
         Intent successIntent = new Intent(MainActivity.this, AudioPreviewActivity.class);
         successIntent.putExtra(FILEPATH, filePath);
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, progressDialog);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
 
         FFmpegUtil.call(complexCommand, handler);
     }
