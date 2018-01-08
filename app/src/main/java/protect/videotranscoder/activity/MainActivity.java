@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity
     private ScrollView mainlayout;
     private TextView tvLeft, tvRight;
     private String filePath;
-    private int duration;
+    private int durationMs;
 
     private static final int READ_WRITE_PERMISSION_REQUEST = 1;
     private static final int AUDIO_PERMISSION_REQUEST = 2;
@@ -322,14 +322,14 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onPrepared(MediaPlayer mp)
                     {
-                        duration = mp.getDuration() / 1000;
+                        durationMs = mp.getDuration();
                         tvLeft.setText("00:00:00");
 
-                        tvRight.setText(getTime(mp.getDuration() / 1000));
+                        tvRight.setText(getTime(durationMs / 1000));
                         mp.setLooping(true);
-                        rangeSeekBar.setRangeValues(0, duration);
+                        rangeSeekBar.setRangeValues(0, durationMs / 1000);
                         rangeSeekBar.setSelectedMinValue(0);
-                        rangeSeekBar.setSelectedMaxValue(duration);
+                        rangeSeekBar.setSelectedMaxValue(durationMs / 1000);
                         rangeSeekBar.setEnabled(true);
 
                         rangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener()
