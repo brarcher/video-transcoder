@@ -31,12 +31,14 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/videoView"
             android:layout_marginTop="@dimen/dp5"
-            app:showLabels="false"
+            app:showLabels="true"
+            android:visibility="invisible"
             rsb:activeColor="#ED1C24"
             rsb:textAboveThumbsColor="#000000" />
 
         <TextView
             android:id="@+id/tvLeft"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/rangeSeekBar"
@@ -46,6 +48,7 @@
 
         <TextView
             android:id="@+id/tvRight"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignEnd="@+id/rangeSeekBar"
@@ -55,6 +58,7 @@
 
         <TextView
             android:id="@+id/tvInstructions"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvRight"
