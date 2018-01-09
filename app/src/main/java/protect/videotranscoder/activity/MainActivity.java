@@ -28,7 +28,6 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.google.common.collect.ImmutableMap;
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity
     private int durationMs;
 
     private static final int READ_WRITE_PERMISSION_REQUEST = 1;
-    private static final int AUDIO_PERMISSION_REQUEST = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -153,14 +151,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if (selectedVideoUri != null)
                 {
-                    if (Build.VERSION.SDK_INT >= 23)
-                    {
-                        getAudioPermission();
-                    }
-                    else
-                    {
-                        extractAudioVideo();
-                    }
+                    extractAudioVideo();
                 }
                 else
                 {
@@ -205,40 +196,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void getAudioPermission()
-    {
-        String[] params = null;
-        String recordAudio = Manifest.permission.RECORD_AUDIO;
-        String modifyAudio = Manifest.permission.MODIFY_AUDIO_SETTINGS;
-
-        int hasRecordAudioPermission = ActivityCompat.checkSelfPermission(this, recordAudio);
-        int hasModifyAudioPermission = ActivityCompat.checkSelfPermission(this, modifyAudio);
-        List<String> permissions = new ArrayList<String>();
-
-        if (hasRecordAudioPermission != PackageManager.PERMISSION_GRANTED)
-        {
-            permissions.add(recordAudio);
-        }
-        if (hasModifyAudioPermission != PackageManager.PERMISSION_GRANTED)
-        {
-            permissions.add(modifyAudio);
-        }
-
-        if (!permissions.isEmpty())
-        {
-            params = permissions.toArray(new String[permissions.size()]);
-        }
-        if (params != null && params.length > 0)
-        {
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    params,
-                    AUDIO_PERMISSION_REQUEST);
-        } else
-        {
-            extractAudioVideo();
-        }
-    }
-
     /**
      * Handling response for permission request
      */
@@ -251,11 +208,6 @@ public class MainActivity extends AppCompatActivity
             if(requestCode == READ_WRITE_PERMISSION_REQUEST)
             {
                 uploadVideo();
-            }
-
-            if(requestCode == AUDIO_PERMISSION_REQUEST)
-            {
-                extractAudioVideo();
             }
         }
     }
