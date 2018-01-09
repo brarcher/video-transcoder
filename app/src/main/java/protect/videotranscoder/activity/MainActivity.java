@@ -394,6 +394,39 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private ResultCallbackHandler<Boolean> _transcodeResultHandler = new ResultCallbackHandler<Boolean>()
+    {
+        @Override
+        public void onResult(Boolean result)
+        {
+            String message;
+
+            if(result)
+            {
+                message = getResources().getString(R.string.transcodeSuccess, filePath);
+            }
+            else
+            {
+                message = getResources().getString(R.string.transcodeFailed);
+            }
+
+            new AlertDialog.Builder(MainActivity.this)
+                    .setMessage(message)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+
+            videoView.seekTo(stopPosition);
+            videoView.start();
+        }
+    };
+
     /**
      * Command for cutting video
      */
@@ -422,10 +455,7 @@ public class MainActivity extends AppCompatActivity
 
         final String[] complexCommand = {"-ss", "" + startMs / 1000, "-y", "-i", yourRealPath, "-t", "" + (endMs - startMs) / 1000,"-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
 
-        Intent successIntent = new Intent(MainActivity.this, PreviewActivity.class);
-        successIntent.putExtra(FILEPATH, filePath);
-
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
@@ -459,10 +489,7 @@ public class MainActivity extends AppCompatActivity
         filePath = dest.getAbsolutePath();
         String[] complexCommand = {"-y", "-i", yourRealPath, "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", "150k", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
 
-        Intent successIntent = new Intent(MainActivity.this, PreviewActivity.class);
-        successIntent.putExtra(FILEPATH, filePath);
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
-
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition();
@@ -508,10 +535,7 @@ public class MainActivity extends AppCompatActivity
 
         String[] complexCommand = {"-y", "-i", yourRealPath, "-an", "-r", "1", "-ss", "" + startMs / 1000, "-t", "" + (endMs - startMs) / 1000, dest.getAbsolutePath()};
 
-        Intent successIntent = new Intent(MainActivity.this, PreviewImageActivity.class);
-        successIntent.putExtra(FILEPATH, filePath);
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
-
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
@@ -544,10 +568,7 @@ public class MainActivity extends AppCompatActivity
 
         String[] complexCommand = {"-y", "-i", yourRealPath, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "256k", "-f", "mp3", filePath};
 
-        Intent successIntent = new Intent(MainActivity.this, AudioPreviewActivity.class);
-        successIntent.putExtra(FILEPATH, filePath);
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
-
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition(); //stopPosition is an int

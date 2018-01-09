@@ -2,7 +2,6 @@ package protect.videotranscoder;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
@@ -12,29 +11,31 @@ public class FFmpegResponseHandler extends ExecuteBinaryResponseHandler
     private static final String TAG = "VideoTranscoder";
 
     private final Context _context;
-    private final Intent _intentToLaunch;
     private final long _durationMs;
     private final ProgressDialog _progressDialog;
+    private final ResultCallbackHandler<Boolean> _resultHandler;
 
-    public FFmpegResponseHandler(Context context, Intent intent, long durationMs, ProgressDialog progressDialog)
+    public FFmpegResponseHandler(Context context, long durationMs, ProgressDialog progressDialog,
+                                 ResultCallbackHandler<Boolean> resultHandler)
     {
         _context = context;
-        _intentToLaunch = intent;
         _durationMs = durationMs;
         _progressDialog = progressDialog;
+        _resultHandler = resultHandler;
     }
 
     @Override
     public void onFailure(String s)
     {
         Log.d(TAG, "Failed with output : " + s);
+        _resultHandler.onResult(false);
     }
 
     @Override
     public void onSuccess(String s)
     {
         Log.d(TAG, "Success with output : " +s);
-        _context.startActivity(_intentToLaunch);
+        _resultHandler.onResult(true);
     }
 
     @Override

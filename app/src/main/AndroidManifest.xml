@@ -20,18 +20,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.PreviewActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
-        <activity android:name=".activity.PreviewImageActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
-        <activity android:name=".activity.AudioPreviewActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
     </application>
 
 </manifest>

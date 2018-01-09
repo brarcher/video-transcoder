@@ -16,6 +16,9 @@
 
     <string name="ok">OK</string>
 
+    <string name="transcodeSuccess">Encoding completed successfully. The file was written to:\n<xliff:g id="path">%s</xliff:g></string>
+    <string name="transcodeFailed">Encoding failed, see logs for details.</string>
+
     <string name="about">About</string>
     <string name="app_copyright_fmt">Copyright 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
     <string name="app_license">Licensed under the GPLv2.</string>
