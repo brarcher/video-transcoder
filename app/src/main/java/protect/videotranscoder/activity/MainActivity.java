@@ -427,6 +427,9 @@ public class MainActivity extends AppCompatActivity
 
         FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
         FFmpegUtil.call(complexCommand, handler);
+
+        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
+        videoView.pause();
     }
 
     /**
@@ -461,6 +464,9 @@ public class MainActivity extends AppCompatActivity
         FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
 
         FFmpegUtil.call(complexCommand, handler);
+
+        stopPosition = videoView.getCurrentPosition();
+        videoView.pause();
     }
 
     /**
@@ -507,6 +513,9 @@ public class MainActivity extends AppCompatActivity
         FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
 
         FFmpegUtil.call(complexCommand, handler);
+
+        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
+        videoView.pause();
     }
 
     /**
@@ -540,6 +549,9 @@ public class MainActivity extends AppCompatActivity
         FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
 
         FFmpegUtil.call(complexCommand, handler);
+
+        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
+        videoView.pause();
     }
 
     /**
