@@ -25,6 +25,14 @@ android {
         disable "GoogleAppIndexingWarning"
         disable "MissingTranslation"
     }
+
+    // Starting with Android Studio 3 Robolectric is unable to find resources.
+    // The following allows it to find the resources.
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -40,6 +48,7 @@ dependencies {
     compile 'commons-io:commons-io:2.5'
     compile group: 'com.google.guava', name: 'guava', version: '20.0'
     testCompile 'junit:junit:4.12'
+    testCompile "org.robolectric:robolectric:3.6.1"
 }
 
 task findbugs(type: FindBugs, dependsOn: 'assembleDebug') {
