@@ -115,18 +115,6 @@
                     android:textSize="@dimen/sp16" />
 
                 <TextView
-                    android:id="@+id/extractImages"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/extract_images_selector"
-                    android:gravity="center"
-                    android:padding="@dimen/dp2"
-                    android:text="@string/extractImages"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/sp16" />
-
-                <TextView
                     android:id="@+id/extractAudio"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"

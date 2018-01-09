@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity
         final TextView uploadVideo = findViewById(R.id.uploadVideo);
         TextView cutVideo = findViewById(R.id.cropVideo);
         TextView compressVideo = findViewById(R.id.compressVideo);
-        TextView extractImages = findViewById(R.id.extractImages);
 
         tvLeft = findViewById(R.id.tvLeft);
         tvRight = findViewById(R.id.tvRight);
@@ -147,22 +146,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        extractImages.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (selectedVideoUri != null)
-                {
-                    extractImagesVideo(rangeSeekBar.getSelectedMinValue().intValue() * 1000, rangeSeekBar.getSelectedMaxValue().intValue() * 1000);
-                }
-                else
-                {
-                    Snackbar.make(mainlayout, "Please upload a video", 4000).show();
-                }
-
-            }
-        });
         extractAudio.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -493,52 +476,6 @@ public class MainActivity extends AppCompatActivity
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition();
-        videoView.pause();
-    }
-
-    /**
-     * Command for extracting images from video
-     */
-    private void extractImagesVideo(int startMs, int endMs)
-    {
-        File moviesDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES
-        );
-
-        String filePrefix = "extract_picture";
-        String fileExtn = ".jpg";
-        String yourRealPath = getPath(MainActivity.this, selectedVideoUri);
-
-        File dir = new File(moviesDir, "VideoEditor");
-        int fileNo = 0;
-        while (dir.exists())
-        {
-            fileNo++;
-            dir = new File(moviesDir, "VideoEditor" + fileNo);
-
-        }
-
-        boolean result = dir.mkdir();
-        if(result == false)
-        {
-            Toast.makeText(this, "Failed to create directory", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        filePath = dir.getAbsolutePath();
-        File dest = new File(dir, filePrefix + "%03d" + fileExtn);
-
-        Log.d(TAG, "startTrim: src: " + yourRealPath);
-        Log.d(TAG, "startTrim: dest: " + dest.getAbsolutePath());
-
-        /* Remove -r 1 if you want to extract all video frames as images from the specified time duration.*/
-
-        String[] complexCommand = {"-y", "-i", yourRealPath, "-an", "-r", "1", "-ss", "" + startMs / 1000, "-t", "" + (endMs - startMs) / 1000, dest.getAbsolutePath()};
-
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
-        FFmpegUtil.call(complexCommand, handler);
-
-        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
         videoView.pause();
     }
 
