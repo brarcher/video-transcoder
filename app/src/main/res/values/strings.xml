@@ -2,7 +2,7 @@
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">Video Transcoder</string>
-    <string name="uploadVideo">Upload\nVideo</string>
+    <string name="selectVideo">Select\nVideo</string>
     <string name="compressVideo">Compress\nVideo</string>
     <string name="cutVideo">Cut\nVideo</string>
     <string name="extractImages">Extract\nImages</string>

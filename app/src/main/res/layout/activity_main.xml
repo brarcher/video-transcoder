@@ -57,7 +57,7 @@
             android:textColor="#000000" />
 
         <TextView
-            android:id="@+id/uploadVideo"
+            android:id="@+id/selectVideo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/rangeSeekBar"
@@ -66,7 +66,7 @@
             android:background="@drawable/upload_video_selector"
             android:gravity="center"
             android:padding="@dimen/dp5"
-            android:text="@string/uploadVideo"
+            android:text="@string/selectVideo"
             android:textColor="#FFFFFF"
             android:textSize="@dimen/sp16" />
 

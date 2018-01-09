@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final TextView uploadVideo = findViewById(R.id.uploadVideo);
+        final TextView selectVideo = findViewById(R.id.selectVideo);
         TextView cutVideo = findViewById(R.id.cropVideo);
         TextView compressVideo = findViewById(R.id.compressVideo);
 
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        uploadVideo.setOnClickListener(new View.OnClickListener()
+        selectVideo.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    uploadVideo();
+                    selectVideo();
                 }
             }
         });
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            uploadVideo();
+            selectVideo();
         }
     }
 
@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity
         {
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                uploadVideo();
+                selectVideo();
             }
             else
             {
@@ -238,12 +238,14 @@ public class MainActivity extends AppCompatActivity
     /**
      * Opening gallery for uploading video
      */
-    private void uploadVideo()
+    private void selectVideo()
     {
         Intent intent = new Intent();
         intent.setType("video/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Video"), REQUEST_TAKE_GALLERY_VIDEO);
+
+        String message = getResources().getString(R.string.selectVideo);
+        startActivityForResult(Intent.createChooser(intent, message), REQUEST_TAKE_GALLERY_VIDEO);
     }
 
     @Override
