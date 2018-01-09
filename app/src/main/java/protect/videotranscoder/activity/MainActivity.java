@@ -28,7 +28,6 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.google.common.collect.ImmutableMap;
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity
     private int durationMs;
 
     private static final int READ_WRITE_PERMISSION_REQUEST = 1;
-    private static final int AUDIO_PERMISSION_REQUEST = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -73,7 +71,6 @@ public class MainActivity extends AppCompatActivity
         final TextView uploadVideo = findViewById(R.id.uploadVideo);
         TextView cutVideo = findViewById(R.id.cropVideo);
         TextView compressVideo = findViewById(R.id.compressVideo);
-        TextView extractImages = findViewById(R.id.extractImages);
 
         tvLeft = findViewById(R.id.tvLeft);
         tvRight = findViewById(R.id.tvRight);
@@ -147,22 +144,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        extractImages.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (selectedVideoUri != null)
-                {
-                    extractImagesVideo(rangeSeekBar.getSelectedMinValue().intValue() * 1000, rangeSeekBar.getSelectedMaxValue().intValue() * 1000);
-                }
-                else
-                {
-                    Snackbar.make(mainlayout, "Please upload a video", 4000).show();
-                }
-
-            }
-        });
         extractAudio.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -170,14 +151,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if (selectedVideoUri != null)
                 {
-                    if (Build.VERSION.SDK_INT >= 23)
-                    {
-                        getAudioPermission();
-                    }
-                    else
-                    {
-                        extractAudioVideo();
-                    }
+                    extractAudioVideo();
                 }
                 else
                 {
@@ -222,40 +196,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void getAudioPermission()
-    {
-        String[] params = null;
-        String recordAudio = Manifest.permission.RECORD_AUDIO;
-        String modifyAudio = Manifest.permission.MODIFY_AUDIO_SETTINGS;
-
-        int hasRecordAudioPermission = ActivityCompat.checkSelfPermission(this, recordAudio);
-        int hasModifyAudioPermission = ActivityCompat.checkSelfPermission(this, modifyAudio);
-        List<String> permissions = new ArrayList<String>();
-
-        if (hasRecordAudioPermission != PackageManager.PERMISSION_GRANTED)
-        {
-            permissions.add(recordAudio);
-        }
-        if (hasModifyAudioPermission != PackageManager.PERMISSION_GRANTED)
-        {
-            permissions.add(modifyAudio);
-        }
-
-        if (!permissions.isEmpty())
-        {
-            params = permissions.toArray(new String[permissions.size()]);
-        }
-        if (params != null && params.length > 0)
-        {
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    params,
-                    AUDIO_PERMISSION_REQUEST);
-        } else
-        {
-            extractAudioVideo();
-        }
-    }
-
     /**
      * Handling response for permission request
      */
@@ -263,16 +203,34 @@ public class MainActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults)
     {
-        if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+        if(requestCode == READ_WRITE_PERMISSION_REQUEST)
         {
-            if(requestCode == READ_WRITE_PERMISSION_REQUEST)
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 uploadVideo();
             }
-
-            if(requestCode == AUDIO_PERMISSION_REQUEST)
+            else
             {
-                extractAudioVideo();
+                new AlertDialog.Builder(MainActivity.this)
+                    .setMessage(R.string.writePermissionExplanation)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.permissionRequestAgain, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                            getPermission();
+                        }
+                    })
+                    .show();
             }
         }
     }
@@ -394,6 +352,39 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private ResultCallbackHandler<Boolean> _transcodeResultHandler = new ResultCallbackHandler<Boolean>()
+    {
+        @Override
+        public void onResult(Boolean result)
+        {
+            String message;
+
+            if(result)
+            {
+                message = getResources().getString(R.string.transcodeSuccess, filePath);
+            }
+            else
+            {
+                message = getResources().getString(R.string.transcodeFailed);
+            }
+
+            new AlertDialog.Builder(MainActivity.this)
+                    .setMessage(message)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+
+            videoView.seekTo(stopPosition);
+            videoView.start();
+        }
+    };
+
     /**
      * Command for cutting video
      */
@@ -422,10 +413,7 @@ public class MainActivity extends AppCompatActivity
 
         final String[] complexCommand = {"-ss", "" + startMs / 1000, "-y", "-i", yourRealPath, "-t", "" + (endMs - startMs) / 1000,"-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
 
-        Intent successIntent = new Intent(MainActivity.this, PreviewActivity.class);
-        successIntent.putExtra(FILEPATH, filePath);
-
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
@@ -459,62 +447,10 @@ public class MainActivity extends AppCompatActivity
         filePath = dest.getAbsolutePath();
         String[] complexCommand = {"-y", "-i", yourRealPath, "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", "150k", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
 
-        Intent successIntent = new Intent(MainActivity.this, PreviewActivity.class);
-        successIntent.putExtra(FILEPATH, filePath);
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
-
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition();
-        videoView.pause();
-    }
-
-    /**
-     * Command for extracting images from video
-     */
-    private void extractImagesVideo(int startMs, int endMs)
-    {
-        File moviesDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES
-        );
-
-        String filePrefix = "extract_picture";
-        String fileExtn = ".jpg";
-        String yourRealPath = getPath(MainActivity.this, selectedVideoUri);
-
-        File dir = new File(moviesDir, "VideoEditor");
-        int fileNo = 0;
-        while (dir.exists())
-        {
-            fileNo++;
-            dir = new File(moviesDir, "VideoEditor" + fileNo);
-
-        }
-
-        boolean result = dir.mkdir();
-        if(result == false)
-        {
-            Toast.makeText(this, "Failed to create directory", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        filePath = dir.getAbsolutePath();
-        File dest = new File(dir, filePrefix + "%03d" + fileExtn);
-
-        Log.d(TAG, "startTrim: src: " + yourRealPath);
-        Log.d(TAG, "startTrim: dest: " + dest.getAbsolutePath());
-
-        /* Remove -r 1 if you want to extract all video frames as images from the specified time duration.*/
-
-        String[] complexCommand = {"-y", "-i", yourRealPath, "-an", "-r", "1", "-ss", "" + startMs / 1000, "-t", "" + (endMs - startMs) / 1000, dest.getAbsolutePath()};
-
-        Intent successIntent = new Intent(MainActivity.this, PreviewImageActivity.class);
-        successIntent.putExtra(FILEPATH, filePath);
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
-
-        FFmpegUtil.call(complexCommand, handler);
-
-        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
         videoView.pause();
     }
 
@@ -544,10 +480,7 @@ public class MainActivity extends AppCompatActivity
 
         String[] complexCommand = {"-y", "-i", yourRealPath, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "256k", "-f", "mp3", filePath};
 
-        Intent successIntent = new Intent(MainActivity.this, AudioPreviewActivity.class);
-        successIntent.putExtra(FILEPATH, filePath);
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, successIntent, durationMs, progressDialog);
-
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
