@@ -209,6 +209,29 @@ public class MainActivity extends AppCompatActivity
             {
                 uploadVideo();
             }
+            else
+            {
+                new AlertDialog.Builder(MainActivity.this)
+                    .setMessage(R.string.writePermissionExplanation)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.permissionRequestAgain, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                            getPermission();
+                        }
+                    })
+                    .show();
+            }
         }
     }
 
