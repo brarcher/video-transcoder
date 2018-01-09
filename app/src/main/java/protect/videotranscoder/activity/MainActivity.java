@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity
     private static final String FILEPATH = "filepath";
     private int stopPosition;
     private ScrollView mainlayout;
-    private TextView tvLeft, tvRight, tvInstructions;
+    private TextView tvLeft, tvRight;
     private String filePath;
     private int durationMs;
 
@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity
 
         tvLeft = findViewById(R.id.tvLeft);
         tvRight = findViewById(R.id.tvRight);
-        tvInstructions = findViewById(R.id.tvInstructions);
 
         final TextView extractAudio = findViewById(R.id.extractAudio);
         videoView =  findViewById(R.id.videoView);
@@ -292,7 +291,6 @@ public class MainActivity extends AppCompatActivity
                         rangeSeekBar.setSelectedMaxValue(durationMs / 1000);
                         rangeSeekBar.setEnabled(true);
                         rangeSeekBar.setVisibility(View.VISIBLE);
-                        tvInstructions.setVisibility(View.VISIBLE);
 
                         rangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener()
                         {
