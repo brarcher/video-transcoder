@@ -203,9 +203,9 @@ public class MainActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults)
     {
-        if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+        if(requestCode == READ_WRITE_PERMISSION_REQUEST)
         {
-            if(requestCode == READ_WRITE_PERMISSION_REQUEST)
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 uploadVideo();
             }
