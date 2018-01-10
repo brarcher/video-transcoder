@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarChangeListener;
@@ -47,6 +48,9 @@ import protect.videotranscoder.FFmpegResponseHandler;
 import protect.videotranscoder.FFmpegUtil;
 import protect.videotranscoder.R;
 import protect.videotranscoder.ResultCallbackHandler;
+import protect.videotranscoder.media.AudioCodec;
+import protect.videotranscoder.media.MediaInfo;
+import protect.videotranscoder.media.VideoCodec;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -87,11 +91,10 @@ public class MainActivity extends AppCompatActivity
     private CrystalRangeSeekbar rangeSeekBar;
     private Timer videoTimer = null;
     private ProgressDialog progressDialog;
-    private Uri selectedVideoUri;
 
     private TextView tvLeft, tvRight;
-    private String filePath;
-    private int durationMs;
+    private MediaInfo videoInfo;
+    private File outputDestination;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -272,6 +275,22 @@ public class MainActivity extends AppCompatActivity
         startVideoPlayback();
     }
 
+    private void populateOptionDefaults()
+    {
+        for(int id : BASIC_SETTINGS_IDS)
+        {
+            findViewById(id).setVisibility(View.VISIBLE);
+        }
+        for(int id : VIDEO_SETTINGS_IDS)
+        {
+            findViewById(id).setVisibility(View.VISIBLE);
+        }
+        for(int id : AUDIO_SETTINGS_IDS)
+        {
+            findViewById(id).setVisibility(View.VISIBLE);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -280,30 +299,24 @@ public class MainActivity extends AppCompatActivity
         {
             if (requestCode == REQUEST_TAKE_GALLERY_VIDEO)
             {
-                for(int id : BASIC_SETTINGS_IDS)
+                Uri selectedVideoUri = data.getData();
+                String videoPath = getPath(MainActivity.this, selectedVideoUri);
+
+                if(videoPath == null)
                 {
-                    findViewById(id).setVisibility(View.VISIBLE);
-                }
-                for(int id : VIDEO_SETTINGS_IDS)
-                {
-                    findViewById(id).setVisibility(View.VISIBLE);
-                }
-                for(int id : AUDIO_SETTINGS_IDS)
-                {
-                    findViewById(id).setVisibility(View.VISIBLE);
+                    Toast.makeText(this, R.string.fileLocationLookupFailed, Toast.LENGTH_LONG).show();
+                    return;
                 }
 
-                selectedVideoUri = data.getData();
                 videoView.setVideoURI(selectedVideoUri);
                 videoView.start();
 
                 videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
                 {
-
                     @Override
                     public void onPrepared(MediaPlayer mp)
                     {
-                        durationMs = mp.getDuration();
+                        int durationMs = mp.getDuration();
                         tvLeft.setVisibility(View.VISIBLE);
                         tvLeft.setText("00:00:00");
                         tvRight.setVisibility(View.VISIBLE);
@@ -326,6 +339,27 @@ public class MainActivity extends AppCompatActivity
                                 startVideoPlayback();
                             }
                         });
+                    }
+                });
+
+                final File videoFile = new File(videoPath);
+
+                FFmpegUtil.getMediaDetails(new File(videoPath), new ResultCallbackHandler<MediaInfo>()
+                {
+                    @Override
+                    public void onResult(MediaInfo result)
+                    {
+                        if(result == null)
+                        {
+                            // Could not query the file, fill in what we know.
+                            result = new MediaInfo(videoFile, 0, VideoCodec.MPEG4.name(), "640x480",
+                                "800", "25", AudioCodec.MP3.name(),
+                                "44100", "128", 2);
+                        }
+
+                        videoInfo = result;
+
+                        populateOptionDefaults();
                     }
                 });
             }
@@ -358,7 +392,6 @@ public class MainActivity extends AppCompatActivity
                 })
                 .create()
                 .show();
-
     }
 
     private ResultCallbackHandler<Boolean> _transcodeResultHandler = new ResultCallbackHandler<Boolean>()
@@ -370,7 +403,7 @@ public class MainActivity extends AppCompatActivity
 
             if(result)
             {
-                message = getResources().getString(R.string.transcodeSuccess, filePath);
+                message = getResources().getString(R.string.transcodeSuccess, outputDestination.getAbsolutePath());
             }
             else
             {
@@ -404,7 +437,7 @@ public class MainActivity extends AppCompatActivity
 
         String filePrefix = "cut_video";
         String fileExtn = ".mp4";
-        String yourRealPath = getPath(MainActivity.this, selectedVideoUri);
+        String yourRealPath = videoInfo.file.getAbsolutePath();
         File dest = new File(moviesDir, filePrefix + fileExtn);
         int fileNo = 0;
         while (dest.exists())
@@ -417,11 +450,11 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "startTrim: dest: " + dest.getAbsolutePath());
         Log.d(TAG, "startTrim: startMs: " + startMs);
         Log.d(TAG, "startTrim: endMs: " + endMs);
-        filePath = dest.getAbsolutePath();
+        outputDestination = dest;
 
-        final String[] complexCommand = {"-ss", "" + startMs / 1000, "-y", "-i", yourRealPath, "-t", "" + (endMs - startMs) / 1000,"-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
+        final String[] complexCommand = {"-ss", "" + startMs / 1000, "-y", "-i", yourRealPath, "-t", "" + (endMs - startMs) / 1000,"-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", dest.getAbsolutePath()};
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopVideoPlayback();
@@ -438,7 +471,7 @@ public class MainActivity extends AppCompatActivity
 
         String filePrefix = "compress_video";
         String fileExtn = ".mp4";
-        String yourRealPath = getPath(MainActivity.this, selectedVideoUri);
+        String yourRealPath = videoInfo.file.getAbsolutePath();
 
 
         File dest = new File(moviesDir, filePrefix + fileExtn);
@@ -451,10 +484,10 @@ public class MainActivity extends AppCompatActivity
 
         Log.d(TAG, "startTrim: src: " + yourRealPath);
         Log.d(TAG, "startTrim: dest: " + dest.getAbsolutePath());
-        filePath = dest.getAbsolutePath();
-        String[] complexCommand = {"-y", "-i", yourRealPath, "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", "150k", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
+        outputDestination = dest;
+        String[] complexCommand = {"-y", "-i", yourRealPath, "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", "150k", "-b:a", "48000", "-ac", "2", "-ar", "22050", dest.getAbsolutePath()};
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopVideoPlayback();
@@ -471,7 +504,7 @@ public class MainActivity extends AppCompatActivity
 
         String filePrefix = "extract_audio";
         String fileExtn = ".mp3";
-        String yourRealPath = getPath(MainActivity.this, selectedVideoUri);
+        String yourRealPath = videoInfo.file.getAbsolutePath();
         File dest = new File(moviesDir, filePrefix + fileExtn);
 
         int fileNo = 0;
@@ -482,11 +515,11 @@ public class MainActivity extends AppCompatActivity
         }
         Log.d(TAG, "startTrim: src: " + yourRealPath);
         Log.d(TAG, "startTrim: dest: " + dest.getAbsolutePath());
-        filePath = dest.getAbsolutePath();
+        outputDestination = dest;
 
-        String[] complexCommand = {"-y", "-i", yourRealPath, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "256k", "-f", "mp3", filePath};
+        String[] complexCommand = {"-y", "-i", yourRealPath, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "256k", "-f", "mp3", dest.getAbsolutePath()};
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopVideoPlayback();

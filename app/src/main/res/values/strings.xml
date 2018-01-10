@@ -21,6 +21,8 @@
     <string name="writePermissionExplanation">This application needs access to storage in order to read and write media files. Without this access, the application cannot transcode.</string>
     <string name="permissionRequestAgain">Request again</string>
 
+    <string name="fileLocationLookupFailed">Failed to resolve the location of the media file</string>
+
     <string name="about">About</string>
     <string name="app_copyright_fmt">Copyright 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
     <string name="app_license">Licensed under the GPLv2.</string>
