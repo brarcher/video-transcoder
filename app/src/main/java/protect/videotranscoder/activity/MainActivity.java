@@ -50,16 +50,10 @@ import protect.videotranscoder.ResultCallbackHandler;
 
 public class MainActivity extends AppCompatActivity
 {
-    private static final int REQUEST_TAKE_GALLERY_VIDEO = 100;
-    private VideoView videoView;
-    private CrystalRangeSeekbar rangeSeekBar;
-    private Timer videoTimer = null;
-    private ProgressDialog progressDialog;
-    private Uri selectedVideoUri;
     private static final String TAG = "VideoTranscoder";
-    private TextView tvLeft, tvRight;
-    private String filePath;
-    private int durationMs;
+
+    private static final int REQUEST_TAKE_GALLERY_VIDEO = 100;
+    private static final int READ_WRITE_PERMISSION_REQUEST = 1;
 
     final List<Integer> BASIC_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
             R.id.basicSettingsText,
@@ -89,7 +83,15 @@ public class MainActivity extends AppCompatActivity
             R.id.audioChannelContainer,
             R.id.audioChannelContainerDivider));
 
-    private static final int READ_WRITE_PERMISSION_REQUEST = 1;
+    private VideoView videoView;
+    private CrystalRangeSeekbar rangeSeekBar;
+    private Timer videoTimer = null;
+    private ProgressDialog progressDialog;
+    private Uri selectedVideoUri;
+
+    private TextView tvLeft, tvRight;
+    private String filePath;
+    private int durationMs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
