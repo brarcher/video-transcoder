@@ -36,7 +36,9 @@ import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +63,34 @@ public class MainActivity extends AppCompatActivity
     private String filePath;
     private int durationMs;
 
+    final List<Integer> BASIC_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+            R.id.basicSettingsText,
+            R.id.basicSettingsTopDivider,
+            R.id.containerTypeContainer,
+            R.id.containerTypeContainerDivider));
+    final List<Integer> VIDEO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+            R.id.videoSettingsText,
+            R.id.videoSettingsTextTopDivider,
+            R.id.videoCodecContainer,
+            R.id.videoCodecContainerDivider,
+            R.id.fpsContainer,
+            R.id.fpsContainerDivider,
+            R.id.resolutionContainer,
+            R.id.resolutionContainerDivider,
+            R.id.videoBitrateContainer,
+            R.id.videoBitrateContainerDivider));
+    final List<Integer> AUDIO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+            R.id.audioSettingsText,
+            R.id.audioSettingsTextTopDivider,
+            R.id.audioCodecContainer,
+            R.id.audioCodecContainerDivider,
+            R.id.audioBitrateContainer,
+            R.id.audioBitrateContainerDivider,
+            R.id.audioSampleRateContainer,
+            R.id.audioSampleRateContainerDivider,
+            R.id.audioChannelContainer,
+            R.id.audioChannelContainerDivider));
+
     private static final int READ_WRITE_PERMISSION_REQUEST = 1;
 
     @Override
@@ -69,13 +99,10 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final TextView selectVideo = findViewById(R.id.selectVideo);
-        TextView cutVideo = findViewById(R.id.cropVideo);
-        TextView compressVideo = findViewById(R.id.compressVideo);
 
         tvLeft = findViewById(R.id.tvLeft);
         tvRight = findViewById(R.id.tvRight);
 
-        final TextView extractAudio = findViewById(R.id.extractAudio);
         videoView =  findViewById(R.id.videoView);
         rangeSeekBar =  findViewById(R.id.rangeSeekBar);
         mainlayout =  findViewById(R.id.mainlayout);
@@ -108,54 +135,6 @@ public class MainActivity extends AppCompatActivity
                 else
                 {
                     selectVideo();
-                }
-            }
-        });
-
-        compressVideo.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (selectedVideoUri != null)
-                {
-                    executeCompressCommand();
-                }
-                else
-                {
-                    Snackbar.make(mainlayout, "Please upload a video", 4000).show();
-                }
-
-            }
-        });
-        cutVideo.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (selectedVideoUri != null)
-                {
-                    executeCutVideoCommand(rangeSeekBar.getSelectedMinValue().intValue() * 1000, rangeSeekBar.getSelectedMaxValue().intValue() * 1000);
-                }
-                else
-                {
-                    Snackbar.make(mainlayout, "Please upload a video", 4000).show();
-                }
-            }
-        });
-
-        extractAudio.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (selectedVideoUri != null)
-                {
-                    extractAudioVideo();
-                }
-                else
-                {
-                    Snackbar.make(mainlayout, "Please upload a video", 4000).show();
                 }
             }
         });
@@ -272,6 +251,19 @@ public class MainActivity extends AppCompatActivity
         {
             if (requestCode == REQUEST_TAKE_GALLERY_VIDEO)
             {
+                for(int id : BASIC_SETTINGS_IDS)
+                {
+                    findViewById(id).setVisibility(View.VISIBLE);
+                }
+                for(int id : VIDEO_SETTINGS_IDS)
+                {
+                    findViewById(id).setVisibility(View.VISIBLE);
+                }
+                for(int id : AUDIO_SETTINGS_IDS)
+                {
+                    findViewById(id).setVisibility(View.VISIBLE);
+                }
+
                 selectedVideoUri = data.getData();
                 videoView.setVideoURI(selectedVideoUri);
                 videoView.start();
