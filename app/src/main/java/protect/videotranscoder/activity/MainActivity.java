@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -39,7 +38,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import protect.videotranscoder.FFmpegResponseHandler;
 import protect.videotranscoder.FFmpegUtil;
@@ -51,11 +53,10 @@ public class MainActivity extends AppCompatActivity
     private static final int REQUEST_TAKE_GALLERY_VIDEO = 100;
     private VideoView videoView;
     private CrystalRangeSeekbar rangeSeekBar;
-    private Runnable r;
+    private Timer videoTimer = null;
     private ProgressDialog progressDialog;
     private Uri selectedVideoUri;
     private static final String TAG = "VideoTranscoder";
-    private int stopPosition;
     private TextView tvLeft, tvRight;
     private String filePath;
     private int durationMs;
@@ -223,20 +224,50 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(Intent.createChooser(intent, message), REQUEST_TAKE_GALLERY_VIDEO);
     }
 
+    private void stopVideoPlayback()
+    {
+        videoView.pause();
+        if(videoTimer != null)
+        {
+            videoTimer.cancel();
+            videoTimer = null;
+        }
+    }
+
+    private void startVideoPlayback()
+    {
+        stopVideoPlayback();
+
+        int startTimeSec = rangeSeekBar.getSelectedMinValue().intValue();
+        int stopTimeSec = rangeSeekBar.getSelectedMaxValue().intValue();
+        int durationSec = stopTimeSec - startTimeSec;
+
+        videoView.seekTo(startTimeSec * 1000);
+        videoView.start();
+
+        videoTimer = new Timer();
+        videoTimer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                startVideoPlayback();
+            }
+        }, durationSec * 1000);
+    }
+
     @Override
     protected void onPause()
     {
         super.onPause();
-        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
-        videoView.pause();
+        stopVideoPlayback();
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-        videoView.seekTo(stopPosition);
-        videoView.start();
+        startVideoPlayback();
     }
 
     @Override
@@ -287,25 +318,12 @@ public class MainActivity extends AppCompatActivity
                             @Override
                             public void valueChanged(Number minValue, Number maxValue)
                             {
-                                videoView.seekTo(minValue.intValue() * 1000);
                                 tvLeft.setText(getTime(minValue.intValue()));
                                 tvRight.setText(getTime(maxValue.intValue()));
+
+                                startVideoPlayback();
                             }
                         });
-
-                        final Handler handler = new Handler();
-                        handler.postDelayed(r = new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-
-                                if (videoView.getCurrentPosition() >= rangeSeekBar.getSelectedMaxValue().intValue() * 1000)
-                                    videoView.seekTo(rangeSeekBar.getSelectedMinValue().intValue() * 1000);
-                                handler.postDelayed(r, 1000);
-                            }
-                        }, 1000);
-
                     }
                 });
             }
@@ -369,8 +387,7 @@ public class MainActivity extends AppCompatActivity
                     })
                     .show();
 
-            videoView.seekTo(stopPosition);
-            videoView.start();
+            startVideoPlayback();
         }
     };
 
@@ -405,8 +422,7 @@ public class MainActivity extends AppCompatActivity
         FFmpegResponseHandler handler = new FFmpegResponseHandler(durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
-        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
-        videoView.pause();
+        stopVideoPlayback();
     }
 
     /**
@@ -439,8 +455,7 @@ public class MainActivity extends AppCompatActivity
         FFmpegResponseHandler handler = new FFmpegResponseHandler(durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
-        stopPosition = videoView.getCurrentPosition();
-        videoView.pause();
+        stopVideoPlayback();
     }
 
     /**
@@ -472,8 +487,7 @@ public class MainActivity extends AppCompatActivity
         FFmpegResponseHandler handler = new FFmpegResponseHandler(durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
-        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
-        videoView.pause();
+        stopVideoPlayback();
     }
 
     /**
