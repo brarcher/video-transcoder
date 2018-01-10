@@ -417,7 +417,7 @@ public class MainActivity extends AppCompatActivity
 
         final String[] complexCommand = {"-ss", "" + startMs / 1000, "-y", "-i", yourRealPath, "-t", "" + (endMs - startMs) / 1000,"-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
@@ -451,7 +451,7 @@ public class MainActivity extends AppCompatActivity
         filePath = dest.getAbsolutePath();
         String[] complexCommand = {"-y", "-i", yourRealPath, "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", "150k", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition();
@@ -484,7 +484,7 @@ public class MainActivity extends AppCompatActivity
 
         String[] complexCommand = {"-y", "-i", yourRealPath, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "256k", "-f", "mp3", filePath};
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
         stopPosition = videoView.getCurrentPosition(); //stopPosition is an int

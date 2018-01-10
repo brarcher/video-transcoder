@@ -10,15 +10,13 @@ public class FFmpegResponseHandler extends ExecuteBinaryResponseHandler
 {
     private static final String TAG = "VideoTranscoder";
 
-    private final Context _context;
     private final long _durationMs;
     private final ProgressDialog _progressDialog;
     private final ResultCallbackHandler<Boolean> _resultHandler;
 
-    public FFmpegResponseHandler(Context context, long durationMs, ProgressDialog progressDialog,
+    public FFmpegResponseHandler(long durationMs, ProgressDialog progressDialog,
                                  ResultCallbackHandler<Boolean> resultHandler)
     {
-        _context = context;
         _durationMs = durationMs;
         _progressDialog = progressDialog;
         _resultHandler = resultHandler;
