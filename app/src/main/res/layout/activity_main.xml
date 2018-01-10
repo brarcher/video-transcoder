@@ -24,15 +24,13 @@
             android:layout_marginRight="@dimen/dp20"
             android:layout_marginTop="@dimen/dp5" />
 
-        <org.florescu.android.rangeseekbar.RangeSeekBar
+        <com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar
             android:id="@+id/rangeSeekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp5"
-            app:showLabels="true"
+            app:data_type="_integer"
             android:visibility="invisible"
-            rsb:activeColor="#ED1C24"
-            rsb:textAboveThumbsColor="#000000" />
+            />
 
         <RelativeLayout
             android:layout_width="match_parent"

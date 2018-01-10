@@ -30,9 +30,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarChangeListener;
 import com.google.common.collect.ImmutableMap;
 
-import org.florescu.android.rangeseekbar.RangeSeekBar;
+import com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity
 {
     private static final int REQUEST_TAKE_GALLERY_VIDEO = 100;
     private VideoView videoView;
-    private RangeSeekBar rangeSeekBar;
+    private CrystalRangeSeekbar rangeSeekBar;
     private Runnable r;
     private ProgressDialog progressDialog;
     private Uri selectedVideoUri;
@@ -280,23 +281,20 @@ public class MainActivity extends AppCompatActivity
                         tvRight.setVisibility(View.VISIBLE);
                         tvRight.setText(getTime(durationMs / 1000));
                         mp.setLooping(true);
-                        rangeSeekBar.setRangeValues(0, durationMs / 1000);
-                        rangeSeekBar.setSelectedMinValue(0);
-                        rangeSeekBar.setSelectedMaxValue(durationMs / 1000);
+
+                        rangeSeekBar.setMinValue(0);
+                        rangeSeekBar.setMaxValue(durationMs / 1000f);
                         rangeSeekBar.setEnabled(true);
                         rangeSeekBar.setVisibility(View.VISIBLE);
 
-                        rangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener()
+                        rangeSeekBar.setOnRangeSeekbarChangeListener(new OnRangeSeekbarChangeListener()
                         {
                             @Override
-                            public void onRangeSeekBarValuesChanged(RangeSeekBar bar, Object minValue, Object maxValue)
+                            public void valueChanged(Number minValue, Number maxValue)
                             {
-                                videoView.seekTo((int) minValue * 1000);
-
-                                tvLeft.setText(getTime((int) bar.getSelectedMinValue()));
-
-                                tvRight.setText(getTime((int) bar.getSelectedMaxValue()));
-
+                                videoView.seekTo(minValue.intValue() * 1000);
+                                tvLeft.setText(getTime(minValue.intValue()));
+                                tvRight.setText(getTime(maxValue.intValue()));
                             }
                         });
 
@@ -650,7 +648,7 @@ public class MainActivity extends AppCompatActivity
             "FFmpeg", "https://www.ffmpeg.org/",
             "FFmpeg Android", "http://writingminds.github.io/ffmpeg-android/",
             "Guava", "https://github.com/google/guava",
-            "Range SeekBar", "https://github.com/anothem/android-range-seek-bar"
+            "Crystal Range Seekbar", "https://github.com/syedowaisali/crystal-range-seekbar"
         );
 
         final Map<String, String> USED_ASSETS = ImmutableMap.of
