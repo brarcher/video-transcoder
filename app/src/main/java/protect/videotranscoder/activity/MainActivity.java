@@ -17,7 +17,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -57,9 +55,7 @@ public class MainActivity extends AppCompatActivity
     private ProgressDialog progressDialog;
     private Uri selectedVideoUri;
     private static final String TAG = "VideoTranscoder";
-    private static final String FILEPATH = "filepath";
     private int stopPosition;
-    private ScrollView mainlayout;
     private TextView tvLeft, tvRight;
     private String filePath;
     private int durationMs;
@@ -106,7 +102,6 @@ public class MainActivity extends AppCompatActivity
 
         videoView =  findViewById(R.id.videoView);
         rangeSeekBar =  findViewById(R.id.rangeSeekBar);
-        mainlayout =  findViewById(R.id.mainlayout);
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle(null);
         progressDialog.setCancelable(false);
