@@ -20,8 +20,10 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import protect.videotranscoder.media.AudioCodec;
 import protect.videotranscoder.media.MediaInfo;
 import protect.videotranscoder.media.MediaContainer;
+import protect.videotranscoder.media.VideoCodec;
 
 /**
  * Utility class for executing ffmpeg
@@ -186,11 +188,11 @@ public class FFmpegUtil
     static MediaInfo parseMediaInfo(File mediaFile, String string)
     {
         long durationMs = 0;
-        String videoCodec = null;
+        VideoCodec videoCodec = null;
         String videoResolution = null;
         String videoBitrate = null;
         String videoFramerate = null;
-        String audioCodec = null;
+        AudioCodec audioCodec = null;
         String audioSampleRate = null;
         String audioBitrate = null;
         int audioChannels = 2;
@@ -252,7 +254,9 @@ public class FFmpegUtil
                 {
                     continue;
                 }
-                videoCodec = split[3];
+
+                String videoCodecName = split[3];
+                videoCodec = VideoCodec.fromName(videoCodecName);
 
                 // Looking for resolution. There are sometimes items such as:
                 //  (mp4a / 0x6134706D)
@@ -294,7 +298,9 @@ public class FFmpegUtil
                 {
                     continue;
                 }
-                audioCodec = split[3];
+
+                String audioCodecName = split[3];
+                audioCodec = AudioCodec.fromName(audioCodecName);
 
                 split = line.split(",");
                 for(String piece : split)

@@ -9,18 +9,18 @@ public class MediaInfo
 {
     public final File file;
     public final long durationMs;
-    public final String videoCodec;
+    public final VideoCodec videoCodec;
     public final String videoResolution;
     public final String videoBitrate;
     public final String videoFramerate;
-    public final String audioCodec;
+    public final AudioCodec audioCodec;
     public final String audioSampleRate;
     public final String audioBitrate;
     public final int audioChannels;
 
 
-    public MediaInfo(File file, long durationMs, String videoCodec, String videoResolution,
-                     String videoBitrate, String videoFramerate, String audioCodec,
+    public MediaInfo(File file, long durationMs, VideoCodec videoCodec, String videoResolution,
+                     String videoBitrate, String videoFramerate, AudioCodec audioCodec,
                      String audioSampleRate, String audioBitrate, int audioChannels)
     {
         this.file = file;

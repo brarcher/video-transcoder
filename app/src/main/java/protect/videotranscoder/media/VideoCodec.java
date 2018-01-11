@@ -1,5 +1,7 @@
 package protect.videotranscoder.media;
 
+import android.support.annotation.Nullable;
+
 /**
  * List of video codecs which the application may support
  */
@@ -14,6 +16,20 @@ public enum VideoCodec
     VideoCodec(String ffmpegName)
     {
         this.ffmpegName = ffmpegName;
+    }
+
+    @Nullable
+    public static VideoCodec fromName(String name)
+    {
+        for(VideoCodec item : values())
+        {
+            if(item.ffmpegName.equals(name))
+            {
+                return item;
+            }
+        }
+
+        return null;
     }
 
 }

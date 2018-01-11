@@ -8,8 +8,10 @@ import org.robolectric.annotation.Config;
 import java.io.File;
 import java.util.List;
 
+import protect.videotranscoder.media.AudioCodec;
 import protect.videotranscoder.media.MediaInfo;
 import protect.videotranscoder.media.MediaContainer;
+import protect.videotranscoder.media.VideoCodec;
 
 import static org.junit.Assert.*;
 
@@ -44,11 +46,11 @@ public class FFmpegUtilTest
         assertEquals(file, info.file);
         assertEquals( (2*60+22)*1000 + 86, info.durationMs);
 
-        assertEquals("h264", info.videoCodec);
+        assertEquals(VideoCodec.H264, info.videoCodec);
         assertEquals("1080x1920", info.videoResolution);
         assertEquals("4499 kb/s", info.videoBitrate);
         assertEquals("19.01 fps", info.videoFramerate);
-        assertEquals("aac", info.audioCodec);
+        assertEquals(AudioCodec.AAC, info.audioCodec);
         assertEquals("22050 Hz", info.audioSampleRate);
         assertEquals("63 kb/s", info.audioBitrate);
         assertEquals(1, info.audioChannels);
@@ -80,11 +82,11 @@ public class FFmpegUtilTest
         assertEquals(file, info.file);
         assertEquals( (10)*1000 + 5, info.durationMs);
 
-        assertEquals("mpeg4", info.videoCodec);
+        assertEquals(VideoCodec.MPEG4, info.videoCodec);
         assertEquals("320x240", info.videoResolution);
         assertEquals("705 kb/s", info.videoBitrate);
         assertEquals("25 fps", info.videoFramerate);
-        assertEquals("aac", info.audioCodec);
+        assertEquals(AudioCodec.AAC, info.audioCodec);
         assertEquals("22050 Hz", info.audioSampleRate);
         assertEquals("47 kb/s", info.audioBitrate);
         assertEquals(2, info.audioChannels);

@@ -352,8 +352,8 @@ public class MainActivity extends AppCompatActivity
                         if(result == null)
                         {
                             // Could not query the file, fill in what we know.
-                            result = new MediaInfo(videoFile, 0, VideoCodec.MPEG4.name(), "640x480",
-                                "800", "25", AudioCodec.MP3.name(),
+                            result = new MediaInfo(videoFile, 0, VideoCodec.MPEG4, "640x480",
+                                "800", "25", AudioCodec.MP3,
                                 "44100", "128", 2);
                         }
 
