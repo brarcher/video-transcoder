@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         int durationMs = mp.getDuration();
                         tvLeft.setVisibility(View.VISIBLE);
-                        tvLeft.setText("00:00:00");
+                        tvLeft.setText(getTime(0));
                         tvRight.setVisibility(View.VISIBLE);
                         tvRight.setText(getTime(durationMs / 1000));
                         mp.setLooping(true);
@@ -372,7 +372,8 @@ public class MainActivity extends AppCompatActivity
         int rem = seconds % 3600;
         int mn = rem / 60;
         int sec = rem % 60;
-        return String.format("%02d", hr) + ":" + String.format("%02d", mn) + ":" + String.format("%02d", sec);
+
+        return String.format(Locale.US, "%02d:%02d:%02d", hr, mn, sec);
     }
 
     private void showUnsupportedExceptionDialog()
