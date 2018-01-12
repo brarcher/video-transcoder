@@ -49,6 +49,7 @@ import protect.videotranscoder.FFmpegUtil;
 import protect.videotranscoder.R;
 import protect.videotranscoder.ResultCallbackHandler;
 import protect.videotranscoder.media.AudioCodec;
+import protect.videotranscoder.media.MediaContainer;
 import protect.videotranscoder.media.MediaInfo;
 import protect.videotranscoder.media.VideoCodec;
 
@@ -352,7 +353,7 @@ public class MainActivity extends AppCompatActivity
                         if(result == null)
                         {
                             // Could not query the file, fill in what we know.
-                            result = new MediaInfo(videoFile, 0, VideoCodec.MPEG4, "640x480",
+                            result = new MediaInfo(videoFile, 0, MediaContainer.MP4, VideoCodec.MPEG4, "640x480",
                                 "800", "25", AudioCodec.MP3,
                                 "44100", "128", 2);
                         }

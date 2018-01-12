@@ -188,6 +188,7 @@ public class FFmpegUtil
     static MediaInfo parseMediaInfo(File mediaFile, String string)
     {
         long durationMs = 0;
+        MediaContainer container = null;
         VideoCodec videoCodec = null;
         String videoResolution = null;
         String videoBitrate = null;
@@ -242,6 +243,18 @@ public class FFmpegUtil
                 }
 
                 durationMs = time;
+            }
+
+            if(line.startsWith("Input"))
+            {
+                for(MediaContainer item : MediaContainer.values())
+                {
+                    if(line.contains(item.ffmpegName))
+                    {
+                        container = item;
+                        break;
+                    }
+                }
             }
 
             if(line.startsWith("Stream") && line.contains("Video:"))
@@ -330,7 +343,7 @@ public class FFmpegUtil
             }
         }
 
-        MediaInfo info = new MediaInfo(mediaFile, durationMs, videoCodec, videoResolution,
+        MediaInfo info = new MediaInfo(mediaFile, durationMs, container, videoCodec, videoResolution,
                 videoBitrate, videoFramerate, audioCodec, audioSampleRate, audioBitrate, audioChannels);
         return info;
     }

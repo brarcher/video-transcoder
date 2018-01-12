@@ -45,7 +45,7 @@ public class FFmpegUtilTest
 
         assertEquals(file, info.file);
         assertEquals( (2*60+22)*1000 + 86, info.durationMs);
-
+        assertEquals(MediaContainer.MP4, info.container);
         assertEquals(VideoCodec.H264, info.videoCodec);
         assertEquals("1080x1920", info.videoResolution);
         assertEquals("4499 kb/s", info.videoBitrate);
@@ -81,7 +81,7 @@ public class FFmpegUtilTest
 
         assertEquals(file, info.file);
         assertEquals( (10)*1000 + 5, info.durationMs);
-
+        assertEquals(MediaContainer.MP4, info.container);
         assertEquals(VideoCodec.MPEG4, info.videoCodec);
         assertEquals("320x240", info.videoResolution);
         assertEquals("705 kb/s", info.videoBitrate);
@@ -89,6 +89,26 @@ public class FFmpegUtilTest
         assertEquals(AudioCodec.AAC, info.audioCodec);
         assertEquals("22050 Hz", info.audioSampleRate);
         assertEquals("47 kb/s", info.audioBitrate);
+        assertEquals(2, info.audioChannels);
+
+        string = "Input #0, flv, from 'SampleVideo_360x240_1mb.flv':\n" +
+                "  Metadata:\n" + "    encoder         : Lavf53.24.2\n" +
+                "  Duration: 00:00:10.64, start: 0.000000, bitrate: 792 kb/s\n" +
+                "    Stream #0:0: Audio: aac (LC), 48000 Hz, 5.1, fltp\n" +
+                "    Stream #0:1: Video: flv1, yuv420p, 320x240, 25 fps, 25 tbr, 1k tbn";
+
+        info = FFmpegUtil.parseMediaInfo(file, string);
+
+        assertEquals(file, info.file);
+        assertEquals( (10)*1000 + 64, info.durationMs);
+        assertEquals(MediaContainer.FLV, info.container);
+        assertEquals(null, info.videoCodec);
+        assertEquals("320x240", info.videoResolution);
+        assertEquals(null, info.videoBitrate);
+        assertEquals("25 fps", info.videoFramerate);
+        assertEquals(AudioCodec.AAC, info.audioCodec);
+        assertEquals("48000 Hz", info.audioSampleRate);
+        assertEquals(null, info.audioBitrate);
         assertEquals(2, info.audioChannels);
     }
 

@@ -9,6 +9,7 @@ public class MediaInfo
 {
     public final File file;
     public final long durationMs;
+    public final MediaContainer container;
     public final VideoCodec videoCodec;
     public final String videoResolution;
     public final String videoBitrate;
@@ -19,12 +20,14 @@ public class MediaInfo
     public final int audioChannels;
 
 
-    public MediaInfo(File file, long durationMs, VideoCodec videoCodec, String videoResolution,
-                     String videoBitrate, String videoFramerate, AudioCodec audioCodec,
-                     String audioSampleRate, String audioBitrate, int audioChannels)
+    public MediaInfo(File file, long durationMs, MediaContainer container, VideoCodec videoCodec,
+                     String videoResolution, String videoBitrate, String videoFramerate,
+                     AudioCodec audioCodec, String audioSampleRate, String audioBitrate,
+                     int audioChannels)
     {
         this.file = file;
         this.durationMs = durationMs;
+        this.container = container;
         this.videoCodec = videoCodec;
         this.videoResolution = videoResolution;
         this.videoBitrate = videoBitrate;
