@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity
         String resolution = (String)resolutionSpinner.getSelectedItem();
         String videoBitrate = (String)videoBitrateSpinner.getSelectedItem();
         AudioCodec audioCodec = (AudioCodec) audioCodecSpinner.getSelectedItem();
-        String audioBitrate = (String) audioBitrateSpinner.getSelectedItem();
+        Integer audioBitrate = (Integer) audioBitrateSpinner.getSelectedItem();
         String audioSampleRate = (String) audioSampleRateSpinner.getSelectedItem();
         String audioChannel = (String) audioChannelSpinner.getSelectedItem();
 
@@ -460,12 +460,12 @@ public class MainActivity extends AppCompatActivity
         startVideoPlayback();
     }
 
-    private void setSpinnerSelection(Spinner spinner, String value)
+    private void setSpinnerSelection(Spinner spinner, Object value)
     {
         for(int index = 0; index < spinner.getCount(); index++)
         {
             String item = spinner.getItemAtPosition(index).toString();
-            if(item.equals(value))
+            if(item.equals(value.toString()))
             {
                 spinner.setSelection(index);
                 break;
@@ -559,7 +559,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        String [] audioBitrate = new String[] {"15", "24", "32", "64", "96", "128", "192", "256", "320", "384", "448", "512"};
+        List<Integer> audioBitrate = new ArrayList<>(Arrays.asList(15, 24, 32, 64, 96, 128, 192, 256, 320, 384, 448, 512));
         audioBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, audioBitrate));
 
         String [] sampleRate = new String[] {"8000", "11025", "16000", "22050", "24000", "32000", "44100", "48000"};
@@ -598,10 +598,14 @@ public class MainActivity extends AppCompatActivity
             setSpinnerSelection(audioCodecSpinner, videoInfo.audioCodec.toString());
         }
 
-        if(videoInfo.audioBitrate != null)
+        Integer defaultAudioBitrate = videoInfo.audioBitrate;
+        if(defaultAudioBitrate == null)
         {
-            setSpinnerSelection(audioBitrateSpinner, videoInfo.audioBitrate);
+            // Set some default if none is detected
+            defaultAudioBitrate = 128;
         }
+
+        setSpinnerSelection(audioBitrateSpinner, defaultAudioBitrate);
 
         if(videoInfo.audioSampleRate != null)
         {
@@ -673,8 +677,8 @@ public class MainActivity extends AppCompatActivity
                         {
                             // Could not query the file, fill in what we know.
                             result = new MediaInfo(videoFile, 0, MediaContainer.MP4, VideoCodec.MPEG4, "640x480",
-                                "800", "25", AudioCodec.MP3,
-                                "44100", "128", 2);
+                                800, "25", AudioCodec.MP3,
+                                44100, 128, 2);
                         }
 
                         videoInfo = result;

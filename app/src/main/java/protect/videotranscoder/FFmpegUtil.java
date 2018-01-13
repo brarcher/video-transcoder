@@ -211,11 +211,11 @@ public class FFmpegUtil
         MediaContainer container = null;
         VideoCodec videoCodec = null;
         String videoResolution = null;
-        String videoBitrate = null;
+        Integer videoBitrate = null;
         String videoFramerate = null;
         AudioCodec audioCodec = null;
-        String audioSampleRate = null;
-        String audioBitrate = null;
+        Integer audioSampleRate = null;
+        Integer audioBitrate = null;
         int audioChannels = 2;
 
         /*
@@ -311,7 +311,15 @@ public class FFmpegUtil
 
                     if(piece.contains("kb/s"))
                     {
-                        videoBitrate = piece.replace("kb/s", "").trim();
+                        try
+                        {
+                            String videoBitrateStr = piece.replace("kb/s", "").trim();
+                            videoBitrate = Integer.parseInt(videoBitrateStr);
+                        }
+                        catch(NumberFormatException e)
+                        {
+                            // Nothing to do
+                        }
                     }
 
                     if(piece.contains("fps"))
@@ -342,16 +350,33 @@ public class FFmpegUtil
 
                     if(piece.contains("Hz"))
                     {
-                        audioSampleRate = piece.replace("Hz", "").trim();
+                        try
+                        {
+                            String audioSampeRateStr = piece.replace("Hz", "").trim();
+                            audioSampleRate = Integer.parseInt(audioSampeRateStr);
+                        }
+                        catch(NumberFormatException e)
+                        {
+                            // Nothing to do
+                        }
                     }
 
                     if(piece.contains("kb/s"))
                     {
-                        audioBitrate = piece.replace("kb/s", "").trim();
+                        String audioBitrateStr = piece.replace("kb/s", "").trim();
 
-                        if(audioBitrate.contains("(default)"))
+                        if(audioBitrateStr.contains("(default)"))
                         {
-                            audioBitrate = audioBitrate.replace("(default)", "").trim();
+                            audioBitrateStr = audioBitrateStr.replace("(default)", "").trim();
+                        }
+
+                        try
+                        {
+                            audioBitrate = Integer.parseInt(audioBitrateStr);
+                        }
+                        catch(NumberFormatException e)
+                        {
+                            // Nothing to do
                         }
                     }
 

@@ -48,12 +48,12 @@ public class FFmpegUtilTest
         assertEquals(MediaContainer.MP4, info.container);
         assertEquals(VideoCodec.H264, info.videoCodec);
         assertEquals("1080x1920", info.videoResolution);
-        assertEquals("4499", info.videoBitrate);
+        assertEquals(Integer.valueOf(4499), info.videoBitrate);
         assertEquals("19.01", info.videoFramerate);
         assertEquals(AudioCodec.AAC, info.audioCodec);
-        assertEquals("22050", info.audioSampleRate);
-        assertEquals("63", info.audioBitrate);
-        assertEquals(1, info.audioChannels);
+        assertEquals(Integer.valueOf(22050), info.audioSampleRate);
+        assertEquals(Integer.valueOf(63), info.audioBitrate);
+        assertEquals(Integer.valueOf(1), info.audioChannels);
 
         string = "libavutil      55. 17.103 / 55. 17.103\n" +
                 "libavcodec     57. 24.102 / 57. 24.102\n" +
@@ -84,12 +84,12 @@ public class FFmpegUtilTest
         assertEquals(MediaContainer.MP4, info.container);
         assertEquals(VideoCodec.MPEG4, info.videoCodec);
         assertEquals("320x240", info.videoResolution);
-        assertEquals("705", info.videoBitrate);
+        assertEquals(Integer.valueOf(705), info.videoBitrate);
         assertEquals("25", info.videoFramerate);
         assertEquals(AudioCodec.AAC, info.audioCodec);
-        assertEquals("22050", info.audioSampleRate);
-        assertEquals("47", info.audioBitrate);
-        assertEquals(2, info.audioChannels);
+        assertEquals(Integer.valueOf(22050), info.audioSampleRate);
+        assertEquals(Integer.valueOf(47), info.audioBitrate);
+        assertEquals(Integer.valueOf(2), info.audioChannels);
 
         string = "Input #0, flv, from 'SampleVideo_360x240_1mb.flv':\n" +
                 "  Metadata:\n" + "    encoder         : Lavf53.24.2\n" +
@@ -107,9 +107,9 @@ public class FFmpegUtilTest
         assertEquals(null, info.videoBitrate);
         assertEquals("25", info.videoFramerate);
         assertEquals(AudioCodec.AAC, info.audioCodec);
-        assertEquals("48000", info.audioSampleRate);
+        assertEquals(Integer.valueOf(48000), info.audioSampleRate);
         assertEquals(null, info.audioBitrate);
-        assertEquals(2, info.audioChannels);
+        assertEquals(Integer.valueOf(2), info.audioChannels);
     }
 
     @Test
