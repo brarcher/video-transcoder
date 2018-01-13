@@ -3,6 +3,7 @@ package protect.videotranscoder;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
 
@@ -11,14 +12,14 @@ public class FFmpegResponseHandler extends ExecuteBinaryResponseHandler
     private static final String TAG = "VideoTranscoder";
 
     private final long _durationMs;
-    private final ProgressDialog _progressDialog;
+    private final ProgressBar _progressBar;
     private final ResultCallbackHandler<Boolean> _resultHandler;
 
-    public FFmpegResponseHandler(long durationMs, ProgressDialog progressDialog,
+    public FFmpegResponseHandler(long durationMs, ProgressBar progressBar,
                                  ResultCallbackHandler<Boolean> resultHandler)
     {
         _durationMs = durationMs;
-        _progressDialog = progressDialog;
+        _progressBar = progressBar;
         _resultHandler = resultHandler;
     }
 
@@ -61,8 +62,7 @@ public class FFmpegResponseHandler extends ExecuteBinaryResponseHandler
         if(currentTimeMs != null)
         {
             int percentComplete = (int)Math.floor((currentTimeMs * 100) / (float)_durationMs);
-
-            _progressDialog.setMessage(percentComplete + "%");
+            _progressBar.setProgress(percentComplete);
         }
     }
 
@@ -70,14 +70,11 @@ public class FFmpegResponseHandler extends ExecuteBinaryResponseHandler
     public void onStart()
     {
         Log.d(TAG, "Started FFmpeg command");
-        _progressDialog.setMessage("Processing...");
-        _progressDialog.show();
     }
 
     @Override
     public void onFinish()
     {
         Log.d(TAG, "Finished command");
-        _progressDialog.dismiss();
     }
 }

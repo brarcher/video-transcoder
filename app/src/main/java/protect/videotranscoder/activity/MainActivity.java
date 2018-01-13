@@ -1,7 +1,6 @@
 package protect.videotranscoder.activity;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,6 +26,7 @@ import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity
     private VideoView videoView;
     private CrystalRangeSeekbar rangeSeekBar;
     private Timer videoTimer = null;
-    private ProgressDialog progressDialog;
+    private ProgressBar progressBar;
 
     private Spinner containerSpinner;
     private Spinner videoCodecSpinner;
@@ -109,7 +109,9 @@ public class MainActivity extends AppCompatActivity
     private Spinner audioChannelSpinner;
 
     private TextView tvLeft, tvRight;
+    private Button selectVideoButton;
     private Button encodeButton;
+    private Button cancelButton;
     private MediaInfo videoInfo;
     private File outputDestination;
 
@@ -118,17 +120,16 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final Button selectVideo = findViewById(R.id.selectVideo);
+        selectVideoButton = findViewById(R.id.selectVideo);
         encodeButton = findViewById(R.id.encode);
+        cancelButton = findViewById(R.id.cancel);
 
         tvLeft = findViewById(R.id.tvLeft);
         tvRight = findViewById(R.id.tvRight);
 
         videoView =  findViewById(R.id.videoView);
         rangeSeekBar =  findViewById(R.id.rangeSeekBar);
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle(null);
-        progressDialog.setCancelable(false);
+        progressBar = findViewById(R.id.encodeProgress);
         rangeSeekBar.setEnabled(false);
 
         containerSpinner = findViewById(R.id.containerSpinner);
@@ -153,7 +154,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        selectVideo.setOnClickListener(new View.OnClickListener()
+        selectVideoButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -175,6 +176,15 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 startEncode();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                cancelEncode();
             }
         });
     }
@@ -379,10 +389,28 @@ public class MainActivity extends AppCompatActivity
         // Output file
         command.add(destination.getAbsolutePath());
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressBar, _transcodeResultHandler);
         FFmpegUtil.call(command.toArray(new String[command.size()]), handler);
 
         stopVideoPlayback();
+
+        selectVideoButton.setVisibility(View.GONE);
+        encodeButton.setVisibility(View.GONE);
+        cancelButton.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void cancelEncode()
+    {
+        FFmpegUtil.cancelCall();
+
+        _transcodeResultHandler.onResult(false);
+
+        boolean result = outputDestination.delete();
+        if(result == false)
+        {
+            Log.d(TAG, "Failed to remove after encode cancel: " + outputDestination.getAbsolutePath());
+        }
     }
 
     private void stopVideoPlayback()
@@ -715,6 +743,11 @@ public class MainActivity extends AppCompatActivity
                     .show();
 
             startVideoPlayback();
+
+            selectVideoButton.setVisibility(View.VISIBLE);
+            encodeButton.setVisibility(View.VISIBLE);
+            cancelButton.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
         }
     };
 

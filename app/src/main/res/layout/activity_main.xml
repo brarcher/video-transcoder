@@ -70,7 +70,22 @@
                     android:visibility="gone"
                     android:text="@string/encode"
                     />
+                <Button
+                    android:id="@+id/cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:text="@string/cancel"
+                    />
             </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/encodeProgress"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_below="@id/buttonContainer"/>
 
             <!-- Basic Settings Title -->
             <TextView
@@ -81,7 +96,7 @@
                 android:paddingRight="@dimen/titlePaddingHorizontal"
                 android:paddingStart="@dimen/titlePaddingHorizontal"
                 android:paddingTop="@dimen/titlePaddingTop"
-                android:layout_below="@id/buttonContainer"
+                android:layout_below="@id/encodeProgress"
                 android:text="Basic Settings"
                 android:textSize="@dimen/inputTitleSize"
                 android:visibility="gone"
