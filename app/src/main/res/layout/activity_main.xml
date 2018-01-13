@@ -267,6 +267,8 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/resolutionContainerDivider"
+                android:paddingEnd="@dimen/inputPadding"
+                android:paddingRight="@dimen/inputPadding"
                 android:visibility="gone">
                 <TextView
                     android:text="@string/bitrate"
@@ -275,13 +277,13 @@
                     android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"/>
 
-                <Spinner
-                    android:id="@+id/videoBitrateSpinner"
+                <EditText
+                    android:id="@+id/videoBitrateValue"
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:textSize="@dimen/inputSize"
-                    android:drawSelectorOnTop="true" />
+                    android:inputType="number"
+                    android:textSize="@dimen/inputSize"/>
             </LinearLayout>
             <View
                 android:id="@+id/videoBitrateContainerDivider"

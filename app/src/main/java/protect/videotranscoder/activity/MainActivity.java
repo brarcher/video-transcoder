@@ -26,6 +26,7 @@ import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity
     private Spinner videoCodecSpinner;
     private Spinner fpsSpinner;
     private Spinner resolutionSpinner;
-    private Spinner videoBitrateSpinner;
+    private EditText videoBitrateValue;
     private Spinner audioCodecSpinner;
     private Spinner audioBitrateSpinner;
     private Spinner audioSampleRateSpinner;
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity
         videoCodecSpinner = findViewById(R.id.videoCodecSpinner);
         fpsSpinner = findViewById(R.id.fpsSpinner);
         resolutionSpinner = findViewById(R.id.resolutionSpinner);
-        videoBitrateSpinner = findViewById(R.id.videoBitrateSpinner);
+        videoBitrateValue = findViewById(R.id.videoBitrateValue);
         audioCodecSpinner = findViewById(R.id.audioCodecSpinner);
         audioBitrateSpinner = findViewById(R.id.audioBitrateSpinner);
         audioSampleRateSpinner = findViewById(R.id.audioSampleRateSpinner);
@@ -282,11 +283,22 @@ public class MainActivity extends AppCompatActivity
         VideoCodec videoCodec = (VideoCodec)videoCodecSpinner.getSelectedItem();
         String fps = (String)fpsSpinner.getSelectedItem();
         String resolution = (String)resolutionSpinner.getSelectedItem();
-        String videoBitrate = (String)videoBitrateSpinner.getSelectedItem();
         AudioCodec audioCodec = (AudioCodec) audioCodecSpinner.getSelectedItem();
         Integer audioBitrate = (Integer) audioBitrateSpinner.getSelectedItem();
         String audioSampleRate = (String) audioSampleRateSpinner.getSelectedItem();
         String audioChannel = (String) audioChannelSpinner.getSelectedItem();
+        int videoBitrate;
+
+        try
+        {
+            String videoBitrateStr = videoBitrateValue.getText().toString();
+            videoBitrate = Integer.parseInt(videoBitrateStr);
+        }
+        catch(NumberFormatException e)
+        {
+            Toast.makeText(this, R.string.videoBitrateValueInvalid, Toast.LENGTH_LONG).show();
+            return;
+        }
 
         File outputDir;
 
@@ -534,10 +546,6 @@ public class MainActivity extends AppCompatActivity
         String [] resolution = new String[] {"176x144", "320x240", "480x360", "640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720", "1920x1080", "2048x1080", "2048x858", "2560x1440", "2560x1600", "4096x2160"};
         resolutionSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, resolution));
 
-        // TODO: Should be a text field, not a spinner
-        String [] videoBitrate = new String[] {"500"};
-        videoBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, videoBitrate));
-
         audioCodecSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
@@ -590,7 +598,7 @@ public class MainActivity extends AppCompatActivity
 
         if(videoInfo.videoBitrate != null)
         {
-            setSpinnerSelection(videoBitrateSpinner, videoInfo.videoBitrate);
+            videoBitrateValue.setText(Integer.toString(videoInfo.videoBitrate));
         }
 
         if(videoInfo.audioCodec != null)
