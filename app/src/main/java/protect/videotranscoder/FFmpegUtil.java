@@ -121,6 +121,26 @@ public class FFmpegUtil
         call(command, handler);
     }
 
+    /**
+     * Cancel the current in-progress invocation of FFmpeg
+     */
+    public static void cancelCall()
+    {
+        String message;
+
+        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning() == false)
+        {
+            message = "Cancel failed, FFmpeg not running";
+        }
+        else
+        {
+            boolean result = ffmpeg.killRunningProcesses();
+            message = "Attempt to cancel FFmpeg: " + (result ? "success" : "failed");
+        }
+
+        Log.d(TAG, message);
+    }
+
     @NonNull
     private static String commandToString(String [] cmd)
     {
