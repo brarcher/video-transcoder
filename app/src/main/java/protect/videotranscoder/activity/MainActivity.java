@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final TextView selectVideo = findViewById(R.id.selectVideo);
+        final Button selectVideo = findViewById(R.id.selectVideo);
         encodeButton = findViewById(R.id.encode);
 
         tvLeft = findViewById(R.id.tvLeft);
