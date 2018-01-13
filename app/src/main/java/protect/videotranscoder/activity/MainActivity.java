@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity
         String resolution = (String)resolutionSpinner.getSelectedItem();
         AudioCodec audioCodec = (AudioCodec) audioCodecSpinner.getSelectedItem();
         Integer audioBitrate = (Integer) audioBitrateSpinner.getSelectedItem();
-        String audioSampleRate = (String) audioSampleRateSpinner.getSelectedItem();
+        Integer audioSampleRate = (Integer) audioSampleRateSpinner.getSelectedItem();
         String audioChannel = (String) audioChannelSpinner.getSelectedItem();
         int videoBitrate;
 
@@ -389,7 +389,7 @@ public class MainActivity extends AppCompatActivity
 
         // Sample rate
         command.add("-ar");
-        command.add(audioSampleRate);
+        command.add(Integer.toString(audioSampleRate));
 
         // Channels
         command.add("-ac");
@@ -549,10 +549,18 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        String [] fps = new String [] {"24", "23.98", "25", "29.97", "30", "50"};
+        LinkedList<String> fps = new LinkedList<>(Arrays.asList("24", "23.98", "25", "29.97", "30", "50"));
+        if(videoInfo.videoFramerate != null && fps.contains(videoInfo.videoFramerate) == false)
+        {
+            fps.addFirst(videoInfo.videoFramerate);
+        }
         fpsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, fps));
 
-        String [] resolution = new String[] {"176x144", "320x240", "480x360", "640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720", "1920x1080", "2048x1080", "2048x858", "2560x1440", "2560x1600", "4096x2160"};
+        LinkedList<String> resolution = new LinkedList<>(Arrays.asList("176x144", "320x240", "480x360", "640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720", "1920x1080", "2048x1080", "2048x858", "2560x1440", "2560x1600", "4096x2160"));
+        if(videoInfo.videoResolution != null && resolution.contains(videoInfo.videoResolution) == false)
+        {
+            resolution.addFirst(videoInfo.videoResolution);
+        }
         resolutionSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, resolution));
 
         audioCodecSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
@@ -584,7 +592,12 @@ public class MainActivity extends AppCompatActivity
         }
         audioBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, audioBitrate));
 
-        String [] sampleRate = new String[] {"8000", "11025", "16000", "22050", "24000", "32000", "44100", "48000"};
+        List<Integer> sampleRate = new ArrayList<>(Arrays.asList(8000, 11025, 16000, 22050, 24000, 32000, 44100, 48000));
+        if(videoInfo.audioSampleRate != null && audioBitrate.contains(videoInfo.audioSampleRate) == false)
+        {
+            sampleRate.add(videoInfo.audioSampleRate);
+            Collections.sort(sampleRate);
+        }
         audioSampleRateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, sampleRate));
 
         String [] channels = new String[] {"1", "2"};
