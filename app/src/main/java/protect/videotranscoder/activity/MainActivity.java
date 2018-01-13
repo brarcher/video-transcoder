@@ -24,6 +24,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -93,6 +97,17 @@ public class MainActivity extends AppCompatActivity
     private Timer videoTimer = null;
     private ProgressDialog progressDialog;
 
+    private Spinner containerSpinner;
+    private Spinner videoCodecSpinner;
+    private Spinner fpsSpinner;
+    private Spinner resolutionSpinner;
+    private Spinner videoBitrateSpinner;
+    private Spinner audioCodecSpinner;
+    private Spinner audioBitrateSpinner;
+    private Spinner audioSampleRateSpinner;
+    private Spinner audioChannelSpinner;
+
+
     private TextView tvLeft, tvRight;
     private MediaInfo videoInfo;
     private File outputDestination;
@@ -113,6 +128,16 @@ public class MainActivity extends AppCompatActivity
         progressDialog.setTitle(null);
         progressDialog.setCancelable(false);
         rangeSeekBar.setEnabled(false);
+
+        containerSpinner = findViewById(R.id.containerSpinner);
+        videoCodecSpinner = findViewById(R.id.videoCodecSpinner);
+        fpsSpinner = findViewById(R.id.fpsSpinner);
+        resolutionSpinner = findViewById(R.id.resolutionSpinner);
+        videoBitrateSpinner = findViewById(R.id.videoBitrateSpinner);
+        audioCodecSpinner = findViewById(R.id.audioCodecSpinner);
+        audioBitrateSpinner = findViewById(R.id.audioBitrateSpinner);
+        audioSampleRateSpinner = findViewById(R.id.audioSampleRateSpinner);
+        audioChannelSpinner = findViewById(R.id.audioChannelSpinner);
 
         FFmpegUtil.init(this, new ResultCallbackHandler<Boolean>()
         {
@@ -290,6 +315,66 @@ public class MainActivity extends AppCompatActivity
         {
             findViewById(id).setVisibility(View.VISIBLE);
         }
+        
+        containerSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, MediaContainer.values()));
+        containerSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
+            {
+                MediaContainer container = (MediaContainer)parentView.getItemAtPosition(position);
+                int visibility = container.supportedVideoCodecs.size() > 0 ? View.VISIBLE : View.GONE;
+
+                for(int resId : VIDEO_SETTINGS_IDS)
+                {
+                    findViewById(resId).setVisibility(visibility);
+                }
+
+                videoCodecSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, container.supportedVideoCodecs));
+                audioCodecSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, container.supportedAudioCodecs));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView)
+            {
+                // Nothing to do
+            }
+        });
+
+        String [] fps = new String [] {"24", "23.98", "25", "29.97", "30", "50"};
+        fpsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, fps));
+
+        String [] resolution = new String[] {"176x144", "320x240", "480x360", "640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720", "1920x1080", "2048x1080", "2048x858", "2560x1440", "2560x1600", "4096x2160"};
+        resolutionSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, resolution));
+
+        // TODO: Should be a text field, not a spinner
+        String [] videoBitrate = new String[] {"500"};
+        videoBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, videoBitrate));
+
+        audioCodecSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
+            {
+                AudioCodec audioCodec = (AudioCodec) parentView.getItemAtPosition(position);
+                audioChannelSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, audioCodec.supportedChannels));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView)
+            {
+                // Nothing to do
+            }
+        });
+
+        String [] audioBitrate = new String[] {"15", "24", "32", "64", "96", "128", "192", "256", "320", "384", "448", "512"};
+        audioBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, audioBitrate));
+
+        String [] sampleRate = new String[] {"8000", "11025", "16000", "22050", "24000", "32000", "44100", "48000"};
+        audioSampleRateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, sampleRate));
+
+        String [] channels = new String[] {"1", "2"};
+        audioChannelSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, channels));
     }
 
     @Override

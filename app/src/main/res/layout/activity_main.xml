@@ -103,7 +103,6 @@
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"
                     android:drawSelectorOnTop="true" />
             </LinearLayout>
@@ -158,7 +157,6 @@
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"
                     android:drawSelectorOnTop="true" />
             </LinearLayout>
@@ -191,7 +189,6 @@
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"
                     android:drawSelectorOnTop="true" />
             </LinearLayout>
@@ -224,7 +221,6 @@
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"
                     android:drawSelectorOnTop="true" />
             </LinearLayout>
@@ -257,7 +253,6 @@
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"
                     android:drawSelectorOnTop="true" />
             </LinearLayout>
@@ -312,7 +307,6 @@
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"
                     android:drawSelectorOnTop="true" />
             </LinearLayout>
@@ -345,7 +339,6 @@
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"
                     android:drawSelectorOnTop="true" />
             </LinearLayout>
@@ -378,7 +371,6 @@
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"
                     android:drawSelectorOnTop="true" />
             </LinearLayout>
@@ -411,7 +403,6 @@
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"
                     android:drawSelectorOnTop="true" />
             </LinearLayout>
