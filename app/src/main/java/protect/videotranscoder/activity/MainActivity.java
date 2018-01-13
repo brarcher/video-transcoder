@@ -14,10 +14,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,63 +24,122 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.ScrollView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarChangeListener;
 import com.google.common.collect.ImmutableMap;
 
-import org.florescu.android.rangeseekbar.RangeSeekBar;
+import com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import protect.videotranscoder.FFmpegResponseHandler;
 import protect.videotranscoder.FFmpegUtil;
 import protect.videotranscoder.R;
 import protect.videotranscoder.ResultCallbackHandler;
+import protect.videotranscoder.media.AudioCodec;
+import protect.videotranscoder.media.MediaContainer;
+import protect.videotranscoder.media.MediaInfo;
+import protect.videotranscoder.media.VideoCodec;
 
 public class MainActivity extends AppCompatActivity
 {
-    private static final int REQUEST_TAKE_GALLERY_VIDEO = 100;
-    private VideoView videoView;
-    private RangeSeekBar rangeSeekBar;
-    private Runnable r;
-    private ProgressDialog progressDialog;
-    private Uri selectedVideoUri;
     private static final String TAG = "VideoTranscoder";
-    private static final String FILEPATH = "filepath";
-    private int stopPosition;
-    private ScrollView mainlayout;
-    private TextView tvLeft, tvRight;
-    private String filePath;
-    private int durationMs;
 
+    private static final int REQUEST_TAKE_GALLERY_VIDEO = 100;
     private static final int READ_WRITE_PERMISSION_REQUEST = 1;
+
+    final List<Integer> BASIC_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+            R.id.basicSettingsText,
+            R.id.basicSettingsTopDivider,
+            R.id.containerTypeContainer,
+            R.id.containerTypeContainerDivider));
+    final List<Integer> VIDEO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+            R.id.videoSettingsText,
+            R.id.videoSettingsTextTopDivider,
+            R.id.videoCodecContainer,
+            R.id.videoCodecContainerDivider,
+            R.id.fpsContainer,
+            R.id.fpsContainerDivider,
+            R.id.resolutionContainer,
+            R.id.resolutionContainerDivider,
+            R.id.videoBitrateContainer,
+            R.id.videoBitrateContainerDivider));
+    final List<Integer> AUDIO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+            R.id.audioSettingsText,
+            R.id.audioSettingsTextTopDivider,
+            R.id.audioCodecContainer,
+            R.id.audioCodecContainerDivider,
+            R.id.audioBitrateContainer,
+            R.id.audioBitrateContainerDivider,
+            R.id.audioSampleRateContainer,
+            R.id.audioSampleRateContainerDivider,
+            R.id.audioChannelContainer,
+            R.id.audioChannelContainerDivider));
+
+    private VideoView videoView;
+    private CrystalRangeSeekbar rangeSeekBar;
+    private Timer videoTimer = null;
+    private ProgressDialog progressDialog;
+
+    private Spinner containerSpinner;
+    private Spinner videoCodecSpinner;
+    private Spinner fpsSpinner;
+    private Spinner resolutionSpinner;
+    private Spinner videoBitrateSpinner;
+    private Spinner audioCodecSpinner;
+    private Spinner audioBitrateSpinner;
+    private Spinner audioSampleRateSpinner;
+    private Spinner audioChannelSpinner;
+
+    private TextView tvLeft, tvRight;
+    private Button encodeButton;
+    private MediaInfo videoInfo;
+    private File outputDestination;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final TextView uploadVideo = findViewById(R.id.uploadVideo);
-        TextView cutVideo = findViewById(R.id.cropVideo);
-        TextView compressVideo = findViewById(R.id.compressVideo);
+        final Button selectVideo = findViewById(R.id.selectVideo);
+        encodeButton = findViewById(R.id.encode);
 
         tvLeft = findViewById(R.id.tvLeft);
         tvRight = findViewById(R.id.tvRight);
 
-        final TextView extractAudio = findViewById(R.id.extractAudio);
         videoView =  findViewById(R.id.videoView);
         rangeSeekBar =  findViewById(R.id.rangeSeekBar);
-        mainlayout =  findViewById(R.id.mainlayout);
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle(null);
         progressDialog.setCancelable(false);
         rangeSeekBar.setEnabled(false);
+
+        containerSpinner = findViewById(R.id.containerSpinner);
+        videoCodecSpinner = findViewById(R.id.videoCodecSpinner);
+        fpsSpinner = findViewById(R.id.fpsSpinner);
+        resolutionSpinner = findViewById(R.id.resolutionSpinner);
+        videoBitrateSpinner = findViewById(R.id.videoBitrateSpinner);
+        audioCodecSpinner = findViewById(R.id.audioCodecSpinner);
+        audioBitrateSpinner = findViewById(R.id.audioBitrateSpinner);
+        audioSampleRateSpinner = findViewById(R.id.audioSampleRateSpinner);
+        audioChannelSpinner = findViewById(R.id.audioChannelSpinner);
 
         FFmpegUtil.init(this, new ResultCallbackHandler<Boolean>()
         {
@@ -96,7 +153,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        uploadVideo.setOnClickListener(new View.OnClickListener()
+        selectVideo.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -107,56 +164,17 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    uploadVideo();
+                    selectVideo();
                 }
             }
         });
 
-        compressVideo.setOnClickListener(new View.OnClickListener()
+        encodeButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                if (selectedVideoUri != null)
-                {
-                    executeCompressCommand();
-                }
-                else
-                {
-                    Snackbar.make(mainlayout, "Please upload a video", 4000).show();
-                }
-
-            }
-        });
-        cutVideo.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (selectedVideoUri != null)
-                {
-                    executeCutVideoCommand(rangeSeekBar.getSelectedMinValue().intValue() * 1000, rangeSeekBar.getSelectedMaxValue().intValue() * 1000);
-                }
-                else
-                {
-                    Snackbar.make(mainlayout, "Please upload a video", 4000).show();
-                }
-            }
-        });
-
-        extractAudio.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (selectedVideoUri != null)
-                {
-                    extractAudioVideo();
-                }
-                else
-                {
-                    Snackbar.make(mainlayout, "Please upload a video", 4000).show();
-                }
+                startEncode();
             }
         });
     }
@@ -192,7 +210,7 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            uploadVideo();
+            selectVideo();
         }
     }
 
@@ -207,7 +225,7 @@ public class MainActivity extends AppCompatActivity
         {
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                uploadVideo();
+                selectVideo();
             }
             else
             {
@@ -238,28 +256,330 @@ public class MainActivity extends AppCompatActivity
     /**
      * Opening gallery for uploading video
      */
-    private void uploadVideo()
+    private void selectVideo()
     {
         Intent intent = new Intent();
         intent.setType("video/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Video"), REQUEST_TAKE_GALLERY_VIDEO);
+
+        String message = getResources().getString(R.string.selectVideo);
+        startActivityForResult(Intent.createChooser(intent, message), REQUEST_TAKE_GALLERY_VIDEO);
+    }
+
+    private void startEncode()
+    {
+        MediaContainer container = (MediaContainer)containerSpinner.getSelectedItem();
+        VideoCodec videoCodec = (VideoCodec)videoCodecSpinner.getSelectedItem();
+        String fps = (String)fpsSpinner.getSelectedItem();
+        String resolution = (String)resolutionSpinner.getSelectedItem();
+        String videoBitrate = (String)videoBitrateSpinner.getSelectedItem();
+        AudioCodec audioCodec = (AudioCodec) audioCodecSpinner.getSelectedItem();
+        String audioBitrate = (String) audioBitrateSpinner.getSelectedItem();
+        String audioSampleRate = (String) audioSampleRateSpinner.getSelectedItem();
+        String audioChannel = (String) audioChannelSpinner.getSelectedItem();
+
+        File outputDir;
+
+        if(container.supportedVideoCodecs.size() > 0)
+        {
+            outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
+        }
+        else
+        {
+            outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+        }
+
+        String filePrefix = "Video_Transcoder_Output";
+        String extension = "." + container.extension;
+        String inputFilePath = videoInfo.file.getAbsolutePath();
+
+        File destination = new File(outputDir, filePrefix + extension);
+        int fileNo = 0;
+        while (destination.exists())
+        {
+            fileNo++;
+            destination = new File(outputDir, filePrefix + "_" + fileNo + extension);
+        }
+
+        outputDestination = destination;
+
+        List<String> command = new LinkedList<>();
+
+        // If the output exists, overwrite it
+        command.add("-y");
+
+        // Input file
+        command.add("-i");
+        command.add(inputFilePath);
+
+        int startTimeSec = rangeSeekBar.getSelectedMinValue().intValue();
+        if(startTimeSec != 0)
+        {
+            // Start time offset
+            command.add("-ss");
+            command.add(Integer.toString(startTimeSec));
+        }
+
+        int endTimeSec = rangeSeekBar.getSelectedMaxValue().intValue();
+        if( (videoInfo.durationMs)/1000 != endTimeSec)
+        {
+            // Duration of media file
+            command.add("-t");
+            command.add(Integer.toString(endTimeSec - startTimeSec));
+        }
+
+        if(container.supportedVideoCodecs.size() > 0)
+        {
+            // Video codec
+            command.add("-vcodec");
+            command.add(videoCodec.ffmpegName);
+
+            // Frame size
+            command.add("-s");
+            command.add(resolution);
+
+            // Frame rate
+            command.add("-r");
+            command.add(fps);
+
+            // Video bitrate
+            command.add("-b:v");
+            command.add(videoBitrate + "k");
+        }
+        else
+        {
+            // No video
+            command.add("-vn");
+        }
+
+        // Audio codec
+        command.add("-acodec");
+        command.add(audioCodec.ffmpegName);
+
+        if(audioCodec == AudioCodec.VORBIS)
+        {
+            // The vorbis encode is experimental, and needs other
+            // flags to enable
+            command.add("-strict");
+            command.add("-2");
+        }
+
+        // Sample rate
+        command.add("-ar");
+        command.add(audioSampleRate);
+
+        // Channels
+        command.add("-ac");
+        command.add(audioChannel);
+
+        // Audio bitrate
+        command.add("-b:a");
+        command.add(audioBitrate + "k");
+
+        // Output file
+        command.add(destination.getAbsolutePath());
+
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegUtil.call(command.toArray(new String[command.size()]), handler);
+
+        stopVideoPlayback();
+    }
+
+    private void stopVideoPlayback()
+    {
+        videoView.pause();
+        if(videoTimer != null)
+        {
+            videoTimer.cancel();
+            videoTimer = null;
+        }
+    }
+
+    private void startVideoPlayback()
+    {
+        stopVideoPlayback();
+
+        int startTimeSec = rangeSeekBar.getSelectedMinValue().intValue();
+        int stopTimeSec = rangeSeekBar.getSelectedMaxValue().intValue();
+        int durationSec = stopTimeSec - startTimeSec;
+
+        videoView.seekTo(startTimeSec * 1000);
+        videoView.start();
+
+        videoTimer = new Timer();
+        videoTimer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                startVideoPlayback();
+            }
+        }, durationSec * 1000);
     }
 
     @Override
     protected void onPause()
     {
         super.onPause();
-        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
-        videoView.pause();
+        stopVideoPlayback();
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-        videoView.seekTo(stopPosition);
-        videoView.start();
+        startVideoPlayback();
+    }
+
+    private void setSpinnerSelection(Spinner spinner, String value)
+    {
+        for(int index = 0; index < spinner.getCount(); index++)
+        {
+            String item = spinner.getItemAtPosition(index).toString();
+            if(item.equals(value))
+            {
+                spinner.setSelection(index);
+                break;
+            }
+        }
+    }
+
+    private void populateOptionDefaults()
+    {
+        for(int id : BASIC_SETTINGS_IDS)
+        {
+            findViewById(id).setVisibility(View.VISIBLE);
+        }
+        for(int id : VIDEO_SETTINGS_IDS)
+        {
+            findViewById(id).setVisibility(View.VISIBLE);
+        }
+        for(int id : AUDIO_SETTINGS_IDS)
+        {
+            findViewById(id).setVisibility(View.VISIBLE);
+        }
+
+        encodeButton.setVisibility(View.VISIBLE);
+
+        containerSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, MediaContainer.values()));
+        containerSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
+            {
+                MediaContainer container = (MediaContainer)parentView.getItemAtPosition(position);
+                int visibility = container.supportedVideoCodecs.size() > 0 ? View.VISIBLE : View.GONE;
+
+                for(int resId : VIDEO_SETTINGS_IDS)
+                {
+                    findViewById(resId).setVisibility(visibility);
+                }
+
+                VideoCodec currentVideoSelection = (VideoCodec)videoCodecSpinner.getSelectedItem();
+                AudioCodec currentAudioSelection = (AudioCodec)audioCodecSpinner.getSelectedItem();
+
+                videoCodecSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, container.supportedVideoCodecs));
+                audioCodecSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, container.supportedAudioCodecs));
+
+                // Attempt to set the same settings again, if they exist
+                if(currentVideoSelection != null)
+                {
+                    setSpinnerSelection(videoCodecSpinner, currentVideoSelection.toString());
+                }
+                if(currentAudioSelection != null)
+                {
+                    setSpinnerSelection(audioCodecSpinner, currentAudioSelection.toString());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView)
+            {
+                // Nothing to do
+            }
+        });
+
+        String [] fps = new String [] {"24", "23.98", "25", "29.97", "30", "50"};
+        fpsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, fps));
+
+        String [] resolution = new String[] {"176x144", "320x240", "480x360", "640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720", "1920x1080", "2048x1080", "2048x858", "2560x1440", "2560x1600", "4096x2160"};
+        resolutionSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, resolution));
+
+        // TODO: Should be a text field, not a spinner
+        String [] videoBitrate = new String[] {"500"};
+        videoBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, videoBitrate));
+
+        audioCodecSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
+            {
+                AudioCodec audioCodec = (AudioCodec) parentView.getItemAtPosition(position);
+
+                String currentSelection = (String)audioChannelSpinner.getSelectedItem();
+                audioChannelSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, audioCodec.supportedChannels));
+
+                // Attempt to set the same setting as before, if it exists
+                setSpinnerSelection(audioChannelSpinner, currentSelection);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView)
+            {
+                // Nothing to do
+            }
+        });
+
+        String [] audioBitrate = new String[] {"15", "24", "32", "64", "96", "128", "192", "256", "320", "384", "448", "512"};
+        audioBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, audioBitrate));
+
+        String [] sampleRate = new String[] {"8000", "11025", "16000", "22050", "24000", "32000", "44100", "48000"};
+        audioSampleRateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, sampleRate));
+
+        String [] channels = new String[] {"1", "2"};
+        audioChannelSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, channels));
+
+        if(videoInfo.container != null)
+        {
+            setSpinnerSelection(containerSpinner, videoInfo.container.toString());
+        }
+
+        if(videoInfo.videoCodec != null)
+        {
+            setSpinnerSelection(videoCodecSpinner, videoInfo.videoCodec.toString());
+        }
+
+        if(videoInfo.videoFramerate != null)
+        {
+            setSpinnerSelection(fpsSpinner, videoInfo.videoFramerate);
+        }
+
+        if(videoInfo.videoResolution != null)
+        {
+            setSpinnerSelection(resolutionSpinner, videoInfo.videoResolution);
+        }
+
+        if(videoInfo.videoBitrate != null)
+        {
+            setSpinnerSelection(videoBitrateSpinner, videoInfo.videoBitrate);
+        }
+
+        if(videoInfo.audioCodec != null)
+        {
+            setSpinnerSelection(audioCodecSpinner, videoInfo.audioCodec.toString());
+        }
+
+        if(videoInfo.audioBitrate != null)
+        {
+            setSpinnerSelection(audioBitrateSpinner, videoInfo.audioBitrate);
+        }
+
+        if(videoInfo.audioSampleRate != null)
+        {
+            setSpinnerSelection(audioSampleRateSpinner, videoInfo.audioSampleRate);
+        }
+
+        setSpinnerSelection(audioChannelSpinner, Integer.toString(videoInfo.audioChannels));
     }
 
     @Override
@@ -270,53 +590,67 @@ public class MainActivity extends AppCompatActivity
         {
             if (requestCode == REQUEST_TAKE_GALLERY_VIDEO)
             {
-                selectedVideoUri = data.getData();
+                Uri selectedVideoUri = data.getData();
+                String videoPath = getPath(MainActivity.this, selectedVideoUri);
+
+                if(videoPath == null)
+                {
+                    Toast.makeText(this, R.string.fileLocationLookupFailed, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 videoView.setVideoURI(selectedVideoUri);
                 videoView.start();
 
                 videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
                 {
-
                     @Override
                     public void onPrepared(MediaPlayer mp)
                     {
-                        durationMs = mp.getDuration();
-                        tvLeft.setText("00:00:00");
-
+                        int durationMs = mp.getDuration();
+                        tvLeft.setVisibility(View.VISIBLE);
+                        tvLeft.setText(getTime(0));
+                        tvRight.setVisibility(View.VISIBLE);
                         tvRight.setText(getTime(durationMs / 1000));
                         mp.setLooping(true);
-                        rangeSeekBar.setRangeValues(0, durationMs / 1000);
-                        rangeSeekBar.setSelectedMinValue(0);
-                        rangeSeekBar.setSelectedMaxValue(durationMs / 1000);
-                        rangeSeekBar.setEnabled(true);
 
-                        rangeSeekBar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener()
+                        rangeSeekBar.setMinValue(0);
+                        rangeSeekBar.setMaxValue(durationMs / 1000f);
+                        rangeSeekBar.setEnabled(true);
+                        rangeSeekBar.setVisibility(View.VISIBLE);
+
+                        rangeSeekBar.setOnRangeSeekbarChangeListener(new OnRangeSeekbarChangeListener()
                         {
                             @Override
-                            public void onRangeSeekBarValuesChanged(RangeSeekBar bar, Object minValue, Object maxValue)
+                            public void valueChanged(Number minValue, Number maxValue)
                             {
-                                videoView.seekTo((int) minValue * 1000);
+                                tvLeft.setText(getTime(minValue.intValue()));
+                                tvRight.setText(getTime(maxValue.intValue()));
 
-                                tvLeft.setText(getTime((int) bar.getSelectedMinValue()));
-
-                                tvRight.setText(getTime((int) bar.getSelectedMaxValue()));
-
+                                startVideoPlayback();
                             }
                         });
+                    }
+                });
 
-                        final Handler handler = new Handler();
-                        handler.postDelayed(r = new Runnable()
+                final File videoFile = new File(videoPath);
+
+                FFmpegUtil.getMediaDetails(new File(videoPath), new ResultCallbackHandler<MediaInfo>()
+                {
+                    @Override
+                    public void onResult(MediaInfo result)
+                    {
+                        if(result == null)
                         {
-                            @Override
-                            public void run()
-                            {
+                            // Could not query the file, fill in what we know.
+                            result = new MediaInfo(videoFile, 0, MediaContainer.MP4, VideoCodec.MPEG4, "640x480",
+                                "800", "25", AudioCodec.MP3,
+                                "44100", "128", 2);
+                        }
 
-                                if (videoView.getCurrentPosition() >= rangeSeekBar.getSelectedMaxValue().intValue() * 1000)
-                                    videoView.seekTo(rangeSeekBar.getSelectedMinValue().intValue() * 1000);
-                                handler.postDelayed(r, 1000);
-                            }
-                        }, 1000);
+                        videoInfo = result;
 
+                        populateOptionDefaults();
                     }
                 });
             }
@@ -329,7 +663,8 @@ public class MainActivity extends AppCompatActivity
         int rem = seconds % 3600;
         int mn = rem / 60;
         int sec = rem % 60;
-        return String.format("%02d", hr) + ":" + String.format("%02d", mn) + ":" + String.format("%02d", sec);
+
+        return String.format(Locale.US, "%02d:%02d:%02d", hr, mn, sec);
     }
 
     private void showUnsupportedExceptionDialog()
@@ -349,7 +684,6 @@ public class MainActivity extends AppCompatActivity
                 })
                 .create()
                 .show();
-
     }
 
     private ResultCallbackHandler<Boolean> _transcodeResultHandler = new ResultCallbackHandler<Boolean>()
@@ -361,7 +695,7 @@ public class MainActivity extends AppCompatActivity
 
             if(result)
             {
-                message = getResources().getString(R.string.transcodeSuccess, filePath);
+                message = getResources().getString(R.string.transcodeSuccess, outputDestination.getAbsolutePath());
             }
             else
             {
@@ -380,8 +714,7 @@ public class MainActivity extends AppCompatActivity
                     })
                     .show();
 
-            videoView.seekTo(stopPosition);
-            videoView.start();
+            startVideoPlayback();
         }
     };
 
@@ -396,7 +729,7 @@ public class MainActivity extends AppCompatActivity
 
         String filePrefix = "cut_video";
         String fileExtn = ".mp4";
-        String yourRealPath = getPath(MainActivity.this, selectedVideoUri);
+        String yourRealPath = videoInfo.file.getAbsolutePath();
         File dest = new File(moviesDir, filePrefix + fileExtn);
         int fileNo = 0;
         while (dest.exists())
@@ -409,15 +742,14 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "startTrim: dest: " + dest.getAbsolutePath());
         Log.d(TAG, "startTrim: startMs: " + startMs);
         Log.d(TAG, "startTrim: endMs: " + endMs);
-        filePath = dest.getAbsolutePath();
+        outputDestination = dest;
 
-        final String[] complexCommand = {"-ss", "" + startMs / 1000, "-y", "-i", yourRealPath, "-t", "" + (endMs - startMs) / 1000,"-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
+        final String[] complexCommand = {"-ss", "" + startMs / 1000, "-y", "-i", yourRealPath, "-t", "" + (endMs - startMs) / 1000,"-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", dest.getAbsolutePath()};
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
-        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
-        videoView.pause();
+        stopVideoPlayback();
     }
 
     /**
@@ -431,7 +763,7 @@ public class MainActivity extends AppCompatActivity
 
         String filePrefix = "compress_video";
         String fileExtn = ".mp4";
-        String yourRealPath = getPath(MainActivity.this, selectedVideoUri);
+        String yourRealPath = videoInfo.file.getAbsolutePath();
 
 
         File dest = new File(moviesDir, filePrefix + fileExtn);
@@ -444,14 +776,13 @@ public class MainActivity extends AppCompatActivity
 
         Log.d(TAG, "startTrim: src: " + yourRealPath);
         Log.d(TAG, "startTrim: dest: " + dest.getAbsolutePath());
-        filePath = dest.getAbsolutePath();
-        String[] complexCommand = {"-y", "-i", yourRealPath, "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", "150k", "-b:a", "48000", "-ac", "2", "-ar", "22050", filePath};
+        outputDestination = dest;
+        String[] complexCommand = {"-y", "-i", yourRealPath, "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", "150k", "-b:a", "48000", "-ac", "2", "-ar", "22050", dest.getAbsolutePath()};
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
-        stopPosition = videoView.getCurrentPosition();
-        videoView.pause();
+        stopVideoPlayback();
     }
 
     /**
@@ -465,7 +796,7 @@ public class MainActivity extends AppCompatActivity
 
         String filePrefix = "extract_audio";
         String fileExtn = ".mp3";
-        String yourRealPath = getPath(MainActivity.this, selectedVideoUri);
+        String yourRealPath = videoInfo.file.getAbsolutePath();
         File dest = new File(moviesDir, filePrefix + fileExtn);
 
         int fileNo = 0;
@@ -476,15 +807,14 @@ public class MainActivity extends AppCompatActivity
         }
         Log.d(TAG, "startTrim: src: " + yourRealPath);
         Log.d(TAG, "startTrim: dest: " + dest.getAbsolutePath());
-        filePath = dest.getAbsolutePath();
+        outputDestination = dest;
 
-        String[] complexCommand = {"-y", "-i", yourRealPath, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "256k", "-f", "mp3", filePath};
+        String[] complexCommand = {"-y", "-i", yourRealPath, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "256k", "-f", "mp3", dest.getAbsolutePath()};
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(this, durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressDialog, _transcodeResultHandler);
         FFmpegUtil.call(complexCommand, handler);
 
-        stopPosition = videoView.getCurrentPosition(); //stopPosition is an int
-        videoView.pause();
+        stopVideoPlayback();
     }
 
     /**
@@ -654,7 +984,7 @@ public class MainActivity extends AppCompatActivity
             "FFmpeg", "https://www.ffmpeg.org/",
             "FFmpeg Android", "http://writingminds.github.io/ffmpeg-android/",
             "Guava", "https://github.com/google/guava",
-            "Range SeekBar", "https://github.com/anothem/android-range-seek-bar"
+            "Crystal Range Seekbar", "https://github.com/syedowaisali/crystal-range-seekbar"
         );
 
         final Map<String, String> USED_ASSETS = ImmutableMap.of

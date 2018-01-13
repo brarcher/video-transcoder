@@ -8,8 +8,10 @@ import org.robolectric.annotation.Config;
 import java.io.File;
 import java.util.List;
 
+import protect.videotranscoder.media.AudioCodec;
 import protect.videotranscoder.media.MediaInfo;
 import protect.videotranscoder.media.MediaContainer;
+import protect.videotranscoder.media.VideoCodec;
 
 import static org.junit.Assert.*;
 
@@ -43,14 +45,14 @@ public class FFmpegUtilTest
 
         assertEquals(file, info.file);
         assertEquals( (2*60+22)*1000 + 86, info.durationMs);
-
-        assertEquals("h264", info.videoCodec);
+        assertEquals(MediaContainer.MP4, info.container);
+        assertEquals(VideoCodec.H264, info.videoCodec);
         assertEquals("1080x1920", info.videoResolution);
-        assertEquals("4499 kb/s", info.videoBitrate);
-        assertEquals("19.01 fps", info.videoFramerate);
-        assertEquals("aac", info.audioCodec);
-        assertEquals("22050 Hz", info.audioSampleRate);
-        assertEquals("63 kb/s", info.audioBitrate);
+        assertEquals("4499", info.videoBitrate);
+        assertEquals("19.01", info.videoFramerate);
+        assertEquals(AudioCodec.AAC, info.audioCodec);
+        assertEquals("22050", info.audioSampleRate);
+        assertEquals("63", info.audioBitrate);
         assertEquals(1, info.audioChannels);
 
         string = "libavutil      55. 17.103 / 55. 17.103\n" +
@@ -79,14 +81,34 @@ public class FFmpegUtilTest
 
         assertEquals(file, info.file);
         assertEquals( (10)*1000 + 5, info.durationMs);
-
-        assertEquals("mpeg4", info.videoCodec);
+        assertEquals(MediaContainer.MP4, info.container);
+        assertEquals(VideoCodec.MPEG4, info.videoCodec);
         assertEquals("320x240", info.videoResolution);
-        assertEquals("705 kb/s", info.videoBitrate);
-        assertEquals("25 fps", info.videoFramerate);
-        assertEquals("aac", info.audioCodec);
-        assertEquals("22050 Hz", info.audioSampleRate);
-        assertEquals("47 kb/s", info.audioBitrate);
+        assertEquals("705", info.videoBitrate);
+        assertEquals("25", info.videoFramerate);
+        assertEquals(AudioCodec.AAC, info.audioCodec);
+        assertEquals("22050", info.audioSampleRate);
+        assertEquals("47", info.audioBitrate);
+        assertEquals(2, info.audioChannels);
+
+        string = "Input #0, flv, from 'SampleVideo_360x240_1mb.flv':\n" +
+                "  Metadata:\n" + "    encoder         : Lavf53.24.2\n" +
+                "  Duration: 00:00:10.64, start: 0.000000, bitrate: 792 kb/s\n" +
+                "    Stream #0:0: Audio: aac (LC), 48000 Hz, 5.1, fltp\n" +
+                "    Stream #0:1: Video: flv1, yuv420p, 320x240, 25 fps, 25 tbr, 1k tbn";
+
+        info = FFmpegUtil.parseMediaInfo(file, string);
+
+        assertEquals(file, info.file);
+        assertEquals( (10)*1000 + 64, info.durationMs);
+        assertEquals(MediaContainer.FLV, info.container);
+        assertEquals(null, info.videoCodec);
+        assertEquals("320x240", info.videoResolution);
+        assertEquals(null, info.videoBitrate);
+        assertEquals("25", info.videoFramerate);
+        assertEquals(AudioCodec.AAC, info.audioCodec);
+        assertEquals("48000", info.audioSampleRate);
+        assertEquals(null, info.audioBitrate);
         assertEquals(2, info.audioChannels);
     }
 

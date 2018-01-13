@@ -7,128 +7,427 @@
     android:layout_height="match_parent"
     android:fadeScrollbars="false"
     android:layout_weight="1"
+    android:background="@color/inputContrastBackground"
     android:fillViewport="true">
 
-    <RelativeLayout
-
-
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <VideoView
             android:id="@+id/videoView"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp200"
-            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
             android:layout_marginLeft="@dimen/dp20"
             android:layout_marginRight="@dimen/dp20"
             android:layout_marginTop="@dimen/dp5" />
 
-
-        <org.florescu.android.rangeseekbar.RangeSeekBar
+        <com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar
             android:id="@+id/rangeSeekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/videoView"
-            android:layout_marginTop="@dimen/dp5"
-            app:showLabels="false"
-            rsb:activeColor="#ED1C24"
-            rsb:textAboveThumbsColor="#000000" />
+            app:data_type="_integer"
+            android:visibility="invisible"
+            />
 
-        <TextView
-            android:id="@+id/tvLeft"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/rangeSeekBar"
-            android:layout_alignStart="@+id/rangeSeekBar"
-            android:layout_below="@+id/rangeSeekBar"
-            android:textColor="#000000" />
-
-        <TextView
-            android:id="@+id/tvRight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/rangeSeekBar"
-            android:layout_alignRight="@+id/rangeSeekBar"
-            android:layout_below="@+id/rangeSeekBar"
-            android:textColor="#000000" />
-
-        <TextView
-            android:id="@+id/tvInstructions"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvRight"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="@dimen/dp5"
-            android:gravity="center"
-            android:text="@string/rangeSeekBarText"
-            android:textColor="#000000" />
-
-        <TextView
-            android:id="@+id/uploadVideo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvInstructions"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/dp5"
-            android:background="@drawable/upload_video_selector"
-            android:gravity="center"
-            android:padding="@dimen/dp5"
-            android:text="@string/uploadVideo"
-            android:textColor="#FFFFFF"
-            android:textSize="@dimen/sp16" />
-
-        <TableLayout
-            android:id="@+id/footer"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@+id/uploadVideo"
-            android:layout_marginTop="@dimen/dp5"
-            android:gravity="center_horizontal|bottom"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tvLeft"
+                android:visibility="invisible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:textColor="#000000" />
 
-            <TableRow>
+            <TextView
+                android:id="@+id/tvRight"
+                android:visibility="invisible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textColor="#000000" />
 
-                <TextView
-                    android:id="@+id/compressVideo"
-                    android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/buttonContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/selectVideo"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/compress_video_selector"
-                    android:gravity="center"
-                    android:padding="@dimen/dp2"
-                    android:text="@string/compressVideo"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/sp16" />
-
-                <TextView
-                    android:id="@+id/cropVideo"
-                    android:layout_width="0dp"
+                    android:text="@string/selectVideo"
+                    />
+                <Button
+                    android:id="@+id/encode"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/crop_video_selector"
-                    android:gravity="center"
-                    android:padding="@dimen/dp2"
-                    android:text="@string/cutVideo"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/sp16" />
+                    android:visibility="gone"
+                    android:text="@string/encode"
+                    />
+            </LinearLayout>
 
+            <!-- Basic Settings Title -->
+            <TextView
+                android:id="@+id/basicSettingsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/titlePaddingHorizontal"
+                android:paddingRight="@dimen/titlePaddingHorizontal"
+                android:paddingStart="@dimen/titlePaddingHorizontal"
+                android:paddingTop="@dimen/titlePaddingTop"
+                android:layout_below="@id/buttonContainer"
+                android:text="Basic Settings"
+                android:textSize="@dimen/inputTitleSize"
+                android:visibility="invisible"
+                />
+            <View
+                android:id="@+id/basicSettingsTopDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/basicSettingsText"
+                android:visibility="invisible"/>
+
+            <!-- Container Type -->
+            <LinearLayout
+                android:id="@+id/containerTypeContainer"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/inputBackground"
+                android:layout_below="@id/basicSettingsTopDivider"
+                android:visibility="invisible">
                 <TextView
-                    android:id="@+id/extractAudio"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/extract_audio_selector"
-                    android:gravity="center"
-                    android:padding="@dimen/dp2"
-                    android:text="@string/extractAudio"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/sp16" />
-            </TableRow>
+                    android:text="Container"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/inputPadding"
+                    android:textSize="@dimen/inputSize"/>
 
-        </TableLayout>
+                <Spinner
+                    android:id="@+id/containerSpinner"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textSize="@dimen/inputSize"
+                    android:drawSelectorOnTop="true" />
+            </LinearLayout>
+            <View
+                android:id="@+id/containerTypeContainerDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/containerTypeContainer"
+                android:visibility="invisible"/>
 
+            <!-- Video Settings Title -->
+            <TextView
+                android:id="@+id/videoSettingsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/titlePaddingHorizontal"
+                android:paddingRight="@dimen/titlePaddingHorizontal"
+                android:paddingStart="@dimen/titlePaddingHorizontal"
+                android:paddingTop="@dimen/titlePaddingTop"
+                android:layout_below="@id/containerTypeContainerDivider"
+                android:text="Video Settings"
+                android:textSize="@dimen/inputTitleSize"
+                android:visibility="invisible"
+                />
+            <View
+                android:id="@+id/videoSettingsTextTopDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/videoSettingsText"
+                android:visibility="invisible"/>
 
-    </RelativeLayout>
+            <!-- Video Codec -->
+            <LinearLayout
+                android:id="@+id/videoCodecContainer"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/inputBackground"
+                android:layout_below="@id/videoSettingsTextTopDivider"
+                android:visibility="invisible">
+                <TextView
+                    android:text="Codec"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/inputPadding"
+                    android:textSize="@dimen/inputSize"/>
+
+                <Spinner
+                    android:id="@+id/videoCodecSpinner"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textSize="@dimen/inputSize"
+                    android:drawSelectorOnTop="true" />
+            </LinearLayout>
+            <View
+                android:id="@+id/videoCodecContainerDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/videoCodecContainer"
+                android:visibility="invisible"/>
+
+            <!-- Frames Per Second -->
+            <LinearLayout
+                android:id="@+id/fpsContainer"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/inputBackground"
+                android:layout_below="@id/videoCodecContainerDivider"
+                android:visibility="invisible">
+                <TextView
+                    android:text="FPS"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/inputPadding"
+                    android:textSize="@dimen/inputSize"/>
+
+                <Spinner
+                    android:id="@+id/fpsSpinner"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textSize="@dimen/inputSize"
+                    android:drawSelectorOnTop="true" />
+            </LinearLayout>
+            <View
+                android:id="@+id/fpsContainerDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/fpsContainer"
+                android:visibility="invisible"/>
+
+            <!-- Resolution -->
+            <LinearLayout
+                android:id="@+id/resolutionContainer"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/inputBackground"
+                android:layout_below="@id/fpsContainerDivider"
+                android:visibility="invisible">
+                <TextView
+                    android:text="Resolution"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/inputPadding"
+                    android:textSize="@dimen/inputSize"/>
+
+                <Spinner
+                    android:id="@+id/resolutionSpinner"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textSize="@dimen/inputSize"
+                    android:drawSelectorOnTop="true" />
+            </LinearLayout>
+            <View
+                android:id="@+id/resolutionContainerDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/resolutionContainer"
+                android:visibility="invisible"/>
+
+            <!-- Video Bitrate -->
+            <LinearLayout
+                android:id="@+id/videoBitrateContainer"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/inputBackground"
+                android:layout_below="@id/resolutionContainerDivider"
+                android:visibility="invisible">
+                <TextView
+                    android:text="Bitrate"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/inputPadding"
+                    android:textSize="@dimen/inputSize"/>
+
+                <Spinner
+                    android:id="@+id/videoBitrateSpinner"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textSize="@dimen/inputSize"
+                    android:drawSelectorOnTop="true" />
+            </LinearLayout>
+            <View
+                android:id="@+id/videoBitrateContainerDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/videoBitrateContainer"
+                android:visibility="invisible"/>
+
+            <!-- Audio Settings Title -->
+            <TextView
+                android:id="@+id/audioSettingsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/titlePaddingHorizontal"
+                android:paddingRight="@dimen/titlePaddingHorizontal"
+                android:paddingStart="@dimen/titlePaddingHorizontal"
+                android:paddingTop="@dimen/titlePaddingTop"
+                android:layout_below="@id/videoBitrateContainerDivider"
+                android:text="Audio Settings"
+                android:textSize="@dimen/inputTitleSize"
+                android:visibility="invisible"
+                />
+            <View
+                android:id="@+id/audioSettingsTextTopDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/audioSettingsText"
+                android:visibility="invisible"/>
+
+            <!-- Audio Codec -->
+            <LinearLayout
+                android:id="@+id/audioCodecContainer"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/inputBackground"
+                android:layout_below="@id/audioSettingsTextTopDivider"
+                android:visibility="invisible">
+                <TextView
+                    android:text="Codec"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/inputPadding"
+                    android:textSize="@dimen/inputSize"/>
+
+                <Spinner
+                    android:id="@+id/audioCodecSpinner"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textSize="@dimen/inputSize"
+                    android:drawSelectorOnTop="true" />
+            </LinearLayout>
+            <View
+                android:id="@+id/audioCodecContainerDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/audioCodecContainer"
+                android:visibility="invisible"/>
+
+            <!-- Audio Bitrate -->
+            <LinearLayout
+                android:id="@+id/audioBitrateContainer"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/inputBackground"
+                android:layout_below="@id/audioCodecContainerDivider"
+                android:visibility="invisible">
+                <TextView
+                    android:text="Bitrate"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/inputPadding"
+                    android:textSize="@dimen/inputSize"/>
+
+                <Spinner
+                    android:id="@+id/audioBitrateSpinner"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textSize="@dimen/inputSize"
+                    android:drawSelectorOnTop="true" />
+            </LinearLayout>
+            <View
+                android:id="@+id/audioBitrateContainerDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/audioBitrateContainer"
+                android:visibility="invisible"/>
+
+            <!-- Audio Sample Rate -->
+            <LinearLayout
+                android:id="@+id/audioSampleRateContainer"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/inputBackground"
+                android:layout_below="@id/audioBitrateContainerDivider"
+                android:visibility="invisible">
+                <TextView
+                    android:text="Sample Rate"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/inputPadding"
+                    android:textSize="@dimen/inputSize"/>
+
+                <Spinner
+                    android:id="@+id/audioSampleRateSpinner"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textSize="@dimen/inputSize"
+                    android:drawSelectorOnTop="true" />
+            </LinearLayout>
+            <View
+                android:id="@+id/audioSampleRateContainerDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/audioSampleRateContainer"
+                android:visibility="invisible"/>
+
+            <!-- Audio Channel -->
+            <LinearLayout
+                android:id="@+id/audioChannelContainer"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/inputBackground"
+                android:layout_below="@id/audioSampleRateContainerDivider"
+                android:visibility="invisible">
+                <TextView
+                    android:text="Channel"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/inputPadding"
+                    android:textSize="@dimen/inputSize"/>
+
+                <Spinner
+                    android:id="@+id/audioChannelSpinner"
+                    android:gravity="end"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:textSize="@dimen/inputSize"
+                    android:drawSelectorOnTop="true" />
+            </LinearLayout>
+            <View
+                android:id="@+id/audioChannelContainerDivider"
+                android:layout_height="@dimen/inputBorderThickness"
+                android:layout_width="match_parent"
+                android:background="@color/inputBorder"
+                android:layout_below="@id/audioChannelContainer"
+                android:visibility="invisible"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
 </ScrollView>

@@ -20,8 +20,10 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import protect.videotranscoder.media.AudioCodec;
 import protect.videotranscoder.media.MediaInfo;
 import protect.videotranscoder.media.MediaContainer;
+import protect.videotranscoder.media.VideoCodec;
 
 /**
  * Utility class for executing ffmpeg
@@ -186,11 +188,12 @@ public class FFmpegUtil
     static MediaInfo parseMediaInfo(File mediaFile, String string)
     {
         long durationMs = 0;
-        String videoCodec = null;
+        MediaContainer container = null;
+        VideoCodec videoCodec = null;
         String videoResolution = null;
         String videoBitrate = null;
         String videoFramerate = null;
-        String audioCodec = null;
+        AudioCodec audioCodec = null;
         String audioSampleRate = null;
         String audioBitrate = null;
         int audioChannels = 2;
@@ -242,6 +245,18 @@ public class FFmpegUtil
                 durationMs = time;
             }
 
+            if(line.startsWith("Input"))
+            {
+                for(MediaContainer item : MediaContainer.values())
+                {
+                    if(line.contains(item.ffmpegName))
+                    {
+                        container = item;
+                        break;
+                    }
+                }
+            }
+
             if(line.startsWith("Stream") && line.contains("Video:"))
             {
                 // Stream #0:0: Video: h264 (Main), yuv420p, 640x360 [SAR 1:1 DAR 16:9], 25 fps, 25 tbr, 1k tbn, 50 tbc
@@ -252,7 +267,9 @@ public class FFmpegUtil
                 {
                     continue;
                 }
-                videoCodec = split[3];
+
+                String videoCodecName = split[3];
+                videoCodec = VideoCodec.fromName(videoCodecName);
 
                 // Looking for resolution. There are sometimes items such as:
                 //  (mp4a / 0x6134706D)
@@ -274,12 +291,12 @@ public class FFmpegUtil
 
                     if(piece.contains("kb/s"))
                     {
-                        videoBitrate = piece;
+                        videoBitrate = piece.replace("kb/s", "").trim();
                     }
 
                     if(piece.contains("fps"))
                     {
-                        videoFramerate = piece;
+                        videoFramerate = piece.replace("fps", "").trim();
                     }
                 }
             }
@@ -294,7 +311,9 @@ public class FFmpegUtil
                 {
                     continue;
                 }
-                audioCodec = split[3];
+
+                String audioCodecName = split[3];
+                audioCodec = AudioCodec.fromName(audioCodecName);
 
                 split = line.split(",");
                 for(String piece : split)
@@ -303,12 +322,12 @@ public class FFmpegUtil
 
                     if(piece.contains("Hz"))
                     {
-                        audioSampleRate = piece;
+                        audioSampleRate = piece.replace("Hz", "").trim();
                     }
 
                     if(piece.contains("kb/s"))
                     {
-                        audioBitrate = piece;
+                        audioBitrate = piece.replace("kb/s", "").trim();
 
                         if(audioBitrate.contains("(default)"))
                         {
@@ -324,7 +343,7 @@ public class FFmpegUtil
             }
         }
 
-        MediaInfo info = new MediaInfo(mediaFile, durationMs, videoCodec, videoResolution,
+        MediaInfo info = new MediaInfo(mediaFile, durationMs, container, videoCodec, videoResolution,
                 videoBitrate, videoFramerate, audioCodec, audioSampleRate, audioBitrate, audioChannels);
         return info;
     }

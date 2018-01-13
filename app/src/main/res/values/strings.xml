@@ -2,17 +2,9 @@
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">Video Transcoder</string>
-    <string name="rangeSeekBarText">Use RangeSeekbar to select time range for cutting video or extracting images from video(rangeseekbar ineffective for other options)</string>
-    <string name="uploadVideo">Upload\nVideo</string>
-    <string name="compressVideo">Compress\nVideo</string>
-    <string name="cutVideo">Cut\nVideo</string>
-    <string name="extractImages">Extract\nImages</string>
-    <string name="extractAudio">Extract\nAudio</string>
-    <string name="addFade">Add\nFade in-out</string>
-    <string name="increaseSpeed">Fast\nMotion</string>
-    <string name="decreaseSpeed">Slow\nMotion</string>
-    <string name="reverseVideo">Reverse\nVideo</string>
-    <string name="dialogMessage">The process will take some time.Please be patient.</string>
+
+    <string name="selectVideo">Select\nVideo</string>
+    <string name="encode">Encode</string>
 
     <string name="ok">OK</string>
 
@@ -22,6 +14,8 @@
     <string name="writePermissionExplanation">This application needs access to storage in order to read and write media files. Without this access, the application cannot transcode.</string>
     <string name="permissionRequestAgain">Request again</string>
 
+    <string name="fileLocationLookupFailed">Failed to resolve the location of the media file</string>
+
     <string name="about">About</string>
     <string name="app_copyright_fmt">Copyright 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
     <string name="app_license">Licensed under the GPLv2.</string>
@@ -30,6 +24,4 @@
     <string name="app_revision_fmt">Revision Information: <xliff:g id="app_revision_url">%s</xliff:g></string>
     <string name="app_libraries"><xliff:g id="app_name">%s</xliff:g> uses the following third-party libraries: <xliff:g id="app_libraries_list">%s</xliff:g></string>
     <string name="app_resources"><xliff:g id="app_name">%s</xliff:g> uses the following third-party resources: <xliff:g id="app_resources_list">%s</xliff:g></string>
-
-
 </resources>
