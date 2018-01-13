@@ -208,6 +208,7 @@ public class FFmpegUtil
     static MediaInfo parseMediaInfo(File mediaFile, String string)
     {
         long durationMs = 0;
+        Integer totalBitrate = null;
         MediaContainer container = null;
         VideoCodec videoCodec = null;
         String videoResolution = null;
@@ -263,6 +264,24 @@ public class FFmpegUtil
                 }
 
                 durationMs = time;
+
+                split = line.split(",");
+                for(String item : split)
+                {
+                    if(item.contains("bitrate:"))
+                    {
+                        item = item.replace("bitrate:", "").replace("kb/s", "").trim();
+                        try
+                        {
+                            // This may be used later if the video bitrate cannot be determined.
+                            totalBitrate = Integer.parseInt(item);
+                        }
+                        catch(NumberFormatException e)
+                        {
+                            continue;
+                        }
+                    }
+                }
             }
 
             if(line.startsWith("Input"))
@@ -384,6 +403,29 @@ public class FFmpegUtil
                     {
                         audioChannels = 1;
                     }
+                }
+            }
+        }
+
+        if(totalBitrate != null)
+        {
+            if(videoBitrate == null)
+            {
+                if(audioBitrate != null)
+                {
+                    // We know the audio bitrate, we can calculate the video bitrate
+                    videoBitrate = totalBitrate - audioBitrate;
+                }
+
+                if(videoBitrate == null)
+                {
+                    // We do not know any of the separate bitrates. Lets guess 100 kb/s for the audio,
+                    // and subtract that from the total to guess the video bitrate.
+
+                    // As a guess, subtract 100 kb/s from the bitrate for audio, and
+                    // assume that the video is the rest. This should be a decent-ish
+                    // estimate if the video bitrate cannot be found later.
+                    videoBitrate = totalBitrate - 100;
                 }
             }
         }

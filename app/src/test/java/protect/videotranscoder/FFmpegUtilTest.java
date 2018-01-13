@@ -104,12 +104,22 @@ public class FFmpegUtilTest
         assertEquals(MediaContainer.FLV, info.container);
         assertEquals(null, info.videoCodec);
         assertEquals("320x240", info.videoResolution);
-        assertEquals(null, info.videoBitrate);
+        assertEquals(Integer.valueOf(692), info.videoBitrate); // This is guessed from total bitrate
         assertEquals("25", info.videoFramerate);
         assertEquals(AudioCodec.AAC, info.audioCodec);
         assertEquals(Integer.valueOf(48000), info.audioSampleRate);
         assertEquals(null, info.audioBitrate);
         assertEquals(Integer.valueOf(2), info.audioChannels);
+
+        string = "Input #0, flv, from 'SampleVideo_360x240_1mb.flv':\n" +
+                "  Metadata:\n" + "    encoder         : Lavf53.24.2\n" +
+                "  Duration: 00:00:10.64, start: 0.000000, bitrate: 792 kb/s\n" +
+                "    Stream #0:0: Audio: aac (LC), 48000 Hz, 5.1, fltp, 92 kb/s (default)\n" +
+                "    Stream #0:1: Video: flv1, yuv420p, 320x240, 25 fps, 25 tbr, 1k tbn";
+
+        info = FFmpegUtil.parseMediaInfo(file, string);
+
+        assertEquals(Integer.valueOf(700), info.videoBitrate); // This is guessed from total and audio bitrate
     }
 
     @Test
