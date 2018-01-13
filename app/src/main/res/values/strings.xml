@@ -4,6 +4,7 @@
     <string name="app_name">Video Transcoder</string>
 
     <string name="selectVideo">Select\nVideo</string>
+    <string name="encode">Encode</string>
 
     <string name="ok">OK</string>
 

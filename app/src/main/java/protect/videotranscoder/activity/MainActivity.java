@@ -26,6 +26,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -106,8 +107,8 @@ public class MainActivity extends AppCompatActivity
     private Spinner audioSampleRateSpinner;
     private Spinner audioChannelSpinner;
 
-
     private TextView tvLeft, tvRight;
+    private Button encodeButton;
     private MediaInfo videoInfo;
     private File outputDestination;
 
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final TextView selectVideo = findViewById(R.id.selectVideo);
+        encodeButton = findViewById(R.id.encode);
 
         tvLeft = findViewById(R.id.tvLeft);
         tvRight = findViewById(R.id.tvRight);
@@ -163,6 +165,14 @@ public class MainActivity extends AppCompatActivity
                 {
                     selectVideo();
                 }
+            }
+        });
+
+        encodeButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
             }
         });
     }
@@ -327,7 +337,9 @@ public class MainActivity extends AppCompatActivity
         {
             findViewById(id).setVisibility(View.VISIBLE);
         }
-        
+
+        encodeButton.setVisibility(View.VISIBLE);
+
         containerSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, MediaContainer.values()));
         containerSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {

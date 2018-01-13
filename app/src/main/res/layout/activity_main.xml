@@ -51,14 +51,27 @@
                 android:layout_alignParentEnd="true"
                 android:textColor="#000000" />
 
-            <Button
-                android:id="@+id/selectVideo"
+            <LinearLayout
+                android:id="@+id/buttonContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:text="@string/selectVideo"
-                />
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/selectVideo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/selectVideo"
+                    />
+                <Button
+                    android:id="@+id/encode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:text="@string/encode"
+                    />
+            </LinearLayout>
 
             <!-- Basic Settings Title -->
             <TextView
@@ -69,7 +82,7 @@
                 android:paddingRight="@dimen/titlePaddingHorizontal"
                 android:paddingStart="@dimen/titlePaddingHorizontal"
                 android:paddingTop="@dimen/titlePaddingTop"
-                android:layout_below="@id/selectVideo"
+                android:layout_below="@id/buttonContainer"
                 android:text="Basic Settings"
                 android:textSize="@dimen/inputTitleSize"
                 android:visibility="invisible"
