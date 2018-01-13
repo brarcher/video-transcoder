@@ -568,6 +568,11 @@ public class MainActivity extends AppCompatActivity
         });
 
         List<Integer> audioBitrate = new ArrayList<>(Arrays.asList(15, 24, 32, 64, 96, 128, 192, 256, 320, 384, 448, 512));
+        if(videoInfo.audioBitrate != null && audioBitrate.contains(videoInfo.audioBitrate) == false)
+        {
+            audioBitrate.add(videoInfo.audioBitrate);
+            Collections.sort(audioBitrate);
+        }
         audioBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, audioBitrate));
 
         String [] sampleRate = new String[] {"8000", "11025", "16000", "22050", "24000", "32000", "44100", "48000"};
