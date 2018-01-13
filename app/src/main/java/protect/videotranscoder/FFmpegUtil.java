@@ -291,12 +291,12 @@ public class FFmpegUtil
 
                     if(piece.contains("kb/s"))
                     {
-                        videoBitrate = piece;
+                        videoBitrate = piece.replace("kb/s", "").trim();
                     }
 
                     if(piece.contains("fps"))
                     {
-                        videoFramerate = piece;
+                        videoFramerate = piece.replace("fps", "").trim();
                     }
                 }
             }
@@ -322,12 +322,12 @@ public class FFmpegUtil
 
                     if(piece.contains("Hz"))
                     {
-                        audioSampleRate = piece;
+                        audioSampleRate = piece.replace("Hz", "").trim();
                     }
 
                     if(piece.contains("kb/s"))
                     {
-                        audioBitrate = piece;
+                        audioBitrate = piece.replace("kb/s", "").trim();
 
                         if(audioBitrate.contains("(default)"))
                         {
