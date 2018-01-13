@@ -331,11 +331,12 @@ public class MainActivity extends AppCompatActivity
         }
 
         int endTimeSec = rangeSeekBar.getSelectedMaxValue().intValue();
+        int durationSec = endTimeSec - startTimeSec;
         if( (videoInfo.durationMs)/1000 != endTimeSec)
         {
             // Duration of media file
             command.add("-t");
-            command.add(Integer.toString(endTimeSec - startTimeSec));
+            command.add(Integer.toString(durationSec));
         }
 
         if(container.supportedVideoCodecs.size() > 0)
@@ -389,7 +390,7 @@ public class MainActivity extends AppCompatActivity
         // Output file
         command.add(destination.getAbsolutePath());
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressBar, _transcodeResultHandler);
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(durationSec*1000, progressBar, _transcodeResultHandler);
         FFmpegUtil.call(command.toArray(new String[command.size()]), handler);
 
         stopVideoPlayback();
