@@ -39,4 +39,10 @@ public enum AudioCodec
         return null;
     }
 
+    @Override
+    public String toString()
+    {
+        return ffmpegName;
+    }
+
 }

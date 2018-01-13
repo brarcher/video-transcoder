@@ -32,4 +32,10 @@ public enum VideoCodec
         return null;
     }
 
+    @Override
+    public String toString()
+    {
+        return ffmpegName;
+    }
+
 }

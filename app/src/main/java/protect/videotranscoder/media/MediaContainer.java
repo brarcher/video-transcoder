@@ -47,4 +47,10 @@ public enum MediaContainer
 
         return null;
     }
+
+    @Override
+    public String toString()
+    {
+        return ffmpegName;
+    }
 }

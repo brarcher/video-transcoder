@@ -300,6 +300,19 @@ public class MainActivity extends AppCompatActivity
         startVideoPlayback();
     }
 
+    private void setSpinnerSelection(Spinner spinner, String value)
+    {
+        for(int index = 0; index < spinner.getCount(); index++)
+        {
+            String item = spinner.getItemAtPosition(index).toString();
+            if(item.equals(value))
+            {
+                spinner.setSelection(index);
+                break;
+            }
+        }
+    }
+
     private void populateOptionDefaults()
     {
         for(int id : BASIC_SETTINGS_IDS)
@@ -329,8 +342,21 @@ public class MainActivity extends AppCompatActivity
                     findViewById(resId).setVisibility(visibility);
                 }
 
+                VideoCodec currentVideoSelection = (VideoCodec)videoCodecSpinner.getSelectedItem();
+                AudioCodec currentAudioSelection = (AudioCodec)audioCodecSpinner.getSelectedItem();
+
                 videoCodecSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, container.supportedVideoCodecs));
                 audioCodecSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, container.supportedAudioCodecs));
+
+                // Attempt to set the same settings again, if they exist
+                if(currentVideoSelection != null)
+                {
+                    setSpinnerSelection(videoCodecSpinner, currentVideoSelection.toString());
+                }
+                if(currentAudioSelection != null)
+                {
+                    setSpinnerSelection(audioCodecSpinner, currentAudioSelection.toString());
+                }
             }
 
             @Override
@@ -356,7 +382,12 @@ public class MainActivity extends AppCompatActivity
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id)
             {
                 AudioCodec audioCodec = (AudioCodec) parentView.getItemAtPosition(position);
+
+                String currentSelection = (String)audioChannelSpinner.getSelectedItem();
                 audioChannelSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, audioCodec.supportedChannels));
+
+                // Attempt to set the same setting as before, if it exists
+                setSpinnerSelection(audioChannelSpinner, currentSelection);
             }
 
             @Override
@@ -374,6 +405,48 @@ public class MainActivity extends AppCompatActivity
 
         String [] channels = new String[] {"1", "2"};
         audioChannelSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, channels));
+
+        if(videoInfo.container != null)
+        {
+            setSpinnerSelection(containerSpinner, videoInfo.container.toString());
+        }
+
+        if(videoInfo.videoCodec != null)
+        {
+            setSpinnerSelection(videoCodecSpinner, videoInfo.videoCodec.toString());
+        }
+
+        if(videoInfo.videoFramerate != null)
+        {
+            setSpinnerSelection(fpsSpinner, videoInfo.videoFramerate);
+        }
+
+        if(videoInfo.videoResolution != null)
+        {
+            setSpinnerSelection(resolutionSpinner, videoInfo.videoResolution);
+        }
+
+        if(videoInfo.videoBitrate != null)
+        {
+            setSpinnerSelection(videoBitrateSpinner, videoInfo.videoBitrate);
+        }
+
+        if(videoInfo.audioCodec != null)
+        {
+            setSpinnerSelection(audioCodecSpinner, videoInfo.audioCodec.toString());
+        }
+
+        if(videoInfo.audioBitrate != null)
+        {
+            setSpinnerSelection(audioBitrateSpinner, videoInfo.audioBitrate);
+        }
+
+        if(videoInfo.audioSampleRate != null)
+        {
+            setSpinnerSelection(audioSampleRateSpinner, videoInfo.audioSampleRate);
+        }
+
+        setSpinnerSelection(audioChannelSpinner, Integer.toString(videoInfo.audioChannels));
     }
 
     @Override
