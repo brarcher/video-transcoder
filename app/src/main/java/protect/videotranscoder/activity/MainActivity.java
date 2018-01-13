@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -173,6 +174,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
+                startEncode();
             }
         });
     }
@@ -262,6 +264,125 @@ public class MainActivity extends AppCompatActivity
 
         String message = getResources().getString(R.string.selectVideo);
         startActivityForResult(Intent.createChooser(intent, message), REQUEST_TAKE_GALLERY_VIDEO);
+    }
+
+    private void startEncode()
+    {
+        MediaContainer container = (MediaContainer)containerSpinner.getSelectedItem();
+        VideoCodec videoCodec = (VideoCodec)videoCodecSpinner.getSelectedItem();
+        String fps = (String)fpsSpinner.getSelectedItem();
+        String resolution = (String)resolutionSpinner.getSelectedItem();
+        String videoBitrate = (String)videoBitrateSpinner.getSelectedItem();
+        AudioCodec audioCodec = (AudioCodec) audioCodecSpinner.getSelectedItem();
+        String audioBitrate = (String) audioBitrateSpinner.getSelectedItem();
+        String audioSampleRate = (String) audioSampleRateSpinner.getSelectedItem();
+        String audioChannel = (String) audioChannelSpinner.getSelectedItem();
+
+        File outputDir;
+
+        if(container.supportedVideoCodecs.size() > 0)
+        {
+            outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
+        }
+        else
+        {
+            outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+        }
+
+        String filePrefix = "Video_Transcoder_Output";
+        String extension = "." + container.extension;
+        String inputFilePath = videoInfo.file.getAbsolutePath();
+
+        File destination = new File(outputDir, filePrefix + extension);
+        int fileNo = 0;
+        while (destination.exists())
+        {
+            fileNo++;
+            destination = new File(outputDir, filePrefix + "_" + fileNo + extension);
+        }
+
+        outputDestination = destination;
+
+        List<String> command = new LinkedList<>();
+
+        // If the output exists, overwrite it
+        command.add("-y");
+
+        // Input file
+        command.add("-i");
+        command.add(inputFilePath);
+
+        int startTimeSec = rangeSeekBar.getSelectedMinValue().intValue();
+        if(startTimeSec != 0)
+        {
+            // Start time offset
+            command.add("-ss");
+            command.add(Integer.toString(startTimeSec));
+        }
+
+        int endTimeSec = rangeSeekBar.getSelectedMaxValue().intValue();
+        if( (videoInfo.durationMs)/1000 != endTimeSec)
+        {
+            // Duration of media file
+            command.add("-t");
+            command.add(Integer.toString(endTimeSec - startTimeSec));
+        }
+
+        if(container.supportedVideoCodecs.size() > 0)
+        {
+            // Video codec
+            command.add("-vcodec");
+            command.add(videoCodec.ffmpegName);
+
+            // Frame size
+            command.add("-s");
+            command.add(resolution);
+
+            // Frame rate
+            command.add("-r");
+            command.add(fps);
+
+            // Video bitrate
+            command.add("-b:v");
+            command.add(videoBitrate + "k");
+        }
+        else
+        {
+            // No video
+            command.add("-vn");
+        }
+
+        // Audio codec
+        command.add("-acodec");
+        command.add(audioCodec.ffmpegName);
+
+        if(audioCodec == AudioCodec.VORBIS)
+        {
+            // The vorbis encode is experimental, and needs other
+            // flags to enable
+            command.add("-strict");
+            command.add("-2");
+        }
+
+        // Sample rate
+        command.add("-ar");
+        command.add(audioSampleRate);
+
+        // Channels
+        command.add("-ac");
+        command.add(audioChannel);
+
+        // Audio bitrate
+        command.add("-b:a");
+        command.add(audioBitrate + "k");
+
+        // Output file
+        command.add(destination.getAbsolutePath());
+
+        FFmpegResponseHandler handler = new FFmpegResponseHandler(videoInfo.durationMs, progressDialog, _transcodeResultHandler);
+        FFmpegUtil.call(command.toArray(new String[command.size()]), handler);
+
+        stopVideoPlayback();
     }
 
     private void stopVideoPlayback()
