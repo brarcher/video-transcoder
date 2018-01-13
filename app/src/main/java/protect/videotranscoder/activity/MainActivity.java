@@ -426,6 +426,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private boolean isEncoding()
+    {
+        return cancelButton.getVisibility() == View.VISIBLE;
+    }
+
     private void stopVideoPlayback()
     {
         videoView.pause();
@@ -469,7 +474,11 @@ public class MainActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-        startVideoPlayback();
+
+        if(isEncoding() == false)
+        {
+            startVideoPlayback();
+        }
     }
 
     private void setSpinnerSelection(Spinner spinner, Object value)
@@ -673,7 +682,10 @@ public class MainActivity extends AppCompatActivity
                                 tvLeft.setText(getTime(minValue.intValue()));
                                 tvRight.setText(getTime(maxValue.intValue()));
 
-                                startVideoPlayback();
+                                if(isEncoding() == false)
+                                {
+                                    startVideoPlayback();
+                                }
                             }
                         });
                     }
