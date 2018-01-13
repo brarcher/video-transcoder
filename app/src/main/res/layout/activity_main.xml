@@ -85,7 +85,7 @@
                 android:layout_below="@id/buttonContainer"
                 android:text="Basic Settings"
                 android:textSize="@dimen/inputTitleSize"
-                android:visibility="invisible"
+                android:visibility="gone"
                 />
             <View
                 android:id="@+id/basicSettingsTopDivider"
@@ -93,7 +93,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/basicSettingsText"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Container Type -->
             <LinearLayout
@@ -103,7 +103,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/basicSettingsTopDivider"
-                android:visibility="invisible">
+                android:visibility="gone">
                 <TextView
                     android:text="Container"
                     android:layout_height="wrap_content"
@@ -125,7 +125,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/containerTypeContainer"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Video Settings Title -->
             <TextView
@@ -139,7 +139,7 @@
                 android:layout_below="@id/containerTypeContainerDivider"
                 android:text="Video Settings"
                 android:textSize="@dimen/inputTitleSize"
-                android:visibility="invisible"
+                android:visibility="gone"
                 />
             <View
                 android:id="@+id/videoSettingsTextTopDivider"
@@ -147,7 +147,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/videoSettingsText"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Video Codec -->
             <LinearLayout
@@ -157,7 +157,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/videoSettingsTextTopDivider"
-                android:visibility="invisible">
+                android:visibility="gone">
                 <TextView
                     android:text="Codec"
                     android:layout_height="wrap_content"
@@ -179,7 +179,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/videoCodecContainer"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Frames Per Second -->
             <LinearLayout
@@ -189,7 +189,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/videoCodecContainerDivider"
-                android:visibility="invisible">
+                android:visibility="gone">
                 <TextView
                     android:text="FPS"
                     android:layout_height="wrap_content"
@@ -211,7 +211,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/fpsContainer"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Resolution -->
             <LinearLayout
@@ -221,7 +221,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/fpsContainerDivider"
-                android:visibility="invisible">
+                android:visibility="gone">
                 <TextView
                     android:text="Resolution"
                     android:layout_height="wrap_content"
@@ -243,7 +243,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/resolutionContainer"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Video Bitrate -->
             <LinearLayout
@@ -253,7 +253,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/resolutionContainerDivider"
-                android:visibility="invisible">
+                android:visibility="gone">
                 <TextView
                     android:text="Bitrate"
                     android:layout_height="wrap_content"
@@ -275,7 +275,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/videoBitrateContainer"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Audio Settings Title -->
             <TextView
@@ -289,7 +289,7 @@
                 android:layout_below="@id/videoBitrateContainerDivider"
                 android:text="Audio Settings"
                 android:textSize="@dimen/inputTitleSize"
-                android:visibility="invisible"
+                android:visibility="gone"
                 />
             <View
                 android:id="@+id/audioSettingsTextTopDivider"
@@ -297,7 +297,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/audioSettingsText"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Audio Codec -->
             <LinearLayout
@@ -307,7 +307,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/audioSettingsTextTopDivider"
-                android:visibility="invisible">
+                android:visibility="gone">
                 <TextView
                     android:text="Codec"
                     android:layout_height="wrap_content"
@@ -329,7 +329,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/audioCodecContainer"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Audio Bitrate -->
             <LinearLayout
@@ -339,7 +339,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/audioCodecContainerDivider"
-                android:visibility="invisible">
+                android:visibility="gone">
                 <TextView
                     android:text="Bitrate"
                     android:layout_height="wrap_content"
@@ -361,7 +361,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/audioBitrateContainer"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Audio Sample Rate -->
             <LinearLayout
@@ -371,7 +371,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/audioBitrateContainerDivider"
-                android:visibility="invisible">
+                android:visibility="gone">
                 <TextView
                     android:text="Sample Rate"
                     android:layout_height="wrap_content"
@@ -393,7 +393,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/audioSampleRateContainer"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <!-- Audio Channel -->
             <LinearLayout
@@ -403,7 +403,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/audioSampleRateContainerDivider"
-                android:visibility="invisible">
+                android:visibility="gone">
                 <TextView
                     android:text="Channel"
                     android:layout_height="wrap_content"
@@ -425,7 +425,7 @@
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
                 android:layout_below="@id/audioChannelContainer"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
         </RelativeLayout>
 
