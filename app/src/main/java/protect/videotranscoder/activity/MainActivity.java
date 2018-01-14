@@ -1,21 +1,17 @@
 package protect.videotranscoder.activity;
 
 import android.Manifest;
-import android.content.ContentUris;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -50,6 +46,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import protect.videotranscoder.BuildConfig;
 import protect.videotranscoder.FFmpegResponseHandler;
 import protect.videotranscoder.FFmpegUtil;
 import protect.videotranscoder.FileUtil;
@@ -116,6 +113,7 @@ public class MainActivity extends AppCompatActivity
     private Button cancelButton;
     private MediaInfo videoInfo;
     private File outputDestination;
+    private String outputMimetype;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -325,6 +323,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         outputDestination = destination;
+        outputMimetype = container.mimetype;
 
         List<String> command = new LinkedList<>();
 
@@ -777,7 +776,7 @@ public class MainActivity extends AppCompatActivity
                 message = getResources().getString(R.string.transcodeFailed);
             }
 
-            new AlertDialog.Builder(MainActivity.this)
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
                     .setMessage(message)
                     .setCancelable(true)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
@@ -786,8 +785,30 @@ public class MainActivity extends AppCompatActivity
                         {
                             dialog.dismiss();
                         }
-                    })
-                    .show();
+                    });
+            if(result)
+            {
+                final Uri outputUri = FileProvider.getUriForFile(MainActivity.this, BuildConfig.APPLICATION_ID, outputDestination);
+
+                final CharSequence sendLabel = getResources().getText(R.string.sendLabel);
+                builder.setNeutralButton(sendLabel, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_STREAM, outputUri);
+                        sendIntent.setType(outputMimetype);
+
+                        // set flag to give temporary permission to external app to use the FileProvider
+                        sendIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                        startActivity(Intent.createChooser(sendIntent, sendLabel));
+                    }
+                });
+            }
+
+            builder.show();
 
             startVideoPlayback();
 

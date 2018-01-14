@@ -8,6 +8,7 @@
     <string name="cancel">Cancel</string>
 
     <string name="ok">OK</string>
+    <string name="sendLabel">Send&#8230;</string>
 
     <string name="basicSettingsTitle">Basic Settings</string>
     <string name="container">Container</string>
