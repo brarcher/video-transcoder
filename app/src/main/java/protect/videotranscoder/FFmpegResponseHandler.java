@@ -59,9 +59,10 @@ public class FFmpegResponseHandler extends ExecuteBinaryResponseHandler
             }
         }
 
-        if(currentTimeMs != null)
+        if(currentTimeMs != null && currentTimeMs > 0)
         {
             int percentComplete = (int)Math.floor((currentTimeMs * 100) / (float)_durationMs);
+            _progressBar.setIndeterminate(false);
             _progressBar.setProgress(percentComplete);
         }
     }
