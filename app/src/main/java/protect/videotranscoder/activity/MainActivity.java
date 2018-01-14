@@ -408,6 +408,9 @@ public class MainActivity extends AppCompatActivity
 
         stopVideoPlayback();
 
+        progressBar.setProgress(0);
+        progressBar.setIndeterminate(true);
+
         selectVideoButton.setVisibility(View.GONE);
         encodeButton.setVisibility(View.GONE);
         cancelButton.setVisibility(View.VISIBLE);
