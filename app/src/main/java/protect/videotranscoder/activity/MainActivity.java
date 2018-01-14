@@ -26,6 +26,7 @@ import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity
     private Spinner videoCodecSpinner;
     private Spinner fpsSpinner;
     private Spinner resolutionSpinner;
-    private Spinner videoBitrateSpinner;
+    private EditText videoBitrateValue;
     private Spinner audioCodecSpinner;
     private Spinner audioBitrateSpinner;
     private Spinner audioSampleRateSpinner;
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity
         videoCodecSpinner = findViewById(R.id.videoCodecSpinner);
         fpsSpinner = findViewById(R.id.fpsSpinner);
         resolutionSpinner = findViewById(R.id.resolutionSpinner);
-        videoBitrateSpinner = findViewById(R.id.videoBitrateSpinner);
+        videoBitrateValue = findViewById(R.id.videoBitrateValue);
         audioCodecSpinner = findViewById(R.id.audioCodecSpinner);
         audioBitrateSpinner = findViewById(R.id.audioBitrateSpinner);
         audioSampleRateSpinner = findViewById(R.id.audioSampleRateSpinner);
@@ -282,11 +283,22 @@ public class MainActivity extends AppCompatActivity
         VideoCodec videoCodec = (VideoCodec)videoCodecSpinner.getSelectedItem();
         String fps = (String)fpsSpinner.getSelectedItem();
         String resolution = (String)resolutionSpinner.getSelectedItem();
-        String videoBitrate = (String)videoBitrateSpinner.getSelectedItem();
         AudioCodec audioCodec = (AudioCodec) audioCodecSpinner.getSelectedItem();
-        String audioBitrate = (String) audioBitrateSpinner.getSelectedItem();
-        String audioSampleRate = (String) audioSampleRateSpinner.getSelectedItem();
+        Integer audioBitrate = (Integer) audioBitrateSpinner.getSelectedItem();
+        Integer audioSampleRate = (Integer) audioSampleRateSpinner.getSelectedItem();
         String audioChannel = (String) audioChannelSpinner.getSelectedItem();
+        int videoBitrate;
+
+        try
+        {
+            String videoBitrateStr = videoBitrateValue.getText().toString();
+            videoBitrate = Integer.parseInt(videoBitrateStr);
+        }
+        catch(NumberFormatException e)
+        {
+            Toast.makeText(this, R.string.videoBitrateValueInvalid, Toast.LENGTH_LONG).show();
+            return;
+        }
 
         File outputDir;
 
@@ -377,7 +389,7 @@ public class MainActivity extends AppCompatActivity
 
         // Sample rate
         command.add("-ar");
-        command.add(audioSampleRate);
+        command.add(Integer.toString(audioSampleRate));
 
         // Channels
         command.add("-ac");
@@ -412,6 +424,11 @@ public class MainActivity extends AppCompatActivity
         {
             Log.d(TAG, "Failed to remove after encode cancel: " + outputDestination.getAbsolutePath());
         }
+    }
+
+    private boolean isEncoding()
+    {
+        return cancelButton.getVisibility() == View.VISIBLE;
     }
 
     private void stopVideoPlayback()
@@ -457,15 +474,19 @@ public class MainActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-        startVideoPlayback();
+
+        if(isEncoding() == false)
+        {
+            startVideoPlayback();
+        }
     }
 
-    private void setSpinnerSelection(Spinner spinner, String value)
+    private void setSpinnerSelection(Spinner spinner, Object value)
     {
         for(int index = 0; index < spinner.getCount(); index++)
         {
             String item = spinner.getItemAtPosition(index).toString();
-            if(item.equals(value))
+            if(item.equals(value.toString()))
             {
                 spinner.setSelection(index);
                 break;
@@ -528,15 +549,19 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        String [] fps = new String [] {"24", "23.98", "25", "29.97", "30", "50"};
+        LinkedList<String> fps = new LinkedList<>(Arrays.asList("24", "23.98", "25", "29.97", "30", "50"));
+        if(videoInfo.videoFramerate != null && fps.contains(videoInfo.videoFramerate) == false)
+        {
+            fps.addFirst(videoInfo.videoFramerate);
+        }
         fpsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, fps));
 
-        String [] resolution = new String[] {"176x144", "320x240", "480x360", "640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720", "1920x1080", "2048x1080", "2048x858", "2560x1440", "2560x1600", "4096x2160"};
+        LinkedList<String> resolution = new LinkedList<>(Arrays.asList("176x144", "320x240", "480x360", "640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720", "1920x1080", "2048x1080", "2048x858", "2560x1440", "2560x1600", "4096x2160"));
+        if(videoInfo.videoResolution != null && resolution.contains(videoInfo.videoResolution) == false)
+        {
+            resolution.addFirst(videoInfo.videoResolution);
+        }
         resolutionSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, resolution));
-
-        // TODO: Should be a text field, not a spinner
-        String [] videoBitrate = new String[] {"500"};
-        videoBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, videoBitrate));
 
         audioCodecSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
@@ -559,10 +584,20 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        String [] audioBitrate = new String[] {"15", "24", "32", "64", "96", "128", "192", "256", "320", "384", "448", "512"};
+        List<Integer> audioBitrate = new ArrayList<>(Arrays.asList(15, 24, 32, 64, 96, 128, 192, 256, 320, 384, 448, 512));
+        if(videoInfo.audioBitrate != null && audioBitrate.contains(videoInfo.audioBitrate) == false)
+        {
+            audioBitrate.add(videoInfo.audioBitrate);
+            Collections.sort(audioBitrate);
+        }
         audioBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, audioBitrate));
 
-        String [] sampleRate = new String[] {"8000", "11025", "16000", "22050", "24000", "32000", "44100", "48000"};
+        List<Integer> sampleRate = new ArrayList<>(Arrays.asList(8000, 11025, 16000, 22050, 24000, 32000, 44100, 48000));
+        if(videoInfo.audioSampleRate != null && audioBitrate.contains(videoInfo.audioSampleRate) == false)
+        {
+            sampleRate.add(videoInfo.audioSampleRate);
+            Collections.sort(sampleRate);
+        }
         audioSampleRateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, sampleRate));
 
         String [] channels = new String[] {"1", "2"};
@@ -590,7 +625,7 @@ public class MainActivity extends AppCompatActivity
 
         if(videoInfo.videoBitrate != null)
         {
-            setSpinnerSelection(videoBitrateSpinner, videoInfo.videoBitrate);
+            videoBitrateValue.setText(Integer.toString(videoInfo.videoBitrate));
         }
 
         if(videoInfo.audioCodec != null)
@@ -598,10 +633,14 @@ public class MainActivity extends AppCompatActivity
             setSpinnerSelection(audioCodecSpinner, videoInfo.audioCodec.toString());
         }
 
-        if(videoInfo.audioBitrate != null)
+        Integer defaultAudioBitrate = videoInfo.audioBitrate;
+        if(defaultAudioBitrate == null)
         {
-            setSpinnerSelection(audioBitrateSpinner, videoInfo.audioBitrate);
+            // Set some default if none is detected
+            defaultAudioBitrate = 128;
         }
+
+        setSpinnerSelection(audioBitrateSpinner, defaultAudioBitrate);
 
         if(videoInfo.audioSampleRate != null)
         {
@@ -656,7 +695,10 @@ public class MainActivity extends AppCompatActivity
                                 tvLeft.setText(getTime(minValue.intValue()));
                                 tvRight.setText(getTime(maxValue.intValue()));
 
-                                startVideoPlayback();
+                                if(isEncoding() == false)
+                                {
+                                    startVideoPlayback();
+                                }
                             }
                         });
                     }
@@ -673,8 +715,8 @@ public class MainActivity extends AppCompatActivity
                         {
                             // Could not query the file, fill in what we know.
                             result = new MediaInfo(videoFile, 0, MediaContainer.MP4, VideoCodec.MPEG4, "640x480",
-                                "800", "25", AudioCodec.MP3,
-                                "44100", "128", 2);
+                                800, "25", AudioCodec.MP3,
+                                44100, 128, 2);
                         }
 
                         videoInfo = result;

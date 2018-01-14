@@ -9,6 +9,18 @@
 
     <string name="ok">OK</string>
 
+    <string name="basicSettingsTitle">Basic Settings</string>
+    <string name="container">Container</string>
+    <string name="videoSettingsTitle">Video Settings</string>
+    <string name="codec">Codec</string>
+    <string name="fps">FPS</string>
+    <string name="resolution">Resolution</string>
+    <string name="bitrate">Bitrate (kb/s)</string>
+    <string name="audioSettingsTitle">Audio Settings</string>
+    <string name="sampleRate">Sample Rate (Hz)</string>
+    <string name="channels">Channels</string>
+
+    <string name="videoBitrateValueInvalid">Video bitcode value is invalid, could not encode.</string>
     <string name="transcodeSuccess">Encoding completed successfully. The file was written to:\n<xliff:g id="path">%s</xliff:g></string>
     <string name="transcodeFailed">Encoding failed, see logs for details.</string>
 

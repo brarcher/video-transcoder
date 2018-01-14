@@ -76,9 +76,9 @@ public class FFmpegUtil
      */
     public static void call(final String[] command, @NonNull final ExecuteBinaryResponseHandler handler)
     {
-        if(ffmpeg == null)
+        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning())
         {
-            String message = "Command failed, FFmpeg not initialized";
+            String message = "Command failed, FFmpeg " + (ffmpeg == null ? "not initialized" : "still running");
             Log.d(TAG, message);
 
             handler.onFailure(message);
@@ -182,7 +182,7 @@ public class FFmpegUtil
 
     public static void getMediaDetails(final File mediaFile, final ResultCallbackHandler<MediaInfo> resultHandler)
     {
-        if(ffmpeg == null)
+        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning())
         {
             resultHandler.onResult(null);
             return;
@@ -208,14 +208,15 @@ public class FFmpegUtil
     static MediaInfo parseMediaInfo(File mediaFile, String string)
     {
         long durationMs = 0;
+        Integer totalBitrate = null;
         MediaContainer container = null;
         VideoCodec videoCodec = null;
         String videoResolution = null;
-        String videoBitrate = null;
+        Integer videoBitrate = null;
         String videoFramerate = null;
         AudioCodec audioCodec = null;
-        String audioSampleRate = null;
-        String audioBitrate = null;
+        Integer audioSampleRate = null;
+        Integer audioBitrate = null;
         int audioChannels = 2;
 
         /*
@@ -263,6 +264,24 @@ public class FFmpegUtil
                 }
 
                 durationMs = time;
+
+                split = line.split(",");
+                for(String item : split)
+                {
+                    if(item.contains("bitrate:"))
+                    {
+                        item = item.replace("bitrate:", "").replace("kb/s", "").trim();
+                        try
+                        {
+                            // This may be used later if the video bitrate cannot be determined.
+                            totalBitrate = Integer.parseInt(item);
+                        }
+                        catch(NumberFormatException e)
+                        {
+                            continue;
+                        }
+                    }
+                }
             }
 
             if(line.startsWith("Input"))
@@ -311,7 +330,15 @@ public class FFmpegUtil
 
                     if(piece.contains("kb/s"))
                     {
-                        videoBitrate = piece.replace("kb/s", "").trim();
+                        try
+                        {
+                            String videoBitrateStr = piece.replace("kb/s", "").trim();
+                            videoBitrate = Integer.parseInt(videoBitrateStr);
+                        }
+                        catch(NumberFormatException e)
+                        {
+                            // Nothing to do
+                        }
                     }
 
                     if(piece.contains("fps"))
@@ -342,16 +369,33 @@ public class FFmpegUtil
 
                     if(piece.contains("Hz"))
                     {
-                        audioSampleRate = piece.replace("Hz", "").trim();
+                        try
+                        {
+                            String audioSampeRateStr = piece.replace("Hz", "").trim();
+                            audioSampleRate = Integer.parseInt(audioSampeRateStr);
+                        }
+                        catch(NumberFormatException e)
+                        {
+                            // Nothing to do
+                        }
                     }
 
                     if(piece.contains("kb/s"))
                     {
-                        audioBitrate = piece.replace("kb/s", "").trim();
+                        String audioBitrateStr = piece.replace("kb/s", "").trim();
 
-                        if(audioBitrate.contains("(default)"))
+                        if(audioBitrateStr.contains("(default)"))
                         {
-                            audioBitrate = audioBitrate.replace("(default)", "").trim();
+                            audioBitrateStr = audioBitrateStr.replace("(default)", "").trim();
+                        }
+
+                        try
+                        {
+                            audioBitrate = Integer.parseInt(audioBitrateStr);
+                        }
+                        catch(NumberFormatException e)
+                        {
+                            // Nothing to do
                         }
                     }
 
@@ -363,6 +407,29 @@ public class FFmpegUtil
             }
         }
 
+        if(totalBitrate != null)
+        {
+            if(videoBitrate == null)
+            {
+                if(audioBitrate != null)
+                {
+                    // We know the audio bitrate, we can calculate the video bitrate
+                    videoBitrate = totalBitrate - audioBitrate;
+                }
+
+                if(videoBitrate == null)
+                {
+                    // We do not know any of the separate bitrates. Lets guess 100 kb/s for the audio,
+                    // and subtract that from the total to guess the video bitrate.
+
+                    // As a guess, subtract 100 kb/s from the bitrate for audio, and
+                    // assume that the video is the rest. This should be a decent-ish
+                    // estimate if the video bitrate cannot be found later.
+                    videoBitrate = totalBitrate - 100;
+                }
+            }
+        }
+
         MediaInfo info = new MediaInfo(mediaFile, durationMs, container, videoCodec, videoResolution,
                 videoBitrate, videoFramerate, audioCodec, audioSampleRate, audioBitrate, audioChannels);
         return info;
@@ -370,7 +437,7 @@ public class FFmpegUtil
 
     public static void getSupportedContainers(final ResultCallbackHandler<List<MediaContainer>> resultHandler)
     {
-        if(ffmpeg == null)
+        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning())
         {
             resultHandler.onResult(null);
             return;

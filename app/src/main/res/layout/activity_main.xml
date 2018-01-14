@@ -97,7 +97,7 @@
                 android:paddingStart="@dimen/titlePaddingHorizontal"
                 android:paddingTop="@dimen/titlePaddingTop"
                 android:layout_below="@id/encodeProgress"
-                android:text="Basic Settings"
+                android:text="@string/basicSettingsTitle"
                 android:textSize="@dimen/inputTitleSize"
                 android:visibility="gone"
                 />
@@ -119,7 +119,7 @@
                 android:layout_below="@id/basicSettingsTopDivider"
                 android:visibility="gone">
                 <TextView
-                    android:text="Container"
+                    android:text="@string/container"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:padding="@dimen/inputPadding"
@@ -151,7 +151,7 @@
                 android:paddingStart="@dimen/titlePaddingHorizontal"
                 android:paddingTop="@dimen/titlePaddingTop"
                 android:layout_below="@id/containerTypeContainerDivider"
-                android:text="Video Settings"
+                android:text="@string/videoSettingsTitle"
                 android:textSize="@dimen/inputTitleSize"
                 android:visibility="gone"
                 />
@@ -173,7 +173,7 @@
                 android:layout_below="@id/videoSettingsTextTopDivider"
                 android:visibility="gone">
                 <TextView
-                    android:text="Codec"
+                    android:text="@string/codec"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:padding="@dimen/inputPadding"
@@ -205,7 +205,7 @@
                 android:layout_below="@id/videoCodecContainerDivider"
                 android:visibility="gone">
                 <TextView
-                    android:text="FPS"
+                    android:text="@string/fps"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:padding="@dimen/inputPadding"
@@ -237,7 +237,7 @@
                 android:layout_below="@id/fpsContainerDivider"
                 android:visibility="gone">
                 <TextView
-                    android:text="Resolution"
+                    android:text="@string/resolution"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:padding="@dimen/inputPadding"
@@ -267,21 +267,23 @@
                 android:layout_height="wrap_content"
                 android:background="@color/inputBackground"
                 android:layout_below="@id/resolutionContainerDivider"
+                android:paddingEnd="@dimen/inputPadding"
+                android:paddingRight="@dimen/inputPadding"
                 android:visibility="gone">
                 <TextView
-                    android:text="Bitrate"
+                    android:text="@string/bitrate"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:padding="@dimen/inputPadding"
                     android:textSize="@dimen/inputSize"/>
 
-                <Spinner
-                    android:id="@+id/videoBitrateSpinner"
+                <EditText
+                    android:id="@+id/videoBitrateValue"
                     android:gravity="end"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    android:textSize="@dimen/inputSize"
-                    android:drawSelectorOnTop="true" />
+                    android:inputType="number"
+                    android:textSize="@dimen/inputSize"/>
             </LinearLayout>
             <View
                 android:id="@+id/videoBitrateContainerDivider"
@@ -301,7 +303,7 @@
                 android:paddingStart="@dimen/titlePaddingHorizontal"
                 android:paddingTop="@dimen/titlePaddingTop"
                 android:layout_below="@id/videoBitrateContainerDivider"
-                android:text="Audio Settings"
+                android:text="@string/audioSettingsTitle"
                 android:textSize="@dimen/inputTitleSize"
                 android:visibility="gone"
                 />
@@ -323,7 +325,7 @@
                 android:layout_below="@id/audioSettingsTextTopDivider"
                 android:visibility="gone">
                 <TextView
-                    android:text="Codec"
+                    android:text="@string/codec"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:padding="@dimen/inputPadding"
@@ -355,7 +357,7 @@
                 android:layout_below="@id/audioCodecContainerDivider"
                 android:visibility="gone">
                 <TextView
-                    android:text="Bitrate"
+                    android:text="@string/bitrate"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:padding="@dimen/inputPadding"
@@ -387,7 +389,7 @@
                 android:layout_below="@id/audioBitrateContainerDivider"
                 android:visibility="gone">
                 <TextView
-                    android:text="Sample Rate"
+                    android:text="@string/sampleRate"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:padding="@dimen/inputPadding"
@@ -419,7 +421,7 @@
                 android:layout_below="@id/audioSampleRateContainerDivider"
                 android:visibility="gone">
                 <TextView
-                    android:text="Channel"
+                    android:text="@string/channels"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:padding="@dimen/inputPadding"
