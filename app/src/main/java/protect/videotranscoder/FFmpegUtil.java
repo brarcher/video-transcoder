@@ -76,9 +76,9 @@ public class FFmpegUtil
      */
     public static void call(final String[] command, @NonNull final ExecuteBinaryResponseHandler handler)
     {
-        if(ffmpeg == null)
+        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning())
         {
-            String message = "Command failed, FFmpeg not initialized";
+            String message = "Command failed, FFmpeg " + (ffmpeg == null ? "not initialized" : "still running");
             Log.d(TAG, message);
 
             handler.onFailure(message);
@@ -182,7 +182,7 @@ public class FFmpegUtil
 
     public static void getMediaDetails(final File mediaFile, final ResultCallbackHandler<MediaInfo> resultHandler)
     {
-        if(ffmpeg == null)
+        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning())
         {
             resultHandler.onResult(null);
             return;
@@ -437,7 +437,7 @@ public class FFmpegUtil
 
     public static void getSupportedContainers(final ResultCallbackHandler<List<MediaContainer>> resultHandler)
     {
-        if(ffmpeg == null)
+        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning())
         {
             resultHandler.onResult(null);
             return;
