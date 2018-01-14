@@ -1,21 +1,17 @@
 package protect.videotranscoder.activity;
 
 import android.Manifest;
-import android.content.ContentUris;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -50,8 +46,10 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import protect.videotranscoder.BuildConfig;
 import protect.videotranscoder.FFmpegResponseHandler;
 import protect.videotranscoder.FFmpegUtil;
+import protect.videotranscoder.FileUtil;
 import protect.videotranscoder.R;
 import protect.videotranscoder.ResultCallbackHandler;
 import protect.videotranscoder.media.AudioCodec;
@@ -115,6 +113,7 @@ public class MainActivity extends AppCompatActivity
     private Button cancelButton;
     private MediaInfo videoInfo;
     private File outputDestination;
+    private String outputMimetype;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -324,6 +323,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         outputDestination = destination;
+        outputMimetype = container.mimetype;
 
         List<String> command = new LinkedList<>();
 
@@ -406,6 +406,9 @@ public class MainActivity extends AppCompatActivity
         FFmpegUtil.call(command.toArray(new String[command.size()]), handler);
 
         stopVideoPlayback();
+
+        progressBar.setProgress(0);
+        progressBar.setIndeterminate(true);
 
         selectVideoButton.setVisibility(View.GONE);
         encodeButton.setVisibility(View.GONE);
@@ -659,7 +662,7 @@ public class MainActivity extends AppCompatActivity
             if (requestCode == REQUEST_TAKE_GALLERY_VIDEO)
             {
                 Uri selectedVideoUri = data.getData();
-                String videoPath = getPath(MainActivity.this, selectedVideoUri);
+                String videoPath = FileUtil.getPath(MainActivity.this, selectedVideoUri);
 
                 if(videoPath == null)
                 {
@@ -773,7 +776,7 @@ public class MainActivity extends AppCompatActivity
                 message = getResources().getString(R.string.transcodeFailed);
             }
 
-            new AlertDialog.Builder(MainActivity.this)
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
                     .setMessage(message)
                     .setCancelable(true)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
@@ -782,8 +785,30 @@ public class MainActivity extends AppCompatActivity
                         {
                             dialog.dismiss();
                         }
-                    })
-                    .show();
+                    });
+            if(result)
+            {
+                final Uri outputUri = FileProvider.getUriForFile(MainActivity.this, BuildConfig.APPLICATION_ID, outputDestination);
+
+                final CharSequence sendLabel = getResources().getText(R.string.sendLabel);
+                builder.setNeutralButton(sendLabel, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_STREAM, outputUri);
+                        sendIntent.setType(outputMimetype);
+
+                        // set flag to give temporary permission to external app to use the FileProvider
+                        sendIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                        startActivity(Intent.createChooser(sendIntent, sendLabel));
+                    }
+                });
+            }
+
+            builder.show();
 
             startVideoPlayback();
 
@@ -793,144 +818,6 @@ public class MainActivity extends AppCompatActivity
             progressBar.setVisibility(View.GONE);
         }
     };
-
-    /**
-     * Get a file path from a Uri. This will get the the path for Storage Access
-     * Framework Documents, as well as the _data field for the MediaStore and
-     * other file-based ContentProviders.
-     */
-    private String getPath(final Context context, final Uri uri)
-    {
-        // DocumentProvider
-        if (DocumentsContract.isDocumentUri(context, uri))
-        {
-            // ExternalStorageProvider
-            if (isExternalStorageDocument(uri))
-            {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-
-                if ("primary".equalsIgnoreCase(type))
-                {
-                    return Environment.getExternalStorageDirectory() + "/" + split[1];
-                }
-
-                // TODO handle non-primary volumes
-            }
-            // DownloadsProvider
-            else if (isDownloadsDocument(uri))
-            {
-                final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.parseLong(id));
-
-                return getDataColumn(context, contentUri, null, null);
-            }
-            // MediaProvider
-            else if (isMediaDocument(uri))
-            {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-
-                Uri contentUri = null;
-                if ("image".equals(type))
-                {
-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                }
-                else if ("video".equals(type))
-                {
-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                }
-                else if ("audio".equals(type))
-                {
-                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                }
-
-                final String selection = "_id=?";
-                final String[] selectionArgs = new String[]
-                {
-                    split[1]
-                };
-
-                return getDataColumn(context, contentUri, selection, selectionArgs);
-            }
-        }
-        // MediaStore (and general)
-        else if ("content".equalsIgnoreCase(uri.getScheme()))
-        {
-            return getDataColumn(context, uri, null, null);
-        }
-        // File
-        else if ("file".equalsIgnoreCase(uri.getScheme()))
-        {
-            return uri.getPath();
-        }
-
-        return null;
-    }
-
-    /**
-     * Get the value of the data column for this Uri.
-     */
-    private String getDataColumn(Context context, Uri uri, String selection,
-                                 String[] selectionArgs)
-    {
-        Cursor cursor = null;
-        final String column = "_data";
-        final String[] projection =
-        {
-            column
-        };
-
-        try
-        {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
-                    null);
-            if (cursor != null && cursor.moveToFirst())
-            {
-                final int column_index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(column_index);
-            }
-        }
-        finally
-        {
-            if (cursor != null)
-            {
-                cursor.close();
-            }
-        }
-        return null;
-    }
-
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is ExternalStorageProvider.
-     */
-    private boolean isExternalStorageDocument(Uri uri)
-    {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is DownloadsProvider.
-     */
-    private boolean isDownloadsDocument(Uri uri)
-    {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is MediaProvider.
-     */
-    private boolean isMediaDocument(Uri uri)
-    {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)

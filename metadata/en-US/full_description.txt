@@ -1,0 +1,5 @@
+Do you want to encode videos on your phone into different formats, trim videos, or extract audio? Are you looking for a free solution which will not take your information?
+
+Video Transcoder is an application which uses the open source program FFmpeg to transcode video files from one format to another. By selecting the video to process, details for the video are provided and the desired settings can be configured.
+
+The application requires very few permissions, and never attempts to access the Internet.
