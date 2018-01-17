@@ -69,6 +69,10 @@ public class FFmpegUtil
                 resultHandler.onResult(false);
             }
         }
+        else
+        {
+            resultHandler.onResult(true);
+        }
     }
 
     /**

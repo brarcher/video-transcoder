@@ -1,6 +1,10 @@
 package protect.videotranscoder.activity;
 
 import android.Manifest;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -10,6 +14,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.PersistableBundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -35,6 +43,7 @@ import com.google.common.collect.ImmutableMap;
 import com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -47,7 +56,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import protect.videotranscoder.BuildConfig;
-import protect.videotranscoder.FFmpegResponseHandler;
 import protect.videotranscoder.FFmpegUtil;
 import protect.videotranscoder.FileUtil;
 import protect.videotranscoder.R;
@@ -56,10 +64,18 @@ import protect.videotranscoder.media.AudioCodec;
 import protect.videotranscoder.media.MediaContainer;
 import protect.videotranscoder.media.MediaInfo;
 import protect.videotranscoder.media.VideoCodec;
+import protect.videotranscoder.service.FFmpegProcessService;
+import protect.videotranscoder.service.MessageId;
 
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "VideoTranscoder";
+
+    public static final String MESSENGER_INTENT_KEY = BuildConfig.APPLICATION_ID + ".MESSENGER_INTENT_KEY";
+    public static final String FFMPEG_ENCODE_ARGS = BuildConfig.APPLICATION_ID + ".FFMPEG_ENCODE_ARGS";
+    public static final String FFMPEG_OUTPUT_FILE = BuildConfig.APPLICATION_ID + ".FFMPEG_OUTPUT_FILE";
+    public static final String OUTPUT_MIMETYPE = BuildConfig.APPLICATION_ID + ".OUTPUT_MIMETYPE";
+    public static final String OUTPUT_DURATION_MS = BuildConfig.APPLICATION_ID + ".OUTPUT_DURATION_MS";
 
     private static final int REQUEST_TAKE_GALLERY_VIDEO = 100;
     private static final int READ_WRITE_PERMISSION_REQUEST = 1;
@@ -112,14 +128,18 @@ public class MainActivity extends AppCompatActivity
     private Button encodeButton;
     private Button cancelButton;
     private MediaInfo videoInfo;
-    private File outputDestination;
-    private String outputMimetype;
+
+    private JobScheduler schedulerService;
+    private ComponentName serviceComponent;
+    // Handler for incoming messages from the service.
+    private IncomingMessageHandler msgHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         selectVideoButton = findViewById(R.id.selectVideo);
         encodeButton = findViewById(R.id.encode);
         cancelButton = findViewById(R.id.cancel);
@@ -142,17 +162,8 @@ public class MainActivity extends AppCompatActivity
         audioSampleRateSpinner = findViewById(R.id.audioSampleRateSpinner);
         audioChannelSpinner = findViewById(R.id.audioChannelSpinner);
 
-        FFmpegUtil.init(this, new ResultCallbackHandler<Boolean>()
-        {
-            @Override
-            public void onResult(Boolean result)
-            {
-                if(result == false)
-                {
-                    showUnsupportedExceptionDialog();
-                }
-            }
-        });
+        serviceComponent = new ComponentName(this, FFmpegProcessService.class);
+        msgHandler = new IncomingMessageHandler(this);
 
         selectVideoButton.setOnClickListener(new View.OnClickListener()
         {
@@ -187,6 +198,17 @@ public class MainActivity extends AppCompatActivity
                 cancelEncode();
             }
         });
+
+        schedulerService = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        if(schedulerService != null)
+        {
+            // Check if a job is still being processed in the background from a previous
+            // launch. If so, skip to that UI layout.
+            if(schedulerService.getAllPendingJobs().size() > 0)
+            {
+                updateUiForEncoding();
+            }
+        }
     }
 
     private void getPermission()
@@ -288,6 +310,12 @@ public class MainActivity extends AppCompatActivity
         String audioChannel = (String) audioChannelSpinner.getSelectedItem();
         int videoBitrate;
 
+        if(videoInfo == null)
+        {
+            Toast.makeText(this, R.string.selectFileFirst, Toast.LENGTH_LONG).show();
+            return;
+        }
+
         try
         {
             String videoBitrateStr = videoBitrateValue.getText().toString();
@@ -321,9 +349,6 @@ public class MainActivity extends AppCompatActivity
             fileNo++;
             destination = new File(outputDir, filePrefix + "_" + fileNo + extension);
         }
-
-        outputDestination = destination;
-        outputMimetype = container.mimetype;
 
         List<String> command = new LinkedList<>();
 
@@ -402,9 +427,35 @@ public class MainActivity extends AppCompatActivity
         // Output file
         command.add(destination.getAbsolutePath());
 
-        FFmpegResponseHandler handler = new FFmpegResponseHandler(durationSec*1000, progressBar, _transcodeResultHandler);
-        FFmpegUtil.call(command.toArray(new String[command.size()]), handler);
 
+        updateUiForEncoding();
+
+
+        JobInfo.Builder builder = new JobInfo.Builder(1, serviceComponent);
+        builder.setOverrideDeadline(0);
+
+        // Extras, work duration.
+        PersistableBundle extras = new PersistableBundle();
+        extras.putStringArray(FFMPEG_ENCODE_ARGS, command.toArray(new String[command.size()]));
+        extras.putString(FFMPEG_OUTPUT_FILE, destination.getAbsolutePath());
+        extras.putString(OUTPUT_MIMETYPE, container.mimetype);
+        extras.putInt(OUTPUT_DURATION_MS, durationSec*1000);
+        builder.setExtras(extras);
+
+        // Schedule job
+        Log.d(TAG, "Scheduling job");
+        JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        if(scheduler == null)
+        {
+            Toast.makeText(this, R.string.transcodeFailed, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        scheduler.schedule(builder.build());
+    }
+
+    private void updateUiForEncoding()
+    {
         stopVideoPlayback();
 
         progressBar.setProgress(0);
@@ -420,13 +471,14 @@ public class MainActivity extends AppCompatActivity
     {
         FFmpegUtil.cancelCall();
 
-        _transcodeResultHandler.onResult(false);
-
-        boolean result = outputDestination.delete();
-        if(result == false)
+        JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        if(scheduler == null)
         {
-            Log.d(TAG, "Failed to remove after encode cancel: " + outputDestination.getAbsolutePath());
+            Log.w(TAG, "Scheduler was null when canceling encode");
+            return;
         }
+
+        scheduler.cancelAll();
     }
 
     private boolean isEncoding()
@@ -467,6 +519,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStart()
+    {
+        super.onStart();
+        // Start service and provide it a way to communicate with this class.
+        Intent startServiceIntent = new Intent(this, FFmpegProcessService.class);
+        Messenger messengerIncoming = new Messenger(msgHandler);
+        startServiceIntent.putExtra(MESSENGER_INTENT_KEY, messengerIncoming);
+        startService(startServiceIntent);
+    }
+
+    @Override
     protected void onPause()
     {
         super.onPause();
@@ -482,6 +545,16 @@ public class MainActivity extends AppCompatActivity
         {
             startVideoPlayback();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        // A service can be "started" and/or "bound". In this case, it's "started" by this Activity
+        // and "bound" to the JobScheduler (also called "Scheduled" by the JobScheduler). This call
+        // to stopService() won't prevent scheduled jobs to be processed. However, failing
+        // to call stopService() would keep it alive indefinitely.
+        stopService(new Intent(this, FFmpegProcessService.class));
+        super.onStop();
     }
 
     private void setSpinnerSelection(Spinner spinner, Object value)
@@ -741,9 +814,157 @@ public class MainActivity extends AppCompatActivity
         return String.format(Locale.US, "%02d:%02d:%02d", hr, mn, sec);
     }
 
-    private void showUnsupportedExceptionDialog()
+    /**
+     * A {@link Handler} allows you to send messages associated with a thread. A {@link Messenger}
+     * uses this handler to communicate from {@link protect.videotranscoder.service.FFmpegProcessService}.
+     * It's also used to make the start and stop views blink for a short period of time.
+     */
+    private static class IncomingMessageHandler extends Handler
     {
-        new AlertDialog.Builder(MainActivity.this)
+        // Prevent possible leaks with a weak reference.
+        private WeakReference<MainActivity> activityRef;
+
+        IncomingMessageHandler(MainActivity activity)
+        {
+            super(/* default looper */);
+            activityRef = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg)
+        {
+            final MainActivity mainActivity = activityRef.get();
+            if (mainActivity == null)
+            {
+                // Activity is no longer available, exit.
+                return;
+            }
+
+            MessageId messageId = MessageId.fromInt(msg.what);
+
+            switch (MessageId.fromInt(msg.what))
+            {
+                /*
+                 * Receives callback from the service when a job has landed
+                 * on the app. Turns on indicator and sends a message to turn it off after
+                 * a second.
+                 */
+                case JOB_START_MSG:
+                    Log.d(TAG, "JOB_START_MSG: " + msg.obj.toString());
+                    break;
+
+                /*
+                 * Receives callback from the service when a job that previously landed on the
+                 * app must stop executing. Turns on indicator and sends a message to turn it
+                 * off after two seconds.
+                 */
+                case JOB_PROGRESS_MSG:
+                    Integer percentComplete = (Integer)msg.obj;
+
+                    if(percentComplete != null && percentComplete > 0)
+                    {
+                        Log.d(TAG, "JOB_PROGRESS_MSG: " + percentComplete);
+
+                        ProgressBar progressBar = mainActivity.findViewById(R.id.encodeProgress);
+                        progressBar.setIndeterminate(false);
+                        progressBar.setProgress(percentComplete);
+                    }
+                    break;
+
+                case JOB_SUCCEDED_MSG:
+                case JOB_FAILED_MSG:
+                    boolean result = false;
+                    String outputFile = null;
+                    String mimetype = null;
+
+                    if(messageId == MessageId.JOB_SUCCEDED_MSG)
+                    {
+                        result = true;
+                        outputFile = ((Bundle)msg.obj).getString(FFMPEG_OUTPUT_FILE);
+                        mimetype = ((Bundle)msg.obj).getString(OUTPUT_MIMETYPE);
+                    }
+
+                    Log.d(TAG, "Job complete, result: " + result);
+                    showEncodeCompleteDialog(mainActivity, result, outputFile, mimetype);
+                    break;
+
+                case FFMPEG_UNSUPPORTED_MSG:
+                    showUnsupportedExceptionDialog(mainActivity);
+                    break;
+
+                case UNKNOWN_MSG:
+                    Log.w(TAG, "UNKNOWN_MSG received");
+                    break;
+            }
+        }
+
+        private void showEncodeCompleteDialog(final MainActivity mainActivity, final boolean result,
+                                              final String outputFile, final String mimetype)
+        {
+            ProgressBar progressBar = mainActivity.findViewById(R.id.encodeProgress);
+            Button selectVideoButton = mainActivity.findViewById(R.id.selectVideo);
+            Button encodeButton = mainActivity.findViewById(R.id.encode);
+            Button cancelButton = mainActivity.findViewById(R.id.cancel);
+
+            Log.d(TAG, "Encode result: " + result);
+
+            String message;
+
+            if(result)
+            {
+                message = mainActivity.getResources().getString(R.string.transcodeSuccess, outputFile);
+            }
+            else
+            {
+                message = mainActivity.getResources().getString(R.string.transcodeFailed);
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity)
+                .setMessage(message)
+                .setCancelable(true)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.dismiss();
+                    }
+                });
+
+            if(result)
+            {
+                final Uri outputUri = FileProvider.getUriForFile(mainActivity, BuildConfig.APPLICATION_ID, new File(outputFile));
+
+                final CharSequence sendLabel = mainActivity.getResources().getText(R.string.sendLabel);
+                builder.setNeutralButton(sendLabel, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_STREAM, outputUri);
+                        sendIntent.setType(mimetype);
+
+                        // set flag to give temporary permission to external app to use the FileProvider
+                        sendIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                        mainActivity.startActivity(Intent.createChooser(sendIntent, sendLabel));
+                    }
+                });
+            }
+
+            builder.show();
+
+            //startVideoPlayback();
+
+            selectVideoButton.setVisibility(View.VISIBLE);
+            encodeButton.setVisibility(View.VISIBLE);
+            cancelButton.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+        }
+
+        private void showUnsupportedExceptionDialog(final MainActivity mainActivity)
+        {
+            new AlertDialog.Builder(mainActivity)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Not Supported")
                 .setMessage("Device Not Supported")
@@ -753,71 +974,13 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        MainActivity.this.finish();
+                        mainActivity.finish();
                     }
                 })
                 .create()
                 .show();
-    }
-
-    private ResultCallbackHandler<Boolean> _transcodeResultHandler = new ResultCallbackHandler<Boolean>()
-    {
-        @Override
-        public void onResult(Boolean result)
-        {
-            String message;
-
-            if(result)
-            {
-                message = getResources().getString(R.string.transcodeSuccess, outputDestination.getAbsolutePath());
-            }
-            else
-            {
-                message = getResources().getString(R.string.transcodeFailed);
-            }
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
-                    .setMessage(message)
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int which)
-                        {
-                            dialog.dismiss();
-                        }
-                    });
-            if(result)
-            {
-                final Uri outputUri = FileProvider.getUriForFile(MainActivity.this, BuildConfig.APPLICATION_ID, outputDestination);
-
-                final CharSequence sendLabel = getResources().getText(R.string.sendLabel);
-                builder.setNeutralButton(sendLabel, new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        Intent sendIntent = new Intent(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_STREAM, outputUri);
-                        sendIntent.setType(outputMimetype);
-
-                        // set flag to give temporary permission to external app to use the FileProvider
-                        sendIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                        startActivity(Intent.createChooser(sendIntent, sendLabel));
-                    }
-                });
-            }
-
-            builder.show();
-
-            startVideoPlayback();
-
-            selectVideoButton.setVisibility(View.VISIBLE);
-            encodeButton.setVisibility(View.VISIBLE);
-            cancelButton.setVisibility(View.GONE);
-            progressBar.setVisibility(View.GONE);
         }
-    };
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
