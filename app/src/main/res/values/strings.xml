@@ -21,6 +21,7 @@
     <string name="sampleRate">Sample Rate (Hz)</string>
     <string name="channels">Channels</string>
 
+    <string name="selectFileFirst">You must select a file to encode first.</string>
     <string name="videoBitrateValueInvalid">Video bitrate value is invalid, could not encode.</string>
     <string name="transcodeSuccess">Encoding completed successfully. The file was written to:\n<xliff:g id="path">%s</xliff:g></string>
     <string name="transcodeFailed">Encoding failed, see logs for details.</string>
