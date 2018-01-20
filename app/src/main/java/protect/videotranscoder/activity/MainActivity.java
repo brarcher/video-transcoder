@@ -209,6 +209,43 @@ public class MainActivity extends AppCompatActivity
                 updateUiForEncoding();
             }
         }
+
+        selectVideoButton.setEnabled(false);
+
+        FFmpegUtil.init(getApplicationContext(), new ResultCallbackHandler<Boolean>()
+        {
+            @Override
+            public void onResult(Boolean result)
+            {
+                if(result)
+                {
+                    selectVideoButton.setEnabled(true);
+                }
+                else
+                {
+                    showUnsupportedExceptionDialog();
+                }
+            }
+        });
+    }
+
+    private void showUnsupportedExceptionDialog()
+    {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Not Supported")
+                .setMessage("Device Not Supported")
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        finish();
+                    }
+                })
+                .create()
+                .show();
     }
 
     private void getPermission()
@@ -903,7 +940,7 @@ public class MainActivity extends AppCompatActivity
                     break;
 
                 case FFMPEG_UNSUPPORTED_MSG:
-                    showUnsupportedExceptionDialog(mainActivity);
+                    Log.d(TAG, "FFMPEG_UNSUPPORTED_MSG");
                     break;
 
                 case UNKNOWN_MSG:
@@ -974,25 +1011,6 @@ public class MainActivity extends AppCompatActivity
             encodeButton.setVisibility(View.VISIBLE);
             cancelButton.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
-        }
-
-        private void showUnsupportedExceptionDialog(final MainActivity mainActivity)
-        {
-            new AlertDialog.Builder(mainActivity)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Not Supported")
-                .setMessage("Device Not Supported")
-                .setCancelable(false)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        mainActivity.finish();
-                    }
-                })
-                .create()
-                .show();
         }
     }
 
