@@ -233,8 +233,8 @@ public class MainActivity extends AppCompatActivity
     {
         new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Not Supported")
-                .setMessage("Device Not Supported")
+                .setTitle(R.string.notSupportedTitle)
+                .setMessage(R.string.notSupportedMessage)
                 .setCancelable(false)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
                 {
