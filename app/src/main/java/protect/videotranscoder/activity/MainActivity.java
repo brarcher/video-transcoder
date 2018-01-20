@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -678,14 +679,36 @@ public class MainActivity extends AppCompatActivity
         LinkedList<String> fps = new LinkedList<>(Arrays.asList("24", "23.98", "25", "29.97", "30", "50"));
         if(videoInfo.videoFramerate != null && fps.contains(videoInfo.videoFramerate) == false)
         {
-            fps.addFirst(videoInfo.videoFramerate);
+            fps.add(videoInfo.videoFramerate);
+            Collections.sort(fps);
         }
         fpsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, fps));
 
         LinkedList<String> resolution = new LinkedList<>(Arrays.asList("176x144", "320x240", "480x360", "640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720", "1920x1080", "2048x1080", "2048x858", "2560x1440", "2560x1600", "4096x2160"));
         if(videoInfo.videoResolution != null && resolution.contains(videoInfo.videoResolution) == false)
         {
-            resolution.addFirst(videoInfo.videoResolution);
+            resolution.add(videoInfo.videoResolution);
+
+            Collections.sort(resolution, new Comparator<String>()
+            {
+                @Override
+                public int compare(String o1, String o2)
+                {
+                    int width1 = Integer.parseInt(o1.split("x")[0]);
+                    int height1 = Integer.parseInt(o1.split("x")[1]);
+                    int width2 = Integer.parseInt(o2.split("x")[0]);
+                    int height2 = Integer.parseInt(o2.split("x")[1]);
+
+                    if(width1 != width2)
+                    {
+                        return width1 - width2;
+                    }
+                    else
+                    {
+                        return height1 - height2;
+                    }
+                }
+            });
         }
         resolutionSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, resolution));
 
