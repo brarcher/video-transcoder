@@ -188,6 +188,8 @@ public class FFmpegUtil
     {
         if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning())
         {
+            Log.d(TAG, "Failed to get media details, FFmpeg " +
+                    (ffmpeg == null ? "is not initialized" : "is already running"));
             resultHandler.onResult(null);
             return;
         }

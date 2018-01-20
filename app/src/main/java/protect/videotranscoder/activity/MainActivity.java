@@ -802,6 +802,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         if(result == null)
                         {
+                            Log.d(TAG, "Failed to query media file, filling in defaults");
                             // Could not query the file, fill in what we know.
                             result = new MediaInfo(videoFile, 0, MediaContainer.MP4, VideoCodec.MPEG4, "640x480",
                                 800, "25", AudioCodec.MP3,
