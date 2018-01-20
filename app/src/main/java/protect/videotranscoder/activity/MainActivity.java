@@ -676,7 +676,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        LinkedList<String> fps = new LinkedList<>(Arrays.asList("24", "23.98", "25", "29.97", "30", "50"));
+        LinkedList<String> fps = new LinkedList<>(Arrays.asList("15", "24", "23.98", "25", "29.97", "30", "50"));
         if(videoInfo.videoFramerate != null && fps.contains(videoInfo.videoFramerate) == false)
         {
             fps.add(videoInfo.videoFramerate);
