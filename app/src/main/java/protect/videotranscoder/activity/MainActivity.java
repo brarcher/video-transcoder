@@ -664,6 +664,10 @@ public class MainActivity extends AppCompatActivity
                     findViewById(resId).setVisibility(visibility);
                 }
 
+                // Hide video bitrate for GIF, as it does not apply
+                visibility = container == MediaContainer.GIF ? View.GONE : View.VISIBLE;
+                findViewById(R.id.videoBitrateContainer).setVisibility(visibility);
+
                 VideoCodec currentVideoSelection = (VideoCodec)videoCodecSpinner.getSelectedItem();
                 AudioCodec currentAudioSelection = (AudioCodec)audioCodecSpinner.getSelectedItem();
 
