@@ -652,6 +652,13 @@ public class MainActivity extends AppCompatActivity
                     findViewById(resId).setVisibility(visibility);
                 }
 
+                visibility = container.supportedAudioCodecs.size() > 0 ? View.VISIBLE : View.GONE;
+
+                for(int resId : AUDIO_SETTINGS_IDS)
+                {
+                    findViewById(resId).setVisibility(visibility);
+                }
+
                 VideoCodec currentVideoSelection = (VideoCodec)videoCodecSpinner.getSelectedItem();
                 AudioCodec currentAudioSelection = (AudioCodec)audioCodecSpinner.getSelectedItem();
 
