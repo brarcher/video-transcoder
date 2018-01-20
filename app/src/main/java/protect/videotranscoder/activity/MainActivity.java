@@ -689,6 +689,13 @@ public class MainActivity extends AppCompatActivity
         {
             resolution.add(videoInfo.videoResolution);
 
+            int width = Integer.parseInt(videoInfo.videoResolution.split("x")[0]);
+            int height = Integer.parseInt(videoInfo.videoResolution.split("x")[1]);
+
+            // Add a few derivatives of this resolution as well
+            resolution.add( (width/2) + "x" + (height/2) );
+            resolution.add( (width/4) + "x" + (height/4) );
+
             Collections.sort(resolution, new Comparator<String>()
             {
                 @Override
