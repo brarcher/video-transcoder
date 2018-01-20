@@ -14,6 +14,7 @@ public enum AudioCodec
     AAC("aac", Arrays.asList("1", "2")),
     MP3("mp3", Arrays.asList("1", "2")),
     VORBIS("vorbis", Collections.singletonList("2")),
+    NONE("none", Collections.EMPTY_LIST),
     ;
 
     public final String ffmpegName;

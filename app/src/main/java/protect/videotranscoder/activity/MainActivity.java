@@ -442,7 +442,7 @@ public class MainActivity extends AppCompatActivity
             command.add("-vn");
         }
 
-        if(container.supportedAudioCodecs.size() > 0)
+        if(container.supportedAudioCodecs.size() > 0 && audioCodec != AudioCodec.NONE)
         {
             // Audio codec
             command.add("-acodec");
@@ -467,6 +467,11 @@ public class MainActivity extends AppCompatActivity
             // Audio bitrate
             command.add("-b:a");
             command.add(audioBitrate + "k");
+        }
+        else
+        {
+            // No audio
+            command.add("-an");
         }
 
         if(container == MediaContainer.GIF)
@@ -737,7 +742,10 @@ public class MainActivity extends AppCompatActivity
                 audioChannelSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, audioCodec.supportedChannels));
 
                 // Attempt to set the same setting as before, if it exists
-                setSpinnerSelection(audioChannelSpinner, currentSelection);
+                if(currentSelection != null)
+                {
+                    setSpinnerSelection(audioChannelSpinner, currentSelection);
+                }
             }
 
             @Override
