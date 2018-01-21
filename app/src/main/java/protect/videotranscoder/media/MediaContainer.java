@@ -14,8 +14,8 @@ public enum MediaContainer
 {
     // Video and audio:
     FLV("flv", "flv", "video/x-flv", Collections.singletonList(VideoCodec.H264), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3, AudioCodec.NONE)),
-    MKV("matroska", "mkv", "video/x-matroska", Collections.singletonList(VideoCodec.H264), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3, AudioCodec.NONE)),
-    MP4("mp4", "mp4", "video/mp4", Arrays.asList(VideoCodec.H264, VideoCodec.MPEG4), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3, AudioCodec.NONE)),
+    MKV("matroska", "mkv", "video/x-matroska", Arrays.asList(VideoCodec.H264, VideoCodec.MPEG4, VideoCodec.MPEG2, VideoCodec.MPEG1), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3, AudioCodec.NONE)),
+    MP4("mp4", "mp4", "video/mp4", Arrays.asList(VideoCodec.H264, VideoCodec.MPEG4, VideoCodec.MPEG2, VideoCodec.MPEG1), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3, AudioCodec.NONE)),
     GIF("gif", "gif", "image/gif", Arrays.asList(VideoCodec.GIF), Collections.EMPTY_LIST),
 
     // Audio only

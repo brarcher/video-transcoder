@@ -339,7 +339,8 @@ public class MainActivity extends AppCompatActivity
     private void startEncode()
     {
         MediaContainer container = (MediaContainer)containerSpinner.getSelectedItem();
-        VideoCodec videoCodec = (VideoCodec)videoCodecSpinner.getSelectedItem();
+        VideoCodecWrapper videoCodecWrapper = (VideoCodecWrapper)videoCodecSpinner.getSelectedItem();
+        VideoCodec videoCodec = videoCodecWrapper != null ? videoCodecWrapper.codec : null;
         String fps = (String)fpsSpinner.getSelectedItem();
         String resolution = (String)resolutionSpinner.getSelectedItem();
         AudioCodec audioCodec = (AudioCodec) audioCodecSpinner.getSelectedItem();
@@ -613,6 +614,19 @@ public class MainActivity extends AppCompatActivity
         super.onStop();
     }
 
+    private void setSpinnerSelection(Spinner spinner, VideoCodec value)
+    {
+        for(int index = 0; index < spinner.getCount(); index++)
+        {
+            VideoCodecWrapper item = (VideoCodecWrapper)spinner.getItemAtPosition(index);
+            if(item.codec == value)
+            {
+                spinner.setSelection(index);
+                break;
+            }
+        }
+    }
+
     private void setSpinnerSelection(Spinner spinner, Object value)
     {
         for(int index = 0; index < spinner.getCount(); index++)
@@ -665,19 +679,21 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 // Hide video bitrate for GIF, as it does not apply
-                visibility = container == MediaContainer.GIF ? View.GONE : View.VISIBLE;
-                findViewById(R.id.videoBitrateContainer).setVisibility(visibility);
+                if(container == MediaContainer.GIF)
+                {
+                    findViewById(R.id.videoBitrateContainer).setVisibility(View.GONE);
+                }
 
-                VideoCodec currentVideoSelection = (VideoCodec)videoCodecSpinner.getSelectedItem();
+                VideoCodecWrapper currentVideoSelection = (VideoCodecWrapper)videoCodecSpinner.getSelectedItem();
                 AudioCodec currentAudioSelection = (AudioCodec)audioCodecSpinner.getSelectedItem();
 
-                videoCodecSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, container.supportedVideoCodecs));
+                videoCodecSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, VideoCodecWrapper.wrap(MainActivity.this, container.supportedVideoCodecs)));
                 audioCodecSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, container.supportedAudioCodecs));
 
                 // Attempt to set the same settings again, if they exist
                 if(currentVideoSelection != null)
                 {
-                    setSpinnerSelection(videoCodecSpinner, currentVideoSelection.toString());
+                    setSpinnerSelection(videoCodecSpinner, currentVideoSelection.codec);
                 }
                 if(currentAudioSelection != null)
                 {
@@ -785,7 +801,7 @@ public class MainActivity extends AppCompatActivity
 
         if(videoInfo.videoCodec != null)
         {
-            setSpinnerSelection(videoCodecSpinner, videoInfo.videoCodec.toString());
+            setSpinnerSelection(videoCodecSpinner, videoInfo.videoCodec);
         }
 
         if(videoInfo.videoFramerate != null)

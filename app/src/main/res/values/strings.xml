@@ -34,6 +34,11 @@
 
     <string name="fileLocationLookupFailed">Failed to resolve the location of the media file</string>
 
+    <string name="codecSlowExcellent">Slow, Quality excellent</string>
+    <string name="codecFastGood">Fast, Quality good</string>
+    <string name="codecFastOk">Fast, Quality OK</string>
+    <string name="codecFastLow">Fast, Quality low</string>
+
     <string name="about">About</string>
     <string name="app_copyright_fmt">Copyright 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
     <string name="app_license">Licensed under the GPLv2.</string>
