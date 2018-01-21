@@ -55,7 +55,7 @@ public class FFmpegProcessService extends JobService
     @Override
     public boolean onStartJob(final JobParameters params)
     {
-        FFmpegUtil.init(this, new ResultCallbackHandler<Boolean>()
+        FFmpegUtil.init(getApplicationContext(), new ResultCallbackHandler<Boolean>()
         {
             @Override
             public void onResult(Boolean result)

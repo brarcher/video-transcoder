@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -209,6 +210,43 @@ public class MainActivity extends AppCompatActivity
                 updateUiForEncoding();
             }
         }
+
+        selectVideoButton.setEnabled(false);
+
+        FFmpegUtil.init(getApplicationContext(), new ResultCallbackHandler<Boolean>()
+        {
+            @Override
+            public void onResult(Boolean result)
+            {
+                if(result)
+                {
+                    selectVideoButton.setEnabled(true);
+                }
+                else
+                {
+                    showUnsupportedExceptionDialog();
+                }
+            }
+        });
+    }
+
+    private void showUnsupportedExceptionDialog()
+    {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.notSupportedTitle)
+                .setMessage(R.string.notSupportedMessage)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        finish();
+                    }
+                })
+                .create()
+                .show();
     }
 
     private void getPermission()
@@ -378,9 +416,17 @@ public class MainActivity extends AppCompatActivity
 
         if(container.supportedVideoCodecs.size() > 0)
         {
-            // Video codec
-            command.add("-vcodec");
-            command.add(videoCodec.ffmpegName);
+            // These options only apply when not using GIF
+            if(videoCodec != VideoCodec.GIF)
+            {
+                // Video codec
+                command.add("-vcodec");
+                command.add(videoCodec.ffmpegName);
+
+                // Video bitrate
+                command.add("-b:v");
+                command.add(videoBitrate + "k");
+            }
 
             // Frame size
             command.add("-s");
@@ -389,10 +435,6 @@ public class MainActivity extends AppCompatActivity
             // Frame rate
             command.add("-r");
             command.add(fps);
-
-            // Video bitrate
-            command.add("-b:v");
-            command.add(videoBitrate + "k");
         }
         else
         {
@@ -400,29 +442,43 @@ public class MainActivity extends AppCompatActivity
             command.add("-vn");
         }
 
-        // Audio codec
-        command.add("-acodec");
-        command.add(audioCodec.ffmpegName);
-
-        if(audioCodec == AudioCodec.VORBIS)
+        if(container.supportedAudioCodecs.size() > 0 && audioCodec != AudioCodec.NONE)
         {
-            // The vorbis encode is experimental, and needs other
-            // flags to enable
-            command.add("-strict");
-            command.add("-2");
+            // Audio codec
+            command.add("-acodec");
+            command.add(audioCodec.ffmpegName);
+
+            if(audioCodec == AudioCodec.VORBIS)
+            {
+                // The vorbis encode is experimental, and needs other
+                // flags to enable
+                command.add("-strict");
+                command.add("-2");
+            }
+
+            // Sample rate
+            command.add("-ar");
+            command.add(Integer.toString(audioSampleRate));
+
+            // Channels
+            command.add("-ac");
+            command.add(audioChannel);
+
+            // Audio bitrate
+            command.add("-b:a");
+            command.add(audioBitrate + "k");
+        }
+        else
+        {
+            // No audio
+            command.add("-an");
         }
 
-        // Sample rate
-        command.add("-ar");
-        command.add(Integer.toString(audioSampleRate));
-
-        // Channels
-        command.add("-ac");
-        command.add(audioChannel);
-
-        // Audio bitrate
-        command.add("-b:a");
-        command.add(audioBitrate + "k");
+        if(container == MediaContainer.GIF)
+        {
+            command.add("-filter_complex");
+            command.add("fps=" + fps + ",split [o1] [o2];[o1] palettegen [p]; [o2] fifo [o3];[o3] [p] paletteuse");
+        }
 
         // Output file
         command.add(destination.getAbsolutePath());
@@ -601,6 +657,17 @@ public class MainActivity extends AppCompatActivity
                     findViewById(resId).setVisibility(visibility);
                 }
 
+                visibility = container.supportedAudioCodecs.size() > 0 ? View.VISIBLE : View.GONE;
+
+                for(int resId : AUDIO_SETTINGS_IDS)
+                {
+                    findViewById(resId).setVisibility(visibility);
+                }
+
+                // Hide video bitrate for GIF, as it does not apply
+                visibility = container == MediaContainer.GIF ? View.GONE : View.VISIBLE;
+                findViewById(R.id.videoBitrateContainer).setVisibility(visibility);
+
                 VideoCodec currentVideoSelection = (VideoCodec)videoCodecSpinner.getSelectedItem();
                 AudioCodec currentAudioSelection = (AudioCodec)audioCodecSpinner.getSelectedItem();
 
@@ -625,17 +692,46 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        LinkedList<String> fps = new LinkedList<>(Arrays.asList("24", "23.98", "25", "29.97", "30", "50"));
+        LinkedList<String> fps = new LinkedList<>(Arrays.asList("15", "24", "23.98", "25", "29.97", "30", "50"));
         if(videoInfo.videoFramerate != null && fps.contains(videoInfo.videoFramerate) == false)
         {
-            fps.addFirst(videoInfo.videoFramerate);
+            fps.add(videoInfo.videoFramerate);
+            Collections.sort(fps);
         }
         fpsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, fps));
 
         LinkedList<String> resolution = new LinkedList<>(Arrays.asList("176x144", "320x240", "480x360", "640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720", "1920x1080", "2048x1080", "2048x858", "2560x1440", "2560x1600", "4096x2160"));
         if(videoInfo.videoResolution != null && resolution.contains(videoInfo.videoResolution) == false)
         {
-            resolution.addFirst(videoInfo.videoResolution);
+            resolution.add(videoInfo.videoResolution);
+
+            int width = Integer.parseInt(videoInfo.videoResolution.split("x")[0]);
+            int height = Integer.parseInt(videoInfo.videoResolution.split("x")[1]);
+
+            // Add a few derivatives of this resolution as well
+            resolution.add( (width/2) + "x" + (height/2) );
+            resolution.add( (width/4) + "x" + (height/4) );
+
+            Collections.sort(resolution, new Comparator<String>()
+            {
+                @Override
+                public int compare(String o1, String o2)
+                {
+                    int width1 = Integer.parseInt(o1.split("x")[0]);
+                    int height1 = Integer.parseInt(o1.split("x")[1]);
+                    int width2 = Integer.parseInt(o2.split("x")[0]);
+                    int height2 = Integer.parseInt(o2.split("x")[1]);
+
+                    if(width1 != width2)
+                    {
+                        return width1 - width2;
+                    }
+                    else
+                    {
+                        return height1 - height2;
+                    }
+                }
+            });
         }
         resolutionSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, resolution));
 
@@ -650,7 +746,10 @@ public class MainActivity extends AppCompatActivity
                 audioChannelSpinner.setAdapter(new ArrayAdapter<>(MainActivity.this, R.layout.spinner_textview, audioCodec.supportedChannels));
 
                 // Attempt to set the same setting as before, if it exists
-                setSpinnerSelection(audioChannelSpinner, currentSelection);
+                if(currentSelection != null)
+                {
+                    setSpinnerSelection(audioChannelSpinner, currentSelection);
+                }
             }
 
             @Override
@@ -789,6 +888,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         if(result == null)
                         {
+                            Log.d(TAG, "Failed to query media file, filling in defaults");
                             // Could not query the file, fill in what we know.
                             result = new MediaInfo(videoFile, 0, MediaContainer.MP4, VideoCodec.MPEG4, "640x480",
                                 800, "25", AudioCodec.MP3,
@@ -889,7 +989,7 @@ public class MainActivity extends AppCompatActivity
                     break;
 
                 case FFMPEG_UNSUPPORTED_MSG:
-                    showUnsupportedExceptionDialog(mainActivity);
+                    Log.d(TAG, "FFMPEG_UNSUPPORTED_MSG");
                     break;
 
                 case UNKNOWN_MSG:
@@ -960,25 +1060,6 @@ public class MainActivity extends AppCompatActivity
             encodeButton.setVisibility(View.VISIBLE);
             cancelButton.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
-        }
-
-        private void showUnsupportedExceptionDialog(final MainActivity mainActivity)
-        {
-            new AlertDialog.Builder(mainActivity)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Not Supported")
-                .setMessage("Device Not Supported")
-                .setCancelable(false)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        mainActivity.finish();
-                    }
-                })
-                .create()
-                .show();
         }
     }
 
