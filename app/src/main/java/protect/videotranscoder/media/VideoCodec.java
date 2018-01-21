@@ -9,6 +9,7 @@ public enum VideoCodec
 {
     H264("h264"),
     MPEG4("mpeg4"),
+    GIF("gif"),
     ;
 
     public final String ffmpegName;

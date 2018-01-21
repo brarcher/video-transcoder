@@ -378,9 +378,17 @@ public class MainActivity extends AppCompatActivity
 
         if(container.supportedVideoCodecs.size() > 0)
         {
-            // Video codec
-            command.add("-vcodec");
-            command.add(videoCodec.ffmpegName);
+            // These options only apply when not using GIF
+            if(videoCodec != VideoCodec.GIF)
+            {
+                // Video codec
+                command.add("-vcodec");
+                command.add(videoCodec.ffmpegName);
+
+                // Video bitrate
+                command.add("-b:v");
+                command.add(videoBitrate + "k");
+            }
 
             // Frame size
             command.add("-s");
@@ -389,10 +397,6 @@ public class MainActivity extends AppCompatActivity
             // Frame rate
             command.add("-r");
             command.add(fps);
-
-            // Video bitrate
-            command.add("-b:v");
-            command.add(videoBitrate + "k");
         }
         else
         {
@@ -400,29 +404,38 @@ public class MainActivity extends AppCompatActivity
             command.add("-vn");
         }
 
-        // Audio codec
-        command.add("-acodec");
-        command.add(audioCodec.ffmpegName);
-
-        if(audioCodec == AudioCodec.VORBIS)
+        if(container.supportedAudioCodecs.size() > 0)
         {
-            // The vorbis encode is experimental, and needs other
-            // flags to enable
-            command.add("-strict");
-            command.add("-2");
+            // Audio codec
+            command.add("-acodec");
+            command.add(audioCodec.ffmpegName);
+
+            if(audioCodec == AudioCodec.VORBIS)
+            {
+                // The vorbis encode is experimental, and needs other
+                // flags to enable
+                command.add("-strict");
+                command.add("-2");
+            }
+
+            // Sample rate
+            command.add("-ar");
+            command.add(Integer.toString(audioSampleRate));
+
+            // Channels
+            command.add("-ac");
+            command.add(audioChannel);
+
+            // Audio bitrate
+            command.add("-b:a");
+            command.add(audioBitrate + "k");
         }
 
-        // Sample rate
-        command.add("-ar");
-        command.add(Integer.toString(audioSampleRate));
-
-        // Channels
-        command.add("-ac");
-        command.add(audioChannel);
-
-        // Audio bitrate
-        command.add("-b:a");
-        command.add(audioBitrate + "k");
+        if(container == MediaContainer.GIF)
+        {
+            command.add("-filter_complex");
+            command.add("fps=" + fps + ",split [o1] [o2];[o1] palettegen [p]; [o2] fifo [o3];[o3] [p] paletteuse");
+        }
 
         // Output file
         command.add(destination.getAbsolutePath());
