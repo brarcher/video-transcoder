@@ -1,1 +1,1 @@
-Video transcoding for Android
+Video transcoding between common formats
