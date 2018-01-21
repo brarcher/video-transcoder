@@ -11,6 +11,8 @@ public enum VideoCodec
 {
     H264("h264", "H.264", R.string.codecSlowExcellent),
     MPEG4("mpeg4", "MPEG-4", R.string.codecFastGood),
+    MPEG2("mpeg2video", "MPEG-2", R.string.codecFastOk),
+    MPEG1("mpeg1video", "MPEG-1", R.string.codecFastLow),
     GIF("gif", "GIF", null),
     ;
 
