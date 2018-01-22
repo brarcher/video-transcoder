@@ -1,6 +1,9 @@
 # Video Transcoder
 [![Build Status](https://travis-ci.org/brarcher/video-transcoder.svg?branch=master)](https://travis-ci.org/brarcher/video-transcoder)
 
+<a href="https://play.google.com/store/apps/details?id=protect.videoeditor" target="_blank">
+<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="90"/></a>
+
 Do you want to encode videos on your phone into different formats, trim videos, or extract audio? Are you looking for a free solution which will not take your information?
 
 Video Transcoder is an application which uses the open source program FFmpeg to transcode video files from one format to another. By selecting the video to process, details for the video are provided and the desired settings can be configured.
