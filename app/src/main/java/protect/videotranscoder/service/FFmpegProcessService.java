@@ -16,6 +16,7 @@ import protect.videotranscoder.FFmpegUtil;
 import protect.videotranscoder.ResultCallbackHandler;
 
 import static protect.videotranscoder.activity.MainActivity.FFMPEG_ENCODE_ARGS;
+import static protect.videotranscoder.activity.MainActivity.FFMPEG_FAILURE_MSG;
 import static protect.videotranscoder.activity.MainActivity.FFMPEG_OUTPUT_FILE;
 import static protect.videotranscoder.activity.MainActivity.MESSENGER_INTENT_KEY;
 import static protect.videotranscoder.activity.MainActivity.OUTPUT_DURATION_MS;
@@ -77,7 +78,13 @@ public class FFmpegProcessService extends JobService
                             Log.d(TAG, "Failed with output : " + s);
                             jobFinished(params, false);
 
-                            sendMessage(MessageId.JOB_FAILED_MSG, params.getJobId());
+                            // The last line of the output should be the failure message
+                            String [] lines = s.split("\n");
+                            String failureMg = lines[lines.length-1].trim();
+
+                            Bundle bundle = new Bundle();
+                            bundle.putString(FFMPEG_FAILURE_MSG, failureMg);
+                            sendMessage(MessageId.JOB_FAILED_MSG, bundle);
                         }
 
                         @Override

@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity
     public static final String MESSENGER_INTENT_KEY = BuildConfig.APPLICATION_ID + ".MESSENGER_INTENT_KEY";
     public static final String FFMPEG_ENCODE_ARGS = BuildConfig.APPLICATION_ID + ".FFMPEG_ENCODE_ARGS";
     public static final String FFMPEG_OUTPUT_FILE = BuildConfig.APPLICATION_ID + ".FFMPEG_OUTPUT_FILE";
+    public static final String FFMPEG_FAILURE_MSG = BuildConfig.APPLICATION_ID + ".FFMPEG_FAILURE_MSG";
     public static final String OUTPUT_MIMETYPE = BuildConfig.APPLICATION_ID + ".OUTPUT_MIMETYPE";
     public static final String OUTPUT_DURATION_MS = BuildConfig.APPLICATION_ID + ".OUTPUT_DURATION_MS";
 
@@ -992,6 +993,7 @@ public class MainActivity extends AppCompatActivity
                     boolean result = false;
                     String outputFile = null;
                     String mimetype = null;
+                    String message = null;
 
                     if(messageId == MessageId.JOB_SUCCEDED_MSG)
                     {
@@ -999,9 +1001,13 @@ public class MainActivity extends AppCompatActivity
                         outputFile = ((Bundle)msg.obj).getString(FFMPEG_OUTPUT_FILE);
                         mimetype = ((Bundle)msg.obj).getString(OUTPUT_MIMETYPE);
                     }
+                    else
+                    {
+                        message = ((Bundle)msg.obj).getString(FFMPEG_FAILURE_MSG);
+                    }
 
                     Log.d(TAG, "Job complete, result: " + result);
-                    showEncodeCompleteDialog(mainActivity, result, outputFile, mimetype);
+                    showEncodeCompleteDialog(mainActivity, result, message, outputFile, mimetype);
                     break;
 
                 case FFMPEG_UNSUPPORTED_MSG:
@@ -1015,7 +1021,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         private void showEncodeCompleteDialog(final MainActivity mainActivity, final boolean result,
-                                              final String outputFile, final String mimetype)
+                                              final String ffmpegMessage, final String outputFile,
+                                              final String mimetype)
         {
             ProgressBar progressBar = mainActivity.findViewById(R.id.encodeProgress);
             Button selectVideoButton = mainActivity.findViewById(R.id.selectVideo);
@@ -1032,7 +1039,7 @@ public class MainActivity extends AppCompatActivity
             }
             else
             {
-                message = mainActivity.getResources().getString(R.string.transcodeFailed);
+                message = mainActivity.getResources().getString(R.string.transcodeFailed, ffmpegMessage);
             }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity)
