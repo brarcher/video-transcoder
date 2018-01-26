@@ -57,16 +57,32 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/startJumpBack"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_fast_rewind_black_24dp"/>
+                <ImageView
+                    android:id="@+id/startJumpForward"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_fast_forward_black_24dp"/>
                 <Button
                     android:id="@+id/selectVideo"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:text="@string/selectVideo"
                     />
                 <Button
                     android:id="@+id/encode"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
                     android:visibility="gone"
                     android:text="@string/encode"
                     />
@@ -74,9 +90,24 @@
                     android:id="@+id/cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
                     android:visibility="gone"
                     android:text="@string/cancel"
                     />
+                <ImageView
+                    android:id="@+id/endJumpBack"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_fast_rewind_black_24dp"/>
+                <ImageView
+                    android:id="@+id/endJumpForward"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_fast_forward_black_24dp"/>
             </LinearLayout>
 
             <ProgressBar

@@ -31,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -129,6 +130,10 @@ public class MainActivity extends AppCompatActivity
     private Button selectVideoButton;
     private Button encodeButton;
     private Button cancelButton;
+    private ImageView startJumpBack;
+    private ImageView startJumpForward;
+    private ImageView endJumpBack;
+    private ImageView endJumpForward;
     private MediaInfo videoInfo;
 
     private JobScheduler schedulerService;
@@ -145,6 +150,11 @@ public class MainActivity extends AppCompatActivity
         selectVideoButton = findViewById(R.id.selectVideo);
         encodeButton = findViewById(R.id.encode);
         cancelButton = findViewById(R.id.cancel);
+
+        startJumpBack = findViewById(R.id.startJumpBack);
+        startJumpForward = findViewById(R.id.startJumpForward);
+        endJumpBack = findViewById(R.id.endJumpBack);
+        endJumpForward = findViewById(R.id.endJumpForward);
 
         tvLeft = findViewById(R.id.tvLeft);
         tvRight = findViewById(R.id.tvRight);
@@ -521,6 +531,11 @@ public class MainActivity extends AppCompatActivity
 
         selectVideoButton.setVisibility(View.GONE);
         encodeButton.setVisibility(View.GONE);
+        startJumpBack.setVisibility(View.GONE);
+        startJumpForward.setVisibility(View.GONE);
+        endJumpBack.setVisibility(View.GONE);
+        endJumpForward.setVisibility(View.GONE);
+
         cancelButton.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -663,6 +678,10 @@ public class MainActivity extends AppCompatActivity
         }
 
         encodeButton.setVisibility(View.VISIBLE);
+        startJumpBack.setVisibility(View.VISIBLE);
+        startJumpForward.setVisibility(View.VISIBLE);
+        endJumpBack.setVisibility(View.VISIBLE);
+        endJumpForward.setVisibility(View.VISIBLE);
 
         containerSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, MediaContainer.values()));
         containerSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
@@ -926,6 +945,36 @@ public class MainActivity extends AppCompatActivity
                                 }
                             }
                         });
+
+                        class RangeSeekChanger implements View.OnClickListener
+                        {
+                            private final int startOffset;
+                            private final int endOffset;
+                            RangeSeekChanger(int startOffset, int endOffset)
+                            {
+                                this.startOffset = startOffset;
+                                this.endOffset = endOffset;
+                            }
+
+                            @Override
+                            public void onClick(View v)
+                            {
+                                rangeSeekBar.setMinValue(0);
+                                rangeSeekBar.setMaxValue(durationMs / 1000f);
+
+                                int selectedStart = rangeSeekBar.getSelectedMinValue().intValue();
+                                int selectedEnd = rangeSeekBar.getSelectedMaxValue().intValue();
+
+                                rangeSeekBar.setMinStartValue(selectedStart + startOffset);
+                                rangeSeekBar.setMaxStartValue(selectedEnd + endOffset);
+                                rangeSeekBar.apply();
+                            }
+                        }
+
+                        startJumpForward.setOnClickListener(new RangeSeekChanger(1, 0));
+                        startJumpBack.setOnClickListener(new RangeSeekChanger(-1, 0));
+                        endJumpForward.setOnClickListener(new RangeSeekChanger(0, 1));
+                        endJumpBack.setOnClickListener(new RangeSeekChanger(0, -1));
                     }
                 });
 
@@ -1061,6 +1110,10 @@ public class MainActivity extends AppCompatActivity
             Button selectVideoButton = mainActivity.findViewById(R.id.selectVideo);
             Button encodeButton = mainActivity.findViewById(R.id.encode);
             Button cancelButton = mainActivity.findViewById(R.id.cancel);
+            View startJumpBack = mainActivity.findViewById(R.id.startJumpBack);
+            View startJumpForward = mainActivity.findViewById(R.id.startJumpForward);
+            View endJumpBack = mainActivity.findViewById(R.id.endJumpBack);
+            View endJumpForward = mainActivity.findViewById(R.id.endJumpForward);
 
             Log.d(TAG, "Encode result: " + result);
 
@@ -1120,6 +1173,11 @@ public class MainActivity extends AppCompatActivity
 
             selectVideoButton.setVisibility(View.VISIBLE);
             encodeButton.setVisibility(View.VISIBLE);
+            startJumpBack.setVisibility(View.VISIBLE);
+            startJumpForward.setVisibility(View.VISIBLE);
+            endJumpBack.setVisibility(View.VISIBLE);
+            endJumpForward.setVisibility(View.VISIBLE);
+
             cancelButton.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
         }
