@@ -554,15 +554,21 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void startVideoPlayback()
+    private void startVideoPlayback(Integer positionSec)
     {
         stopVideoPlayback();
 
         int startTimeSec = rangeSeekBar.getSelectedMinValue().intValue();
         int stopTimeSec = rangeSeekBar.getSelectedMaxValue().intValue();
-        int durationSec = stopTimeSec - startTimeSec;
 
-        videoView.seekTo(startTimeSec * 1000);
+        if(positionSec == null)
+        {
+            positionSec = startTimeSec;
+        }
+
+        int durationSec = stopTimeSec - positionSec;
+
+        videoView.seekTo(positionSec * 1000);
         videoView.start();
 
         videoTimer = new Timer();
@@ -571,7 +577,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                startVideoPlayback();
+                startVideoPlayback(null);
             }
         }, durationSec * 1000);
     }
@@ -601,7 +607,7 @@ public class MainActivity extends AppCompatActivity
 
         if(isEncoding() == false)
         {
-            startVideoPlayback();
+            startVideoPlayback(null);
         }
     }
 
@@ -867,7 +873,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onPrepared(MediaPlayer mp)
                     {
-                        int durationMs = mp.getDuration();
+                        final int durationMs = mp.getDuration();
                         tvLeft.setVisibility(View.VISIBLE);
                         tvLeft.setText(getTime(0));
                         tvRight.setVisibility(View.VISIBLE);
@@ -881,15 +887,42 @@ public class MainActivity extends AppCompatActivity
 
                         rangeSeekBar.setOnRangeSeekbarChangeListener(new OnRangeSeekbarChangeListener()
                         {
+                            Number prevMinValueSec = 0;
+                            Number prevMaxValueSec = (int)(durationMs / 1000f);
+
+                            // If the end time slider was moved, resume the playback
+                            // this may seconds before the end
+                            static final int END_PLAYBACK_HEADROOM_SEC = 3;
+
                             @Override
                             public void valueChanged(Number minValue, Number maxValue)
                             {
+                                Integer playStartSec = null;
+
+                                if(prevMaxValueSec.intValue() != maxValue.intValue())
+                                {
+                                    // End time was changed
+                                    prevMaxValueSec = maxValue;
+                                    playStartSec = prevMaxValueSec.intValue();
+
+                                    // Resume playback a few seconds before the end
+                                    int headroom = Math.min(maxValue.intValue()-minValue.intValue(), END_PLAYBACK_HEADROOM_SEC);
+                                    playStartSec -= headroom;
+                                }
+
+                                if(prevMinValueSec.intValue() != minValue.intValue())
+                                {
+                                    // Start time was changed
+                                    prevMinValueSec = minValue;
+                                    playStartSec = prevMinValueSec.intValue();
+                                }
+
                                 tvLeft.setText(getTime(minValue.intValue()));
                                 tvRight.setText(getTime(maxValue.intValue()));
 
-                                if(isEncoding() == false)
+                                if(isEncoding() == false && playStartSec != null)
                                 {
-                                    startVideoPlayback();
+                                    startVideoPlayback(playStartSec);
                                 }
                             }
                         });
@@ -1050,7 +1083,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onDismiss(DialogInterface dialog)
                     {
-                        mainActivity.startVideoPlayback();
+                        mainActivity.startVideoPlayback(null);
                     }
                 })
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
