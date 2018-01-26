@@ -1045,6 +1045,14 @@ public class MainActivity extends AppCompatActivity
             AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity)
                 .setMessage(message)
                 .setCancelable(true)
+                .setOnDismissListener(new DialogInterface.OnDismissListener()
+                {
+                    @Override
+                    public void onDismiss(DialogInterface dialog)
+                    {
+                        mainActivity.startVideoPlayback();
+                    }
+                })
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
                 {
                     public void onClick(DialogInterface dialog, int which)
@@ -1076,8 +1084,6 @@ public class MainActivity extends AppCompatActivity
             }
 
             builder.show();
-
-            //startVideoPlayback();
 
             selectVideoButton.setVisibility(View.VISIBLE);
             encodeButton.setVisibility(View.VISIBLE);
