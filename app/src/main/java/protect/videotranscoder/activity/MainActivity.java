@@ -565,6 +565,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         scheduler.cancelAll();
+
+        updateUiForVideoSettings();
     }
 
     private boolean isEncoding()
