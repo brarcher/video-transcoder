@@ -33,6 +33,7 @@
     <string name="permissionRequestAgain">Request again</string>
 
     <string name="fileLocationLookupFailed">Failed to resolve the location of the media file</string>
+    <string name="encodeCanceled">Encoding was canceled</string>
 
     <string name="codecSlowExcellent">Slow, Quality excellent</string>
     <string name="codecFastGood">Fast, Quality good</string>

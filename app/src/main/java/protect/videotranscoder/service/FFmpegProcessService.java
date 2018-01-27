@@ -13,6 +13,7 @@ import android.util.Log;
 import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
 
 import protect.videotranscoder.FFmpegUtil;
+import protect.videotranscoder.R;
 import protect.videotranscoder.ResultCallbackHandler;
 
 import static protect.videotranscoder.activity.MainActivity.FFMPEG_ENCODE_ARGS;
@@ -149,7 +150,9 @@ public class FFmpegProcessService extends JobService
 
         FFmpegUtil.cancelCall();
 
-        sendMessage(MessageId.JOB_FAILED_MSG, params.getJobId());
+        Bundle bundle = new Bundle();
+        bundle.putString(FFMPEG_FAILURE_MSG, getResources().getString(R.string.encodeCanceled));
+        sendMessage(MessageId.JOB_FAILED_MSG, bundle);
 
         // Return false to drop the job.
         return false;
