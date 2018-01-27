@@ -540,6 +540,19 @@ public class MainActivity extends AppCompatActivity
         progressBar.setVisibility(View.VISIBLE);
     }
 
+    private void updateUiForVideoSettings()
+    {
+        selectVideoButton.setVisibility(View.VISIBLE);
+        encodeButton.setVisibility(View.VISIBLE);
+        startJumpBack.setVisibility(View.VISIBLE);
+        startJumpForward.setVisibility(View.VISIBLE);
+        endJumpBack.setVisibility(View.VISIBLE);
+        endJumpForward.setVisibility(View.VISIBLE);
+
+        cancelButton.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
+    }
+
     private void cancelEncode()
     {
         FFmpegUtil.cancelCall();
@@ -1106,15 +1119,6 @@ public class MainActivity extends AppCompatActivity
                                               final String ffmpegMessage, final String outputFile,
                                               final String mimetype)
         {
-            ProgressBar progressBar = mainActivity.findViewById(R.id.encodeProgress);
-            Button selectVideoButton = mainActivity.findViewById(R.id.selectVideo);
-            Button encodeButton = mainActivity.findViewById(R.id.encode);
-            Button cancelButton = mainActivity.findViewById(R.id.cancel);
-            View startJumpBack = mainActivity.findViewById(R.id.startJumpBack);
-            View startJumpForward = mainActivity.findViewById(R.id.startJumpForward);
-            View endJumpBack = mainActivity.findViewById(R.id.endJumpBack);
-            View endJumpForward = mainActivity.findViewById(R.id.endJumpForward);
-
             Log.d(TAG, "Encode result: " + result);
 
             String message;
@@ -1171,15 +1175,7 @@ public class MainActivity extends AppCompatActivity
 
             builder.show();
 
-            selectVideoButton.setVisibility(View.VISIBLE);
-            encodeButton.setVisibility(View.VISIBLE);
-            startJumpBack.setVisibility(View.VISIBLE);
-            startJumpForward.setVisibility(View.VISIBLE);
-            endJumpBack.setVisibility(View.VISIBLE);
-            endJumpForward.setVisibility(View.VISIBLE);
-
-            cancelButton.setVisibility(View.GONE);
-            progressBar.setVisibility(View.GONE);
+            mainActivity.updateUiForVideoSettings();
         }
     }
 
