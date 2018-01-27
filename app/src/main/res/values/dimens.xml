@@ -9,4 +9,6 @@
     <dimen name="titlePaddingTop">20dip</dimen>
     <dimen name="inputSize">15sp</dimen>
     <dimen name="inputTitleSize">15sp</dimen>
+
+    <dimen name="timeNavButtonSize">35dp</dimen>
 </resources>

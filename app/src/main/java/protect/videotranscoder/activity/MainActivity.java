@@ -31,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity
     public static final String MESSENGER_INTENT_KEY = BuildConfig.APPLICATION_ID + ".MESSENGER_INTENT_KEY";
     public static final String FFMPEG_ENCODE_ARGS = BuildConfig.APPLICATION_ID + ".FFMPEG_ENCODE_ARGS";
     public static final String FFMPEG_OUTPUT_FILE = BuildConfig.APPLICATION_ID + ".FFMPEG_OUTPUT_FILE";
+    public static final String FFMPEG_FAILURE_MSG = BuildConfig.APPLICATION_ID + ".FFMPEG_FAILURE_MSG";
     public static final String OUTPUT_MIMETYPE = BuildConfig.APPLICATION_ID + ".OUTPUT_MIMETYPE";
     public static final String OUTPUT_DURATION_MS = BuildConfig.APPLICATION_ID + ".OUTPUT_DURATION_MS";
 
@@ -128,6 +130,10 @@ public class MainActivity extends AppCompatActivity
     private Button selectVideoButton;
     private Button encodeButton;
     private Button cancelButton;
+    private ImageView startJumpBack;
+    private ImageView startJumpForward;
+    private ImageView endJumpBack;
+    private ImageView endJumpForward;
     private MediaInfo videoInfo;
 
     private JobScheduler schedulerService;
@@ -144,6 +150,11 @@ public class MainActivity extends AppCompatActivity
         selectVideoButton = findViewById(R.id.selectVideo);
         encodeButton = findViewById(R.id.encode);
         cancelButton = findViewById(R.id.cancel);
+
+        startJumpBack = findViewById(R.id.startJumpBack);
+        startJumpForward = findViewById(R.id.startJumpForward);
+        endJumpBack = findViewById(R.id.endJumpBack);
+        endJumpForward = findViewById(R.id.endJumpForward);
 
         tvLeft = findViewById(R.id.tvLeft);
         tvRight = findViewById(R.id.tvRight);
@@ -520,8 +531,26 @@ public class MainActivity extends AppCompatActivity
 
         selectVideoButton.setVisibility(View.GONE);
         encodeButton.setVisibility(View.GONE);
+        startJumpBack.setVisibility(View.GONE);
+        startJumpForward.setVisibility(View.GONE);
+        endJumpBack.setVisibility(View.GONE);
+        endJumpForward.setVisibility(View.GONE);
+
         cancelButton.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void updateUiForVideoSettings()
+    {
+        selectVideoButton.setVisibility(View.VISIBLE);
+        encodeButton.setVisibility(View.VISIBLE);
+        startJumpBack.setVisibility(View.VISIBLE);
+        startJumpForward.setVisibility(View.VISIBLE);
+        endJumpBack.setVisibility(View.VISIBLE);
+        endJumpForward.setVisibility(View.VISIBLE);
+
+        cancelButton.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
     }
 
     private void cancelEncode()
@@ -536,6 +565,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         scheduler.cancelAll();
+
+        updateUiForVideoSettings();
     }
 
     private boolean isEncoding()
@@ -553,15 +584,21 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void startVideoPlayback()
+    private void startVideoPlayback(Integer positionSec)
     {
         stopVideoPlayback();
 
         int startTimeSec = rangeSeekBar.getSelectedMinValue().intValue();
         int stopTimeSec = rangeSeekBar.getSelectedMaxValue().intValue();
-        int durationSec = stopTimeSec - startTimeSec;
 
-        videoView.seekTo(startTimeSec * 1000);
+        if(positionSec == null)
+        {
+            positionSec = startTimeSec;
+        }
+
+        int durationSec = stopTimeSec - positionSec;
+
+        videoView.seekTo(positionSec * 1000);
         videoView.start();
 
         videoTimer = new Timer();
@@ -570,7 +607,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                startVideoPlayback();
+                startVideoPlayback(null);
             }
         }, durationSec * 1000);
     }
@@ -600,7 +637,7 @@ public class MainActivity extends AppCompatActivity
 
         if(isEncoding() == false)
         {
-            startVideoPlayback();
+            startVideoPlayback(null);
         }
     }
 
@@ -656,6 +693,10 @@ public class MainActivity extends AppCompatActivity
         }
 
         encodeButton.setVisibility(View.VISIBLE);
+        startJumpBack.setVisibility(View.VISIBLE);
+        startJumpForward.setVisibility(View.VISIBLE);
+        endJumpBack.setVisibility(View.VISIBLE);
+        endJumpForward.setVisibility(View.VISIBLE);
 
         containerSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, MediaContainer.values()));
         containerSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
@@ -866,7 +907,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onPrepared(MediaPlayer mp)
                     {
-                        int durationMs = mp.getDuration();
+                        final int durationMs = mp.getDuration();
                         tvLeft.setVisibility(View.VISIBLE);
                         tvLeft.setText(getTime(0));
                         tvRight.setVisibility(View.VISIBLE);
@@ -880,18 +921,75 @@ public class MainActivity extends AppCompatActivity
 
                         rangeSeekBar.setOnRangeSeekbarChangeListener(new OnRangeSeekbarChangeListener()
                         {
+                            Number prevMinValueSec = 0;
+                            Number prevMaxValueSec = (int)(durationMs / 1000f);
+
+                            // If the end time slider was moved, resume the playback
+                            // this may seconds before the end
+                            static final int END_PLAYBACK_HEADROOM_SEC = 3;
+
                             @Override
                             public void valueChanged(Number minValue, Number maxValue)
                             {
+                                Integer playStartSec = null;
+
+                                if(prevMaxValueSec.intValue() != maxValue.intValue())
+                                {
+                                    // End time was changed
+                                    prevMaxValueSec = maxValue;
+                                    playStartSec = prevMaxValueSec.intValue();
+
+                                    // Resume playback a few seconds before the end
+                                    int headroom = Math.min(maxValue.intValue()-minValue.intValue(), END_PLAYBACK_HEADROOM_SEC);
+                                    playStartSec -= headroom;
+                                }
+
+                                if(prevMinValueSec.intValue() != minValue.intValue())
+                                {
+                                    // Start time was changed
+                                    prevMinValueSec = minValue;
+                                    playStartSec = prevMinValueSec.intValue();
+                                }
+
                                 tvLeft.setText(getTime(minValue.intValue()));
                                 tvRight.setText(getTime(maxValue.intValue()));
 
-                                if(isEncoding() == false)
+                                if(isEncoding() == false && playStartSec != null)
                                 {
-                                    startVideoPlayback();
+                                    startVideoPlayback(playStartSec);
                                 }
                             }
                         });
+
+                        class RangeSeekChanger implements View.OnClickListener
+                        {
+                            private final int startOffset;
+                            private final int endOffset;
+                            RangeSeekChanger(int startOffset, int endOffset)
+                            {
+                                this.startOffset = startOffset;
+                                this.endOffset = endOffset;
+                            }
+
+                            @Override
+                            public void onClick(View v)
+                            {
+                                rangeSeekBar.setMinValue(0);
+                                rangeSeekBar.setMaxValue(durationMs / 1000f);
+
+                                int selectedStart = rangeSeekBar.getSelectedMinValue().intValue();
+                                int selectedEnd = rangeSeekBar.getSelectedMaxValue().intValue();
+
+                                rangeSeekBar.setMinStartValue(selectedStart + startOffset);
+                                rangeSeekBar.setMaxStartValue(selectedEnd + endOffset);
+                                rangeSeekBar.apply();
+                            }
+                        }
+
+                        startJumpForward.setOnClickListener(new RangeSeekChanger(1, 0));
+                        startJumpBack.setOnClickListener(new RangeSeekChanger(-1, 0));
+                        endJumpForward.setOnClickListener(new RangeSeekChanger(0, 1));
+                        endJumpBack.setOnClickListener(new RangeSeekChanger(0, -1));
                     }
                 });
 
@@ -992,6 +1090,7 @@ public class MainActivity extends AppCompatActivity
                     boolean result = false;
                     String outputFile = null;
                     String mimetype = null;
+                    String message = null;
 
                     if(messageId == MessageId.JOB_SUCCEDED_MSG)
                     {
@@ -999,9 +1098,13 @@ public class MainActivity extends AppCompatActivity
                         outputFile = ((Bundle)msg.obj).getString(FFMPEG_OUTPUT_FILE);
                         mimetype = ((Bundle)msg.obj).getString(OUTPUT_MIMETYPE);
                     }
+                    else
+                    {
+                        message = ((Bundle)msg.obj).getString(FFMPEG_FAILURE_MSG);
+                    }
 
                     Log.d(TAG, "Job complete, result: " + result);
-                    showEncodeCompleteDialog(mainActivity, result, outputFile, mimetype);
+                    showEncodeCompleteDialog(mainActivity, result, message, outputFile, mimetype);
                     break;
 
                 case FFMPEG_UNSUPPORTED_MSG:
@@ -1015,13 +1118,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         private void showEncodeCompleteDialog(final MainActivity mainActivity, final boolean result,
-                                              final String outputFile, final String mimetype)
+                                              final String ffmpegMessage, final String outputFile,
+                                              final String mimetype)
         {
-            ProgressBar progressBar = mainActivity.findViewById(R.id.encodeProgress);
-            Button selectVideoButton = mainActivity.findViewById(R.id.selectVideo);
-            Button encodeButton = mainActivity.findViewById(R.id.encode);
-            Button cancelButton = mainActivity.findViewById(R.id.cancel);
-
             Log.d(TAG, "Encode result: " + result);
 
             String message;
@@ -1032,12 +1131,20 @@ public class MainActivity extends AppCompatActivity
             }
             else
             {
-                message = mainActivity.getResources().getString(R.string.transcodeFailed);
+                message = mainActivity.getResources().getString(R.string.transcodeFailed, ffmpegMessage);
             }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity)
                 .setMessage(message)
                 .setCancelable(true)
+                .setOnDismissListener(new DialogInterface.OnDismissListener()
+                {
+                    @Override
+                    public void onDismiss(DialogInterface dialog)
+                    {
+                        mainActivity.startVideoPlayback(null);
+                    }
+                })
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
                 {
                     public void onClick(DialogInterface dialog, int which)
@@ -1070,12 +1177,7 @@ public class MainActivity extends AppCompatActivity
 
             builder.show();
 
-            //startVideoPlayback();
-
-            selectVideoButton.setVisibility(View.VISIBLE);
-            encodeButton.setVisibility(View.VISIBLE);
-            cancelButton.setVisibility(View.GONE);
-            progressBar.setVisibility(View.GONE);
+            mainActivity.updateUiForVideoSettings();
         }
     }
 
