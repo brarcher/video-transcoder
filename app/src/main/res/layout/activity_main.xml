@@ -59,15 +59,15 @@
                 android:orientation="horizontal">
                 <ImageView
                     android:id="@+id/startJumpBack"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="@dimen/timeNavButtonSize"
+                    android:layout_height="@dimen/timeNavButtonSize"
                     android:layout_gravity="center_vertical"
                     android:visibility="gone"
                     android:src="@drawable/ic_fast_rewind_black_24dp"/>
                 <ImageView
                     android:id="@+id/startJumpForward"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="@dimen/timeNavButtonSize"
+                    android:layout_height="@dimen/timeNavButtonSize"
                     android:layout_gravity="center_vertical"
                     android:visibility="gone"
                     android:src="@drawable/ic_fast_forward_black_24dp"/>
@@ -96,15 +96,15 @@
                     />
                 <ImageView
                     android:id="@+id/endJumpBack"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="@dimen/timeNavButtonSize"
+                    android:layout_height="@dimen/timeNavButtonSize"
                     android:layout_gravity="center_vertical"
                     android:visibility="gone"
                     android:src="@drawable/ic_fast_rewind_black_24dp"/>
                 <ImageView
                     android:id="@+id/endJumpForward"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="@dimen/timeNavButtonSize"
+                    android:layout_height="@dimen/timeNavButtonSize"
                     android:layout_gravity="center_vertical"
                     android:visibility="gone"
                     android:src="@drawable/ic_fast_forward_black_24dp"/>
