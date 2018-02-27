@@ -1,6 +1,8 @@
 # Video Transcoder
 [![Build Status](https://travis-ci.org/brarcher/video-transcoder.svg?branch=master)](https://travis-ci.org/brarcher/video-transcoder)
 
+<a href="https://f-droid.org/packages/protect.videoeditor/" target="_blank">
+<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="90"/></a>
 <a href="https://play.google.com/store/apps/details?id=protect.videoeditor" target="_blank">
 <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="90"/></a>
 
