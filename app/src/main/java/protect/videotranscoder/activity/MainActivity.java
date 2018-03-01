@@ -1204,14 +1204,13 @@ public class MainActivity extends AppCompatActivity
 
     private void displayAboutDialog()
     {
-        final Map<String, String> USED_LIBRARIES = ImmutableMap.of
-        (
-            "Commons IO", "https://commons.apache.org/proper/commons-io/",
-            "FFmpeg", "https://www.ffmpeg.org/",
-            "FFmpeg Android", "http://writingminds.github.io/ffmpeg-android/",
-            "Guava", "https://github.com/google/guava",
-            "Crystal Range Seekbar", "https://github.com/syedowaisali/crystal-range-seekbar"
-        );
+        final Map<String, String> USED_LIBRARIES = new ImmutableMap.Builder<String, String>()
+            .put("Commons IO", "https://commons.apache.org/proper/commons-io/")
+            .put("FFmpeg", "https://www.ffmpeg.org/")
+            .put("FFmpeg Android", "http://writingminds.github.io/ffmpeg-android/")
+            .put("Guava", "https://github.com/google/guava")
+            .put("Crystal Range Seekbar", "https://github.com/syedowaisali/crystal-range-seekbar")
+            .build();
 
         final Map<String, String> USED_ASSETS = ImmutableMap.of
         (
