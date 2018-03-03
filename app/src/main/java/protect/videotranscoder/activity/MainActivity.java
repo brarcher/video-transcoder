@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.codekidlabs.storagechooser.StorageChooser;
 import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarChangeListener;
 import com.google.common.collect.ImmutableMap;
 
@@ -56,10 +57,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Pattern;
 
 import protect.videotranscoder.BuildConfig;
 import protect.videotranscoder.FFmpegUtil;
-import protect.videotranscoder.FileUtil;
 import protect.videotranscoder.R;
 import protect.videotranscoder.ResultCallbackHandler;
 import protect.videotranscoder.media.AudioCodec;
@@ -339,12 +340,36 @@ public class MainActivity extends AppCompatActivity
      */
     private void selectVideo()
     {
-        Intent intent = new Intent();
-        intent.setType("video/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
+        ArrayList<String> extensions = new ArrayList<>();
+        for(MediaContainer item : MediaContainer.values())
+        {
+            if(item.supportedVideoCodecs.size() > 0)
+            {
+                extensions.add(item.extension);
+            }
+        }
 
-        String message = getResources().getString(R.string.selectVideo);
-        startActivityForResult(Intent.createChooser(intent, message), REQUEST_TAKE_GALLERY_VIDEO);
+        final StorageChooser fileChooser = new StorageChooser.Builder()
+                .withActivity(MainActivity.this)
+                .withFragmentManager(getFragmentManager())
+                .allowCustomPath(true)
+                .setType(StorageChooser.FILE_PICKER)
+                .disableMultiSelect()
+                .customFilter(extensions)
+                .build();
+
+        // get path that the user has chosen
+        fileChooser.setOnSelectListener(new StorageChooser.OnSelectListener()
+        {
+            @Override
+            public void onSelect(String filePath)
+            {
+                Log.i(TAG, "Selected file: " + filePath);
+                setSelectMediaFile(filePath);
+            }
+        });
+
+        fileChooser.show();
     }
 
     private void startEncode()
@@ -882,140 +907,123 @@ public class MainActivity extends AppCompatActivity
         setSpinnerSelection(audioChannelSpinner, Integer.toString(videoInfo.audioChannels));
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    private void setSelectMediaFile(String path)
     {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK)
+        videoView.setVideoPath(path);
+        videoView.start();
+
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
         {
-            if (requestCode == REQUEST_TAKE_GALLERY_VIDEO)
+            @Override
+            public void onPrepared(MediaPlayer mp)
             {
-                Uri selectedVideoUri = data.getData();
-                String videoPath = FileUtil.getPath(MainActivity.this, selectedVideoUri);
+                final int durationMs = mp.getDuration();
+                tvLeft.setVisibility(View.VISIBLE);
+                tvLeft.setText(getTime(0));
+                tvRight.setVisibility(View.VISIBLE);
+                tvRight.setText(getTime(durationMs / 1000));
+                mp.setLooping(true);
 
-                if(videoPath == null)
+                rangeSeekBar.setMinValue(0);
+                rangeSeekBar.setMaxValue(durationMs / 1000f);
+                rangeSeekBar.setEnabled(true);
+                rangeSeekBar.setVisibility(View.VISIBLE);
+
+                rangeSeekBar.setOnRangeSeekbarChangeListener(new OnRangeSeekbarChangeListener()
                 {
-                    Toast.makeText(this, R.string.fileLocationLookupFailed, Toast.LENGTH_LONG).show();
-                    return;
-                }
+                    Number prevMinValueSec = 0;
+                    Number prevMaxValueSec = (int)(durationMs / 1000f);
 
-                videoView.setVideoURI(selectedVideoUri);
-                videoView.start();
+                    // If the end time slider was moved, resume the playback
+                    // this may seconds before the end
+                    static final int END_PLAYBACK_HEADROOM_SEC = 3;
 
-                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
-                {
                     @Override
-                    public void onPrepared(MediaPlayer mp)
+                    public void valueChanged(Number minValue, Number maxValue)
                     {
-                        final int durationMs = mp.getDuration();
-                        tvLeft.setVisibility(View.VISIBLE);
-                        tvLeft.setText(getTime(0));
-                        tvRight.setVisibility(View.VISIBLE);
-                        tvRight.setText(getTime(durationMs / 1000));
-                        mp.setLooping(true);
+                        Integer playStartSec = null;
 
+                        if(prevMaxValueSec.intValue() != maxValue.intValue())
+                        {
+                            // End time was changed
+                            prevMaxValueSec = maxValue;
+                            playStartSec = prevMaxValueSec.intValue();
+
+                            // Resume playback a few seconds before the end
+                            int headroom = Math.min(maxValue.intValue()-minValue.intValue(), END_PLAYBACK_HEADROOM_SEC);
+                            playStartSec -= headroom;
+                        }
+
+                        if(prevMinValueSec.intValue() != minValue.intValue())
+                        {
+                            // Start time was changed
+                            prevMinValueSec = minValue;
+                            playStartSec = prevMinValueSec.intValue();
+                        }
+
+                        tvLeft.setText(getTime(minValue.intValue()));
+                        tvRight.setText(getTime(maxValue.intValue()));
+
+                        if(isEncoding() == false && playStartSec != null)
+                        {
+                            startVideoPlayback(playStartSec);
+                        }
+                    }
+                });
+
+                class RangeSeekChanger implements View.OnClickListener
+                {
+                    private final int startOffset;
+                    private final int endOffset;
+                    RangeSeekChanger(int startOffset, int endOffset)
+                    {
+                        this.startOffset = startOffset;
+                        this.endOffset = endOffset;
+                    }
+
+                    @Override
+                    public void onClick(View v)
+                    {
                         rangeSeekBar.setMinValue(0);
                         rangeSeekBar.setMaxValue(durationMs / 1000f);
-                        rangeSeekBar.setEnabled(true);
-                        rangeSeekBar.setVisibility(View.VISIBLE);
 
-                        rangeSeekBar.setOnRangeSeekbarChangeListener(new OnRangeSeekbarChangeListener()
-                        {
-                            Number prevMinValueSec = 0;
-                            Number prevMaxValueSec = (int)(durationMs / 1000f);
+                        int selectedStart = rangeSeekBar.getSelectedMinValue().intValue();
+                        int selectedEnd = rangeSeekBar.getSelectedMaxValue().intValue();
 
-                            // If the end time slider was moved, resume the playback
-                            // this may seconds before the end
-                            static final int END_PLAYBACK_HEADROOM_SEC = 3;
-
-                            @Override
-                            public void valueChanged(Number minValue, Number maxValue)
-                            {
-                                Integer playStartSec = null;
-
-                                if(prevMaxValueSec.intValue() != maxValue.intValue())
-                                {
-                                    // End time was changed
-                                    prevMaxValueSec = maxValue;
-                                    playStartSec = prevMaxValueSec.intValue();
-
-                                    // Resume playback a few seconds before the end
-                                    int headroom = Math.min(maxValue.intValue()-minValue.intValue(), END_PLAYBACK_HEADROOM_SEC);
-                                    playStartSec -= headroom;
-                                }
-
-                                if(prevMinValueSec.intValue() != minValue.intValue())
-                                {
-                                    // Start time was changed
-                                    prevMinValueSec = minValue;
-                                    playStartSec = prevMinValueSec.intValue();
-                                }
-
-                                tvLeft.setText(getTime(minValue.intValue()));
-                                tvRight.setText(getTime(maxValue.intValue()));
-
-                                if(isEncoding() == false && playStartSec != null)
-                                {
-                                    startVideoPlayback(playStartSec);
-                                }
-                            }
-                        });
-
-                        class RangeSeekChanger implements View.OnClickListener
-                        {
-                            private final int startOffset;
-                            private final int endOffset;
-                            RangeSeekChanger(int startOffset, int endOffset)
-                            {
-                                this.startOffset = startOffset;
-                                this.endOffset = endOffset;
-                            }
-
-                            @Override
-                            public void onClick(View v)
-                            {
-                                rangeSeekBar.setMinValue(0);
-                                rangeSeekBar.setMaxValue(durationMs / 1000f);
-
-                                int selectedStart = rangeSeekBar.getSelectedMinValue().intValue();
-                                int selectedEnd = rangeSeekBar.getSelectedMaxValue().intValue();
-
-                                rangeSeekBar.setMinStartValue(selectedStart + startOffset);
-                                rangeSeekBar.setMaxStartValue(selectedEnd + endOffset);
-                                rangeSeekBar.apply();
-                            }
-                        }
-
-                        startJumpForward.setOnClickListener(new RangeSeekChanger(1, 0));
-                        startJumpBack.setOnClickListener(new RangeSeekChanger(-1, 0));
-                        endJumpForward.setOnClickListener(new RangeSeekChanger(0, 1));
-                        endJumpBack.setOnClickListener(new RangeSeekChanger(0, -1));
+                        rangeSeekBar.setMinStartValue(selectedStart + startOffset);
+                        rangeSeekBar.setMaxStartValue(selectedEnd + endOffset);
+                        rangeSeekBar.apply();
                     }
-                });
+                }
 
-                final File videoFile = new File(videoPath);
-
-                FFmpegUtil.getMediaDetails(new File(videoPath), new ResultCallbackHandler<MediaInfo>()
-                {
-                    @Override
-                    public void onResult(MediaInfo result)
-                    {
-                        if(result == null)
-                        {
-                            Log.d(TAG, "Failed to query media file, filling in defaults");
-                            // Could not query the file, fill in what we know.
-                            result = new MediaInfo(videoFile, 0, MediaContainer.MP4, VideoCodec.MPEG4, "640x480",
-                                800, "25", AudioCodec.MP3,
-                                44100, 128, 2);
-                        }
-
-                        videoInfo = result;
-
-                        populateOptionDefaults();
-                    }
-                });
+                startJumpForward.setOnClickListener(new RangeSeekChanger(1, 0));
+                startJumpBack.setOnClickListener(new RangeSeekChanger(-1, 0));
+                endJumpForward.setOnClickListener(new RangeSeekChanger(0, 1));
+                endJumpBack.setOnClickListener(new RangeSeekChanger(0, -1));
             }
-        }
+        });
+
+        final File videoFile = new File(path);
+
+        FFmpegUtil.getMediaDetails(new File(path), new ResultCallbackHandler<MediaInfo>()
+        {
+            @Override
+            public void onResult(MediaInfo result)
+            {
+                if(result == null)
+                {
+                    Log.d(TAG, "Failed to query media file, filling in defaults");
+                    // Could not query the file, fill in what we know.
+                    result = new MediaInfo(videoFile, 0, MediaContainer.MP4, VideoCodec.MPEG4, "640x480",
+                        800, "25", AudioCodec.MP3,
+                        44100, 128, 2);
+                }
+
+                videoInfo = result;
+
+                populateOptionDefaults();
+            }
+        });
     }
 
     private String getTime(int seconds)
@@ -1204,14 +1212,14 @@ public class MainActivity extends AppCompatActivity
 
     private void displayAboutDialog()
     {
-        final Map<String, String> USED_LIBRARIES = ImmutableMap.of
-        (
-            "Commons IO", "https://commons.apache.org/proper/commons-io/",
-            "FFmpeg", "https://www.ffmpeg.org/",
-            "FFmpeg Android", "http://writingminds.github.io/ffmpeg-android/",
-            "Guava", "https://github.com/google/guava",
-            "Crystal Range Seekbar", "https://github.com/syedowaisali/crystal-range-seekbar"
-        );
+        final Map<String, String> USED_LIBRARIES = new ImmutableMap.Builder<String, String>()
+            .put("Commons IO", "https://commons.apache.org/proper/commons-io/")
+            .put("FFmpeg", "https://www.ffmpeg.org/")
+            .put("FFmpeg Android", "http://writingminds.github.io/ffmpeg-android/")
+            .put("Guava", "https://github.com/google/guava")
+            .put("Crystal Range Seekbar", "https://github.com/syedowaisali/crystal-range-seekbar")
+            .put("Storage Chooser", "https://github.com/codekidX/storage-chooser")
+            .build();
 
         final Map<String, String> USED_ASSETS = ImmutableMap.of
         (
