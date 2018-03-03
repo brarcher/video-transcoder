@@ -43,6 +43,7 @@ dependencies {
     compile 'com.crystal:crystalrangeseekbar:1.1.3'
     compile 'commons-io:commons-io:2.5'
     compile group: 'com.google.guava', name: 'guava', version: '20.0'
+    compile 'com.github.codekidX:storage-chooser:2.0.3'
     testCompile 'junit:junit:4.12'
     testCompile "org.robolectric:robolectric:3.6.1"
 }
