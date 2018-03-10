@@ -4,12 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
-import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
-import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
-import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
-import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
-
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,6 +14,9 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler;
+import nl.bravobit.ffmpeg.FFmpeg;
+import nl.bravobit.ffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
 import protect.videotranscoder.media.AudioCodec;
 import protect.videotranscoder.media.MediaInfo;
 import protect.videotranscoder.media.MediaContainer;
@@ -43,29 +40,13 @@ public class FFmpegUtil
             Log.d(TAG, "Creating FFmpeg instance");
             final FFmpeg tmpFfmpeg = FFmpeg.getInstance(context.getApplicationContext());
 
-            try
+            if(tmpFfmpeg.isSupported())
             {
-                tmpFfmpeg.loadBinary(new LoadBinaryResponseHandler()
-                {
-                    @Override
-                    public void onFailure()
-                    {
-                        Log.d(TAG, "FFmpeg load failed");
-                        resultHandler.onResult(false);
-                    }
-
-                    @Override
-                    public void onSuccess()
-                    {
-                        Log.d(TAG, "FFmpeg load succeeded");
-                        ffmpeg = tmpFfmpeg;
-                        resultHandler.onResult(true);
-                    }
-                });
+                ffmpeg = tmpFfmpeg;
+                resultHandler.onResult(true);
             }
-            catch (FFmpegNotSupportedException e)
+            else
             {
-                Log.d(TAG, "Failed to load FFmpeg", e);
                 resultHandler.onResult(false);
             }
         }
@@ -80,7 +61,7 @@ public class FFmpegUtil
      */
     public static void call(final String[] command, @NonNull final ExecuteBinaryResponseHandler handler)
     {
-        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning())
+        if(ffmpeg == null || ffmpeg.isCommandRunning())
         {
             String message = "Command failed, FFmpeg " + (ffmpeg == null ? "not initialized" : "still running");
             Log.d(TAG, message);
@@ -132,7 +113,7 @@ public class FFmpegUtil
     {
         String message;
 
-        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning() == false)
+        if(ffmpeg == null || ffmpeg.isCommandRunning() == false)
         {
             message = "Cancel failed, FFmpeg not running";
         }
@@ -186,7 +167,7 @@ public class FFmpegUtil
 
     public static void getMediaDetails(final File mediaFile, final ResultCallbackHandler<MediaInfo> resultHandler)
     {
-        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning())
+        if(ffmpeg == null || ffmpeg.isCommandRunning())
         {
             Log.d(TAG, "Failed to get media details, FFmpeg " +
                     (ffmpeg == null ? "is not initialized" : "is already running"));
@@ -443,7 +424,7 @@ public class FFmpegUtil
 
     public static void getSupportedContainers(final ResultCallbackHandler<List<MediaContainer>> resultHandler)
     {
-        if(ffmpeg == null || ffmpeg.isFFmpegCommandRunning())
+        if(ffmpeg == null || ffmpeg.isCommandRunning())
         {
             resultHandler.onResult(null);
             return;
