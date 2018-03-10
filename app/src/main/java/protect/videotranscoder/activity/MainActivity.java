@@ -1215,7 +1215,7 @@ public class MainActivity extends AppCompatActivity
         final Map<String, String> USED_LIBRARIES = new ImmutableMap.Builder<String, String>()
             .put("Commons IO", "https://commons.apache.org/proper/commons-io/")
             .put("FFmpeg", "https://www.ffmpeg.org/")
-            .put("FFmpeg Android", "http://writingminds.github.io/ffmpeg-android/")
+            .put("FFmpeg Android", "https://github.com/bravobit/FFmpeg-Android")
             .put("Guava", "https://github.com/google/guava")
             .put("Crystal Range Seekbar", "https://github.com/syedowaisali/crystal-range-seekbar")
             .put("Storage Chooser", "https://github.com/codekidX/storage-chooser")
