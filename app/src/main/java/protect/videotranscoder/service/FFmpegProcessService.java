@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.List;
 
 import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler;
+import nl.bravobit.ffmpeg.FFprobe;
 import protect.videotranscoder.FFmpegUtil;
 import protect.videotranscoder.R;
 import protect.videotranscoder.activity.MainActivity;

@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler;
 import nl.bravobit.ffmpeg.FFmpeg;
+import nl.bravobit.ffmpeg.FFprobe;
 import nl.bravobit.ffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
 import protect.videotranscoder.media.AudioCodec;
 import protect.videotranscoder.media.MediaInfo;
@@ -29,6 +30,7 @@ public class FFmpegUtil
 {
     private static final String TAG = "VideoTranscoder";
     private static FFmpeg ffmpeg;
+    private static FFprobe ffprobe;
 
     /**
      * Load FFmpeg binary
@@ -39,10 +41,12 @@ public class FFmpegUtil
         {
             Log.d(TAG, "Creating FFmpeg instance");
             final FFmpeg tmpFfmpeg = FFmpeg.getInstance(context.getApplicationContext());
+            final FFprobe tmpFfprobe = FFprobe.getInstance(context.getApplicationContext());
 
-            if(tmpFfmpeg.isSupported())
+            if(tmpFfmpeg.isSupported() && tmpFfprobe.isSupported())
             {
                 ffmpeg = tmpFfmpeg;
+                ffprobe = tmpFfprobe;
                 return true;
             }
             else
