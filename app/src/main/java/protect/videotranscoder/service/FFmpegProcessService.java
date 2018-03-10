@@ -1,19 +1,26 @@
 package protect.videotranscoder.service;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import java.io.File;
 
 import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler;
 import protect.videotranscoder.FFmpegUtil;
 import protect.videotranscoder.R;
 import protect.videotranscoder.ResultCallbackHandler;
+import protect.videotranscoder.activity.MainActivity;
 
 import static protect.videotranscoder.activity.MainActivity.FFMPEG_ENCODE_ARGS;
 import static protect.videotranscoder.activity.MainActivity.FFMPEG_FAILURE_MSG;
@@ -25,13 +32,18 @@ import static protect.videotranscoder.activity.MainActivity.OUTPUT_MIMETYPE;
 public class FFmpegProcessService extends JobService
 {
     private static final String TAG = "VideoTranscoder";
+    private static final int NOTIFICATION_ID = 1;
 
     private Messenger _activityMessenger;
+    NotificationManager _notificationManager;
 
     @Override
     public void onCreate()
     {
         super.onCreate();
+
+        _notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
         Log.i(TAG, "Service created");
     }
 
@@ -51,6 +63,32 @@ public class FFmpegProcessService extends JobService
     {
         _activityMessenger = intent.getParcelableExtra(MESSENGER_INTENT_KEY);
         return START_NOT_STICKY;
+    }
+
+    private void setNotification(String filename)
+    {
+        String message = String.format(getString(R.string.encodingNotification), filename);
+
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setOngoing(true)
+                        .setSmallIcon(R.drawable.encoding_notification)
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(message);
+
+        // Creates an explicit intent for the Activity
+        Intent resultIntent = new Intent(this, MainActivity.class);
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0,
+                resultIntent, 0);
+        builder.setContentIntent(resultPendingIntent);
+
+        _notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    private void clearNotification()
+    {
+        _notificationManager.cancel(NOTIFICATION_ID);
     }
 
     @Override
@@ -77,6 +115,7 @@ public class FFmpegProcessService extends JobService
                         {
                             Log.d(TAG, "Failed with output : " + s);
                             jobFinished(params, false);
+                            clearNotification();
 
                             // The last line of the output should be the failure message
                             String [] lines = s.split("\n");
@@ -92,6 +131,7 @@ public class FFmpegProcessService extends JobService
                         {
                             Log.d(TAG, "Success with output : " +s);
                             jobFinished(params, false);
+                            clearNotification();
 
                             Bundle bundle = new Bundle();
                             bundle.putString(FFMPEG_OUTPUT_FILE, outputFile);
@@ -128,6 +168,11 @@ public class FFmpegProcessService extends JobService
                         }
                     };
 
+                    if(outputFile != null)
+                    {
+                        setNotification(new File(outputFile).getName());
+                    }
+
                     FFmpegUtil.call(args, handler);
                 }
                 else
@@ -146,6 +191,8 @@ public class FFmpegProcessService extends JobService
     {
         // Stop tracking these job parameters, as we've 'finished' executing.
         Log.i(TAG, "on stop job: " + params.getJobId());
+
+        clearNotification();
 
         FFmpegUtil.cancelCall();
 
