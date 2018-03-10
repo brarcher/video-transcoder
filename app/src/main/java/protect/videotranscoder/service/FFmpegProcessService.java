@@ -94,93 +94,88 @@ public class FFmpegProcessService extends JobService
     @Override
     public boolean onStartJob(final JobParameters params)
     {
-        FFmpegUtil.init(getApplicationContext(), new ResultCallbackHandler<Boolean>()
+        boolean result = FFmpegUtil.init(getApplicationContext());
+
+        if(result)
         {
-            @Override
-            public void onResult(Boolean result)
+            sendMessage(MessageId.JOB_START_MSG, params.getJobId());
+
+            final String [] args = params.getExtras().getStringArray(FFMPEG_ENCODE_ARGS);
+            final String outputFile = params.getExtras().getString(FFMPEG_OUTPUT_FILE);
+            final String mimetype = params.getExtras().getString(OUTPUT_MIMETYPE);
+            final Integer durationMs = params.getExtras().getInt(OUTPUT_DURATION_MS);
+
+            ExecuteBinaryResponseHandler handler = new ExecuteBinaryResponseHandler()
             {
-                if(result)
+                @Override
+                public void onFailure(String s)
                 {
-                    sendMessage(MessageId.JOB_START_MSG, params.getJobId());
+                    Log.d(TAG, "Failed with output : " + s);
+                    jobFinished(params, false);
+                    clearNotification();
 
-                    final String [] args = params.getExtras().getStringArray(FFMPEG_ENCODE_ARGS);
-                    final String outputFile = params.getExtras().getString(FFMPEG_OUTPUT_FILE);
-                    final String mimetype = params.getExtras().getString(OUTPUT_MIMETYPE);
-                    final Integer durationMs = params.getExtras().getInt(OUTPUT_DURATION_MS);
+                    // The last line of the output should be the failure message
+                    String [] lines = s.split("\n");
+                    String failureMg = lines[lines.length-1].trim();
 
-                    ExecuteBinaryResponseHandler handler = new ExecuteBinaryResponseHandler()
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FFMPEG_FAILURE_MSG, failureMg);
+                    sendMessage(MessageId.JOB_FAILED_MSG, bundle);
+                }
+
+                @Override
+                public void onSuccess(String s)
+                {
+                    Log.d(TAG, "Success with output : " +s);
+                    jobFinished(params, false);
+                    clearNotification();
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FFMPEG_OUTPUT_FILE, outputFile);
+                    bundle.putString(OUTPUT_MIMETYPE, mimetype);
+                    sendMessage(MessageId.JOB_SUCCEDED_MSG, bundle);
+                }
+
+                @Override
+                public void onProgress(String s)
+                {
+                    // Progress updates look like the following:
+                    // frame=   15 fps=7.1 q=2.0 size=      26kB time=00:00:00.69 bitrate= 309.4kbits/s dup=6 drop=0 speed=0.329x
+                    Long currentTimeMs = null;
+
+                    String [] split = s.split(" ");
+                    for(String item : split)
                     {
-                        @Override
-                        public void onFailure(String s)
+                        if(item.startsWith("time="))
                         {
-                            Log.d(TAG, "Failed with output : " + s);
-                            jobFinished(params, false);
-                            clearNotification();
-
-                            // The last line of the output should be the failure message
-                            String [] lines = s.split("\n");
-                            String failureMg = lines[lines.length-1].trim();
-
-                            Bundle bundle = new Bundle();
-                            bundle.putString(FFMPEG_FAILURE_MSG, failureMg);
-                            sendMessage(MessageId.JOB_FAILED_MSG, bundle);
+                            item = item.replace("time=", "");
+                            currentTimeMs = FFmpegUtil.timestampToMs(item);
+                            break;
                         }
-
-                        @Override
-                        public void onSuccess(String s)
-                        {
-                            Log.d(TAG, "Success with output : " +s);
-                            jobFinished(params, false);
-                            clearNotification();
-
-                            Bundle bundle = new Bundle();
-                            bundle.putString(FFMPEG_OUTPUT_FILE, outputFile);
-                            bundle.putString(OUTPUT_MIMETYPE, mimetype);
-                            sendMessage(MessageId.JOB_SUCCEDED_MSG, bundle);
-                        }
-
-                        @Override
-                        public void onProgress(String s)
-                        {
-                            // Progress updates look like the following:
-                            // frame=   15 fps=7.1 q=2.0 size=      26kB time=00:00:00.69 bitrate= 309.4kbits/s dup=6 drop=0 speed=0.329x
-                            Long currentTimeMs = null;
-
-                            String [] split = s.split(" ");
-                            for(String item : split)
-                            {
-                                if(item.startsWith("time="))
-                                {
-                                    item = item.replace("time=", "");
-                                    currentTimeMs = FFmpegUtil.timestampToMs(item);
-                                    break;
-                                }
-                            }
-
-                            Integer percentComplete = null;
-
-                            if(currentTimeMs != null && currentTimeMs > 0)
-                            {
-                                percentComplete = (int)Math.floor((currentTimeMs * 100) / (float)durationMs);
-                            }
-
-                            sendMessage(MessageId.JOB_PROGRESS_MSG, percentComplete);
-                        }
-                    };
-
-                    if(outputFile != null)
-                    {
-                        setNotification(new File(outputFile).getName());
                     }
 
-                    FFmpegUtil.call(args, handler);
+                    Integer percentComplete = null;
+
+                    if(currentTimeMs != null && currentTimeMs > 0)
+                    {
+                        percentComplete = (int)Math.floor((currentTimeMs * 100) / (float)durationMs);
+                    }
+
+                    sendMessage(MessageId.JOB_PROGRESS_MSG, percentComplete);
                 }
-                else
-                {
-                    sendMessage(MessageId.FFMPEG_UNSUPPORTED_MSG, params.getJobId());
-                }
+            };
+
+            if(outputFile != null)
+            {
+                setNotification(new File(outputFile).getName());
             }
-        });
+
+            FFmpegUtil.call(args, handler);
+        }
+        else
+        {
+            sendMessage(MessageId.FFMPEG_UNSUPPORTED_MSG, params.getJobId());
+        }
 
         // Return true as there's more work to be done with this job.
         return true;

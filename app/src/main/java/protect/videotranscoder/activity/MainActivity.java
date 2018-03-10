@@ -225,21 +225,14 @@ public class MainActivity extends AppCompatActivity
 
         selectVideoButton.setEnabled(false);
 
-        FFmpegUtil.init(getApplicationContext(), new ResultCallbackHandler<Boolean>()
+        if(FFmpegUtil.init(getApplicationContext()))
         {
-            @Override
-            public void onResult(Boolean result)
-            {
-                if(result)
-                {
-                    selectVideoButton.setEnabled(true);
-                }
-                else
-                {
-                    showUnsupportedExceptionDialog();
-                }
-            }
-        });
+            selectVideoButton.setEnabled(true);
+        }
+        else
+        {
+            showUnsupportedExceptionDialog();
+        }
     }
 
     private void showUnsupportedExceptionDialog()

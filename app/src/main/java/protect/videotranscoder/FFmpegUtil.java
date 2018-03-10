@@ -33,7 +33,7 @@ public class FFmpegUtil
     /**
      * Load FFmpeg binary
      */
-    public static void init(final Context context, @NonNull final ResultCallbackHandler<Boolean> resultHandler)
+    public static boolean init(final Context context)
     {
         if (ffmpeg == null)
         {
@@ -43,16 +43,16 @@ public class FFmpegUtil
             if(tmpFfmpeg.isSupported())
             {
                 ffmpeg = tmpFfmpeg;
-                resultHandler.onResult(true);
+                return true;
             }
             else
             {
-                resultHandler.onResult(false);
+                return false;
             }
         }
         else
         {
-            resultHandler.onResult(true);
+            return true;
         }
     }
 
