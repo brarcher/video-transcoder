@@ -375,9 +375,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private List<String> getFfmpegEncodingArgs(String inputFilePath, Integer startTimeSec, Integer endTimeSec, Integer durationSec,
-                                               MediaContainer container, VideoCodec videoCodec, Integer videoBitrate,
+                                               MediaContainer container, VideoCodec videoCodec, Integer videoBitrateK,
                                                String resolution, String fps, AudioCodec audioCodec, Integer audioSampleRate,
-                                               String audioChannel, Integer audioBitrate, String destinationFilePath)
+                                               String audioChannel, Integer audioBitrateK, String destinationFilePath)
     {
         List<String> command = new LinkedList<>();
 
@@ -413,7 +413,7 @@ public class MainActivity extends AppCompatActivity
 
                 // Video bitrate
                 command.add("-b:v");
-                command.add(videoBitrate + "k");
+                command.add(videoBitrateK + "k");
             }
 
             // Frame size
@@ -453,8 +453,9 @@ public class MainActivity extends AppCompatActivity
 
             // Audio bitrate
             command.add("-b:a");
-            command.add(audioBitrate + "k");
-        } else
+            command.add(audioBitrateK + "k");
+        }
+        else
         {
             // No audio
             command.add("-an");
@@ -473,13 +474,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startEncode(String inputFilePath, int startTimeSec, int endTimeSec, int durationSec,
-                             MediaContainer container, VideoCodec videoCodec, Integer videoBitrate,
+                             MediaContainer container, VideoCodec videoCodec, Integer videoBitrateK,
                              String resolution, String fps, AudioCodec audioCodec, Integer audioSampleRate,
-                             String audioChannel, Integer audioBitrate, String destinationFilePath)
+                             String audioChannel, Integer audioBitrateK, String destinationFilePath)
     {
         List<String> args = getFfmpegEncodingArgs(inputFilePath, startTimeSec, endTimeSec, durationSec,
-                container, videoCodec, videoBitrate, resolution, fps, audioCodec, audioSampleRate,
-                audioChannel, audioBitrate, destinationFilePath);
+                container, videoCodec, videoBitrateK, resolution, fps, audioCodec, audioSampleRate,
+                audioChannel, audioBitrateK, destinationFilePath);
 
         updateUiForEncoding();
 
@@ -508,10 +509,10 @@ public class MainActivity extends AppCompatActivity
         String fps = (String)fpsSpinner.getSelectedItem();
         String resolution = (String)resolutionSpinner.getSelectedItem();
         AudioCodec audioCodec = (AudioCodec) audioCodecSpinner.getSelectedItem();
-        Integer audioBitrate = (Integer) audioBitrateSpinner.getSelectedItem();
+        Integer audioBitrateK = (Integer) audioBitrateSpinner.getSelectedItem();
         Integer audioSampleRate = (Integer) audioSampleRateSpinner.getSelectedItem();
         String audioChannel = (String) audioChannelSpinner.getSelectedItem();
-        int videoBitrate;
+        int videoBitrateK;
 
         if(videoInfo == null)
         {
@@ -521,8 +522,8 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            String videoBitrateStr = videoBitrateValue.getText().toString();
-            videoBitrate = Integer.parseInt(videoBitrateStr);
+            String videoBitrateKStr = videoBitrateValue.getText().toString();
+            videoBitrateK = Integer.parseInt(videoBitrateKStr);
         }
         catch(NumberFormatException e)
         {
@@ -558,8 +559,8 @@ public class MainActivity extends AppCompatActivity
         int durationSec = endTimeSec - startTimeSec;
 
         startEncode(inputFilePath, startTimeSec, endTimeSec, durationSec, container, videoCodec,
-                                    videoBitrate, resolution, fps, audioCodec, audioSampleRate, audioChannel,
-                                    audioBitrate, destination.getAbsolutePath());
+                    videoBitrateK, resolution, fps, audioCodec, audioSampleRate, audioChannel,
+                    audioBitrateK, destination.getAbsolutePath());
     }
 
     private void updateUiForEncoding()
@@ -857,16 +858,16 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        List<Integer> audioBitrate = new ArrayList<>(Arrays.asList(15, 24, 32, 64, 96, 128, 192, 256, 320, 384, 448, 512));
-        if(videoInfo.audioBitrate != null && audioBitrate.contains(videoInfo.audioBitrate) == false)
+        List<Integer> audioBitrateK = new ArrayList<>(Arrays.asList(15, 24, 32, 64, 96, 128, 192, 256, 320, 384, 448, 512));
+        if(videoInfo.audioBitrateK != null && audioBitrateK.contains(videoInfo.audioBitrateK) == false)
         {
-            audioBitrate.add(videoInfo.audioBitrate);
-            Collections.sort(audioBitrate);
+            audioBitrateK.add(videoInfo.audioBitrateK);
+            Collections.sort(audioBitrateK);
         }
-        audioBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, audioBitrate));
+        audioBitrateSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, audioBitrateK));
 
         List<Integer> sampleRate = new ArrayList<>(Arrays.asList(8000, 11025, 16000, 22050, 24000, 32000, 44100, 48000));
-        if(videoInfo.audioSampleRate != null && audioBitrate.contains(videoInfo.audioSampleRate) == false)
+        if(videoInfo.audioSampleRate != null && audioBitrateK.contains(videoInfo.audioSampleRate) == false)
         {
             sampleRate.add(videoInfo.audioSampleRate);
             Collections.sort(sampleRate);
@@ -896,9 +897,9 @@ public class MainActivity extends AppCompatActivity
             setSpinnerSelection(resolutionSpinner, videoInfo.videoResolution);
         }
 
-        if(videoInfo.videoBitrate != null)
+        if(videoInfo.videoBitrateK != null)
         {
-            videoBitrateValue.setText(Integer.toString(videoInfo.videoBitrate));
+            videoBitrateValue.setText(Integer.toString(videoInfo.videoBitrateK));
         }
 
         if(videoInfo.audioCodec != null)
@@ -906,14 +907,14 @@ public class MainActivity extends AppCompatActivity
             setSpinnerSelection(audioCodecSpinner, videoInfo.audioCodec.toString());
         }
 
-        Integer defaultAudioBitrate = videoInfo.audioBitrate;
-        if(defaultAudioBitrate == null)
+        Integer defaultAudioBitrateK = videoInfo.audioBitrateK;
+        if(defaultAudioBitrateK == null)
         {
             // Set some default if none is detected
-            defaultAudioBitrate = 128;
+            defaultAudioBitrateK = 128;
         }
 
-        setSpinnerSelection(audioBitrateSpinner, defaultAudioBitrate);
+        setSpinnerSelection(audioBitrateSpinner, defaultAudioBitrateK);
 
         if(videoInfo.audioSampleRate != null)
         {
@@ -1235,6 +1236,7 @@ public class MainActivity extends AppCompatActivity
             .put("Guava", "https://github.com/google/guava")
             .put("Crystal Range Seekbar", "https://github.com/syedowaisali/crystal-range-seekbar")
             .put("Storage Chooser", "https://github.com/codekidX/storage-chooser")
+            .put("jackson-databind", "https://github.com/FasterXML/jackson-databind")
             .build();
 
         final Map<String, String> USED_ASSETS = ImmutableMap.of

@@ -4,13 +4,19 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +24,7 @@ import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler;
 import nl.bravobit.ffmpeg.FFmpeg;
 import nl.bravobit.ffmpeg.FFprobe;
 import nl.bravobit.ffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
+import nl.bravobit.ffmpeg.exceptions.FFprobeCommandAlreadyRunningException;
 import protect.videotranscoder.media.AudioCodec;
 import protect.videotranscoder.media.MediaInfo;
 import protect.videotranscoder.media.MediaContainer;
@@ -89,6 +96,35 @@ public class FFmpegUtil
         }
     }
 
+    /**
+     * Executing FFprobe binary with arguments
+     */
+    public static void probe(final String[] command, @NonNull final ExecuteBinaryResponseHandler handler)
+    {
+        if(ffprobe == null || ffprobe.isCommandRunning())
+        {
+            String message = "Command failed, FFprobe " + (ffprobe == null ? "not initialized" : "still running");
+            Log.d(TAG, message);
+
+            handler.onFailure(message);
+            return;
+        }
+
+        try
+        {
+            Log.d(TAG, "Executing command: " + commandToString(command));
+            ffprobe.execute(command, handler);
+        }
+        catch (FFprobeCommandAlreadyRunningException e)
+        {
+            String message = "Command failed, FFprobe already running";
+            Log.d(TAG, message);
+
+            handler.onFailure(message);
+            // do nothing for now
+        }
+    }
+
     public static void callGetOutput(@NonNull final String [] command,
                                      @NonNull final ResultCallbackHandler<String> resultHandler)
     {
@@ -108,6 +144,27 @@ public class FFmpegUtil
         };
 
         call(command, handler);
+    }
+
+    public static void probeGetOutput(@NonNull final String [] command,
+                                      @NonNull final ResultCallbackHandler<String> resultHandler)
+    {
+        ExecuteBinaryResponseHandler handler = new ExecuteBinaryResponseHandler()
+        {
+            @Override
+            public void onSuccess(String message)
+            {
+                resultHandler.onResult(message);
+            }
+
+            @Override
+            public void onFailure(String message)
+            {
+                resultHandler.onResult(message);
+            }
+        };
+
+        probe(command, handler);
     }
 
     /**
@@ -176,244 +233,284 @@ public class FFmpegUtil
 
     public static void getMediaDetails(final File mediaFile, final ResultCallbackHandler<MediaInfo> resultHandler)
     {
-        if(ffmpeg == null || ffmpeg.isCommandRunning())
-        {
-            Log.d(TAG, "Failed to get media details, FFmpeg " +
-                    (ffmpeg == null ? "is not initialized" : "is already running"));
-            resultHandler.onResult(null);
-            return;
-        }
+        String [] command = {"-i",  mediaFile.getAbsolutePath(),
+                "-v", "quiet", "-print_format", "json", "-show_streams", "-show_format"};
 
-        String [] command = {"-i", mediaFile.getAbsolutePath()};
-        callGetOutput(command, new ResultCallbackHandler<String>()
+        probeGetOutput(command, new ResultCallbackHandler<String>()
         {
             @Override
-            public void onResult(String mediaDetailsStr)
+            public void onResult(String mediaDetailsJsonStr)
             {
-                Log.d(TAG, "Media details on " + mediaFile.getAbsolutePath() + "\n");
-                for(String line : mediaDetailsStr.split("\n"))
-                {
-                    Log.d(TAG, line);
-                }
-                MediaInfo info = parseMediaInfo(mediaFile, mediaDetailsStr);
+                MediaInfo info = parseMediaInfo(mediaFile, mediaDetailsJsonStr);
                 resultHandler.onResult(info);
             }
         });
     }
 
-    static MediaInfo parseMediaInfo(File mediaFile, String string)
+    static MediaInfo parseMediaInfo(File mediaFile, String mediaDetailsJsonStr)
     {
         long durationMs = 0;
-        Integer totalBitrate = null;
+        Integer totalBitrateK = null;
         MediaContainer container = null;
         VideoCodec videoCodec = null;
         String videoResolution = null;
-        Integer videoBitrate = null;
+        Integer videoBitrateK = null;
         String videoFramerate = null;
         AudioCodec audioCodec = null;
         Integer audioSampleRate = null;
-        Integer audioBitrate = null;
+        Integer audioBitrateK = null;
         int audioChannels = 2;
 
         /*
          * Example output:
-         Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'ExampleVideo.mp4':
-          Metadata:
-            major_brand     : mp42
-            minor_version   : 0
-            compatible_brands: isommp42
-            creation_time   : 2018-01-02 00:09:32
-            com.android.version: 7.1.2
-          Duration: 00:02:22.86, start: 0.000000, bitrate: 4569 kb/s
-            Stream #0:0(eng): Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p(tv, bt709), 1080x1920, 4499 kb/s, SAR 1:1 DAR 9:16, 19.01 fps, 90k tbr, 90k tbn, 180k tbc (default)
-            Metadata:
-              creation_time   : 2018-01-02 00:09:32
-              handler_name    : VideoHandle
-            Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 22050 Hz, mono, fltp, 63 kb/s (default)
-            Metadata:
-              creation_time   : 2018-01-02 00:09:32
-              handler_name    : SoundHandle
+         {
+            "streams": [
+                {
+                    "index": 0,
+                    "codec_name": "h264",
+                    "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+                    "profile": "Main",
+                    "codec_type": "video",
+                    "codec_time_base": "1/50",
+                    "codec_tag_string": "[0][0][0][0]",
+                    "codec_tag": "0x0000",
+                    "width": 640,
+                    "height": 360,
+                    "coded_width": 640,
+                    "coded_height": 360,
+                    "has_b_frames": 0,
+                    "sample_aspect_ratio": "1:1",
+                    "display_aspect_ratio": "16:9",
+                    "pix_fmt": "yuv420p",
+                    "level": 30,
+                    "chroma_location": "left",
+                    "refs": 1,
+                    "is_avc": "true",
+                    "nal_length_size": "4",
+                    "r_frame_rate": "25/1",
+                    "avg_frame_rate": "25/1",
+                    "time_base": "1/1000",
+                    "start_pts": 0,
+                    "start_time": "0.000000",
+                    "bits_per_raw_sample": "8",
+                    "disposition": {
+                        "default": 0,
+                        "dub": 0,
+                        "original": 0,
+                        "comment": 0,
+                        "lyrics": 0,
+                        "karaoke": 0,
+                        "forced": 0,
+                        "hearing_impaired": 0,
+                        "visual_impaired": 0,
+                        "clean_effects": 0,
+                        "attached_pic": 0
+                    }
+                },
+                {
+                    "index": 1,
+                    "codec_name": "aac",
+                    "codec_long_name": "AAC (Advanced Audio Coding)",
+                    "profile": "LC",
+                    "codec_type": "audio",
+                    "codec_time_base": "1/44100",
+                    "codec_tag_string": "[0][0][0][0]",
+                    "codec_tag": "0x0000",
+                    "sample_fmt": "fltp",
+                    "sample_rate": "48000",
+                    "channels": 6,
+                    "channel_layout": "5.1",
+                    "bits_per_sample": 0,
+                    "r_frame_rate": "0/0",
+                    "avg_frame_rate": "0/0",
+                    "time_base": "1/1000",
+                    "start_pts": 3,
+                    "start_time": "0.003000",
+                    "disposition": {
+                        "default": 0,
+                        "dub": 0,
+                        "original": 0,
+                        "comment": 0,
+                        "lyrics": 0,
+                        "karaoke": 0,
+                        "forced": 0,
+                        "hearing_impaired": 0,
+                        "visual_impaired": 0,
+                        "clean_effects": 0,
+                        "attached_pic": 0
+                    }
+                }
+            ],
+            "format": {
+                "filename": "/Users/brarcher/Downloads/big_buck_bunny_360p_1mb.flv",
+                "nb_streams": 2,
+                "nb_programs": 0,
+                "format_name": "flv",
+                "format_long_name": "FLV (Flash Video)",
+                "start_time": "0.000000",
+                "duration": "6.893000",
+                "size": "1048720",
+                "bit_rate": "1217142",
+                "probe_score": 100,
+                "tags": {
+                    "encoder": "Lavf53.24.2"
+                }
+            }
+        }
          */
 
-        for(String line : string.split("\n"))
+        ObjectMapper mapper = new ObjectMapper();
+        try
         {
-            line = line.trim();
-            String [] split;
+            JsonNode root = mapper.readTree(mediaDetailsJsonStr);
 
-            if(line.startsWith("Duration:"))
+            JsonNode format = root.get("format");
+            if(format != null)
             {
-                // Duration: 00:02:22.86, start: 0.000000, bitrate: 4569 kb/s
-
-                split = line.split(" ");
-                if(split.length <= 1)
+                JsonNode duration = format.get("duration");
+                if(duration != null)
                 {
-                    continue;
+                    durationMs = (int)(duration.asDouble() * 1000);
                 }
 
-                String valueStr = split[1];
-                valueStr = valueStr.replace(",", "");
-
-                Long time = timestampToMs(valueStr);
-                if(time == null)
+                JsonNode bitrate = format.get("bit_rate");
+                if(bitrate != null)
                 {
-                    continue;
+                    totalBitrateK = bitrate.asInt()/1000;
                 }
 
-                durationMs = time;
-
-                split = line.split(",");
-                for(String item : split)
+                JsonNode formatName = format.get("format_name");
+                if(formatName != null)
                 {
-                    if(item.contains("bitrate:"))
+                    String formatNameStr = formatName.asText();
+
+                    for(MediaContainer item : MediaContainer.values())
                     {
-                        item = item.replace("bitrate:", "").replace("kb/s", "").trim();
+                        if(formatNameStr.contains(item.ffmpegName))
+                        {
+                            container = item;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            JsonNode streams = root.get("streams");
+            if(streams != null)
+            {
+                for(int index = 0; index < streams.size(); index++)
+                {
+                    JsonNode stream = streams.get(index);
+                    JsonNode codecType = stream.get("codec_type");
+                    if(codecType == null)
+                    {
+                        continue;
+                    }
+
+                    if(codecType.asText().equals("video"))
+                    {
+                        JsonNode codecName = stream.get("codec_name");
+                        if(codecName == null)
+                        {
+                            continue;
+                        }
+                        videoCodec = VideoCodec.fromName(codecName.asText());
+
+                        JsonNode width = stream.get("width");
+                        JsonNode height = stream.get("height");
+                        if(width == null || height == null)
+                        {
+                            continue;
+                        }
+                        videoResolution = width + "x" + height;
+
+                        // bit_rate may not always be available, so do not require it.
+                        JsonNode bitrate = stream.get("bit_rate");
+                        if(bitrate != null)
+                        {
+                            videoBitrateK = bitrate.asInt()/1000;
+                        }
+
+                        JsonNode frameRate = stream.get("avg_frame_rate");
+                        if(frameRate == null)
+                        {
+                            continue;
+                        }
+
                         try
                         {
-                            // This may be used later if the video bitrate cannot be determined.
-                            totalBitrate = Integer.parseInt(item);
+                            String frameRateStr = frameRate.asText();
+                            String [] frameRateSplit = frameRateStr.split("/");
+                            int frameRateNum = Integer.parseInt(frameRateSplit[0]);
+                            int frameRateDem = 1;
+                            if(frameRateSplit.length > 1)
+                            {
+                                frameRateDem = Integer.parseInt(frameRateSplit[1]);
+                            }
+
+                            double frameRateValue = frameRateNum/(double)frameRateDem;
+
+                            videoFramerate = String.format(Locale.US,"%.2f", frameRateValue);
+                            if(videoFramerate.contains(".00"))
+                            {
+                                videoFramerate = videoFramerate.replace(".00", "");
+                            }
                         }
                         catch(NumberFormatException e)
                         {
                             continue;
                         }
                     }
-                }
-            }
 
-            if(line.startsWith("Input"))
-            {
-                for(MediaContainer item : MediaContainer.values())
-                {
-                    if(line.contains(item.ffmpegName))
+                    if(codecType.asText().equals("audio"))
                     {
-                        container = item;
-                        break;
-                    }
-                }
-            }
-
-            if(line.startsWith("Stream") && line.contains("Video:"))
-            {
-                // Stream #0:0: Video: h264 (Main), yuv420p, 640x360 [SAR 1:1 DAR 16:9], 25 fps, 25 tbr, 1k tbn, 50 tbc
-                // Stream #0:0(eng): Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p(tv, bt709), 1080x1920, 4499 kb/s, SAR 1:1 DAR 9:16, 19.01 fps, 90k tbr, 90k tbn, 180k tbc (default)
-
-                split = line.split(" ");
-                if(split.length <= 4)
-                {
-                    continue;
-                }
-
-                String videoCodecName = split[3];
-                videoCodec = VideoCodec.fromName(videoCodecName);
-
-                // Looking for resolution. There are sometimes items such as:
-                //  (mp4a / 0x6134706D)
-                // that have numbers and an 'x', that need to be avoided.
-                Pattern p = Pattern.compile("[0-9]+x[0-9]+[ ,]{1}");
-                Matcher m = p.matcher(line);
-
-                if(m.find())
-                {
-                    videoResolution = m.group(0);
-                    // There will be an extra space or , at the end; strip it
-                    videoResolution = videoResolution.trim().replace(",","");
-                }
-
-                split = line.split(",");
-                for(String piece : split)
-                {
-                    piece = piece.trim();
-
-                    if(piece.contains("kb/s"))
-                    {
-                        try
+                        JsonNode codecName = stream.get("codec_name");
+                        if(codecName == null)
                         {
-                            String videoBitrateStr = piece.replace("kb/s", "").trim();
-                            videoBitrate = Integer.parseInt(videoBitrateStr);
+                            continue;
                         }
-                        catch(NumberFormatException e)
+                        audioCodec = AudioCodec.fromName(codecName.asText());
+
+                        JsonNode sampleRate = stream.get("sample_rate");
+                        if(sampleRate == null)
                         {
-                            // Nothing to do
+                            continue;
                         }
-                    }
+                        audioSampleRate = sampleRate.asInt();
 
-                    if(piece.contains("fps"))
-                    {
-                        videoFramerate = piece.replace("fps", "").trim();
-                    }
-                }
-            }
-
-            if(line.startsWith("Stream") && line.contains("Audio:"))
-            {
-                // Stream #0:1: Audio: aac (LC), 48000 Hz, 5.1, fltp
-                // Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 22050 Hz, mono, fltp, 63 kb/s (default)
-
-                split = line.split(" ");
-                if(split.length <= 4)
-                {
-                    continue;
-                }
-
-                String audioCodecName = split[3];
-                audioCodec = AudioCodec.fromName(audioCodecName);
-
-                split = line.split(",");
-                for(String piece : split)
-                {
-                    piece = piece.trim();
-
-                    if(piece.contains("Hz"))
-                    {
-                        try
+                        // bit_rate may not always be available, so do not require it.
+                        JsonNode bitrate = stream.get("bit_rate");
+                        if(bitrate != null)
                         {
-                            String audioSampeRateStr = piece.replace("Hz", "").trim();
-                            audioSampleRate = Integer.parseInt(audioSampeRateStr);
-                        }
-                        catch(NumberFormatException e)
-                        {
-                            // Nothing to do
-                        }
-                    }
-
-                    if(piece.contains("kb/s"))
-                    {
-                        String audioBitrateStr = piece.replace("kb/s", "").trim();
-
-                        if(audioBitrateStr.contains("(default)"))
-                        {
-                            audioBitrateStr = audioBitrateStr.replace("(default)", "").trim();
+                            audioBitrateK = bitrate.asInt()/1000;
                         }
 
-                        try
+                        JsonNode channelLaoyout = stream.get("channel_layout");
+                        if(channelLaoyout == null)
                         {
-                            audioBitrate = Integer.parseInt(audioBitrateStr);
+                            continue;
                         }
-                        catch(NumberFormatException e)
-                        {
-                            // Nothing to do
-                        }
-                    }
-
-                    if(piece.contains("mono"))
-                    {
-                        audioChannels = 1;
+                        audioChannels = channelLaoyout.asText().equals("mono") ? 1 : 2;
                     }
                 }
             }
         }
-
-        if(totalBitrate != null)
+        catch (IOException e)
         {
-            if(videoBitrate == null)
+            Log.w(TAG, "Failed to read media details for file : " + mediaFile.getAbsolutePath() + "\n" + mediaDetailsJsonStr);
+        }
+
+        if(totalBitrateK != null)
+        {
+            if(videoBitrateK == null)
             {
-                if(audioBitrate != null)
+                if(audioBitrateK != null)
                 {
                     // We know the audio bitrate, we can calculate the video bitrate
-                    videoBitrate = totalBitrate - audioBitrate;
+                    videoBitrateK = totalBitrateK - audioBitrateK;
                 }
 
-                if(videoBitrate == null)
+                if(videoBitrateK == null)
                 {
                     // We do not know any of the separate bitrates. Lets guess 100 kb/s for the audio,
                     // and subtract that from the total to guess the video bitrate.
@@ -421,13 +518,13 @@ public class FFmpegUtil
                     // As a guess, subtract 100 kb/s from the bitrate for audio, and
                     // assume that the video is the rest. This should be a decent-ish
                     // estimate if the video bitrate cannot be found later.
-                    videoBitrate = totalBitrate - 100;
+                    videoBitrateK = totalBitrateK - 100;
                 }
             }
         }
 
         MediaInfo info = new MediaInfo(mediaFile, durationMs, container, videoCodec, videoResolution,
-                videoBitrate, videoFramerate, audioCodec, audioSampleRate, audioBitrate, audioChannels);
+                videoBitrateK, videoFramerate, audioCodec, audioSampleRate, audioBitrateK, audioChannels);
         return info;
     }
 
