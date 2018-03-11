@@ -26,7 +26,7 @@
 
     <string name="selectFileFirst">You must select a file to encode first.</string>
     <string name="videoBitrateValueInvalid">Video bitrate value is invalid, could not encode.</string>
-    <string name="encodingNotification">Encoding %s</string>
+    <string name="encodingNotification">Encoding <xliff:g id="input_filename">%s</xliff:g></string>
     <string name="transcodeSuccess">Encoding completed successfully. The file was written to:\n<xliff:g id="path">%s</xliff:g></string>
     <string name="transcodeFailed">Encoding failed: <xliff:g id="failure_message">%s</xliff:g></string>
 
