@@ -41,11 +41,14 @@ public enum MediaContainer
 
     public static MediaContainer fromName(String ffmpegName)
     {
-        for(MediaContainer item : MediaContainer.values())
+        if(ffmpegName != null)
         {
-            if(item.ffmpegName.endsWith(ffmpegName))
+            for (MediaContainer item : MediaContainer.values())
             {
-                return item;
+                if (item.ffmpegName.endsWith(ffmpegName))
+                {
+                    return item;
+                }
             }
         }
 
