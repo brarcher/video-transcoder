@@ -343,10 +343,7 @@ public class MainActivity extends AppCompatActivity
         ArrayList<String> extensions = new ArrayList<>();
         for(MediaContainer item : MediaContainer.values())
         {
-            if(item.supportedVideoCodecs.size() > 0)
-            {
-                extensions.add(item.extension);
-            }
+            extensions.add(item.extension);
         }
 
         final StorageChooser fileChooser = new StorageChooser.Builder()
