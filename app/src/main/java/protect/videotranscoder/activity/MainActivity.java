@@ -340,19 +340,12 @@ public class MainActivity extends AppCompatActivity
      */
     private void selectVideo()
     {
-        ArrayList<String> extensions = new ArrayList<>();
-        for(MediaContainer item : MediaContainer.values())
-        {
-            extensions.add(item.extension);
-        }
-
         final StorageChooser fileChooser = new StorageChooser.Builder()
                 .withActivity(MainActivity.this)
                 .withFragmentManager(getFragmentManager())
                 .allowCustomPath(true)
                 .setType(StorageChooser.FILE_PICKER)
                 .disableMultiSelect()
-                .customFilter(extensions)
                 .build();
 
         // get path that the user has chosen
