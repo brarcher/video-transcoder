@@ -1,12 +1,10 @@
 package protect.videotranscoder.activity;
 
 import android.Manifest;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -15,9 +13,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.PersistableBundle;
+import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -57,8 +56,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.regex.Pattern;
 
+import protect.videoeditor.IFFmpegProcessService;
 import protect.videotranscoder.BuildConfig;
 import protect.videotranscoder.FFmpegUtil;
 import protect.videotranscoder.R;
@@ -75,13 +74,10 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "VideoTranscoder";
 
     public static final String MESSENGER_INTENT_KEY = BuildConfig.APPLICATION_ID + ".MESSENGER_INTENT_KEY";
-    public static final String FFMPEG_ENCODE_ARGS = BuildConfig.APPLICATION_ID + ".FFMPEG_ENCODE_ARGS";
     public static final String FFMPEG_OUTPUT_FILE = BuildConfig.APPLICATION_ID + ".FFMPEG_OUTPUT_FILE";
     public static final String FFMPEG_FAILURE_MSG = BuildConfig.APPLICATION_ID + ".FFMPEG_FAILURE_MSG";
     public static final String OUTPUT_MIMETYPE = BuildConfig.APPLICATION_ID + ".OUTPUT_MIMETYPE";
-    public static final String OUTPUT_DURATION_MS = BuildConfig.APPLICATION_ID + ".OUTPUT_DURATION_MS";
 
-    private static final int REQUEST_TAKE_GALLERY_VIDEO = 100;
     private static final int READ_WRITE_PERMISSION_REQUEST = 1;
 
     final List<Integer> BASIC_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
@@ -137,8 +133,7 @@ public class MainActivity extends AppCompatActivity
     private ImageView endJumpForward;
     private MediaInfo videoInfo;
 
-    private JobScheduler schedulerService;
-    private ComponentName serviceComponent;
+    private IFFmpegProcessService ffmpegService;
     // Handler for incoming messages from the service.
     private IncomingMessageHandler msgHandler;
 
@@ -175,9 +170,6 @@ public class MainActivity extends AppCompatActivity
         audioSampleRateSpinner = findViewById(R.id.audioSampleRateSpinner);
         audioChannelSpinner = findViewById(R.id.audioChannelSpinner);
 
-        serviceComponent = new ComponentName(this, FFmpegProcessService.class);
-        msgHandler = new IncomingMessageHandler(this);
-
         selectVideoButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -212,35 +204,55 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        schedulerService = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if(schedulerService != null)
-        {
-            // Check if a job is still being processed in the background from a previous
-            // launch. If so, skip to that UI layout.
-            if(schedulerService.getAllPendingJobs().size() > 0)
-            {
-                updateUiForEncoding();
-            }
-        }
-
         selectVideoButton.setEnabled(false);
 
-        FFmpegUtil.init(getApplicationContext(), new ResultCallbackHandler<Boolean>()
+        if(FFmpegUtil.init(getApplicationContext()) == false)
         {
-            @Override
-            public void onResult(Boolean result)
+            showUnsupportedExceptionDialog();
+        }
+
+        Intent serviceIntent = new Intent(this, FFmpegProcessService.class);
+        startService(serviceIntent);
+        bindService(serviceIntent, ffmpegServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    private ServiceConnection ffmpegServiceConnection = new ServiceConnection()
+    {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
+            Log.i(TAG, "Bound to service");
+            ffmpegService = IFFmpegProcessService.Stub.asInterface(service);
+
+            try
             {
-                if(result)
+                // Check if a job is still being processed in the background from a previous
+                // launch. If so, skip to that UI layout.
+                if(ffmpegService.isEncoding())
                 {
-                    selectVideoButton.setEnabled(true);
+                    updateUiForEncoding();
                 }
                 else
                 {
-                    showUnsupportedExceptionDialog();
+                    selectVideoButton.setEnabled(true);
                 }
             }
-        });
-    }
+            catch (RemoteException e)
+            {
+                Log.w(TAG, "Failed to query service", e);
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className)
+        {
+            ffmpegService = null;
+            // This method is only invoked when the service quits from the other end or gets killed
+            // Invoking exit() from the AIDL interface makes the Service kill itself, thus invoking this.
+            Log.i(TAG, "Service disconnected");
+        }
+    };
 
     private void showUnsupportedExceptionDialog()
     {
@@ -510,31 +522,23 @@ public class MainActivity extends AppCompatActivity
         // Output file
         command.add(destination.getAbsolutePath());
 
-
         updateUiForEncoding();
 
-
-        JobInfo.Builder builder = new JobInfo.Builder(1, serviceComponent);
-        builder.setOverrideDeadline(0);
-
-        // Extras, work duration.
-        PersistableBundle extras = new PersistableBundle();
-        extras.putStringArray(FFMPEG_ENCODE_ARGS, command.toArray(new String[command.size()]));
-        extras.putString(FFMPEG_OUTPUT_FILE, destination.getAbsolutePath());
-        extras.putString(OUTPUT_MIMETYPE, container.mimetype);
-        extras.putInt(OUTPUT_DURATION_MS, durationSec*1000);
-        builder.setExtras(extras);
-
-        // Schedule job
-        Log.d(TAG, "Scheduling job");
-        JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if(scheduler == null)
+        boolean success = false;
+        try
         {
-            Toast.makeText(this, R.string.transcodeFailed, Toast.LENGTH_LONG).show();
-            return;
+            Log.d(TAG, "Sending encode request to service");
+            success = ffmpegService.startEncode(command, destination.getAbsolutePath(), container.mimetype, durationSec*1000);
+        }
+        catch (RemoteException e)
+        {
+            Log.w(TAG, "Failed to send encode request to service", e);
         }
 
-        scheduler.schedule(builder.build());
+        if(success == false)
+        {
+            updateUiForVideoSettings();
+        }
     }
 
     private void updateUiForEncoding()
@@ -570,16 +574,15 @@ public class MainActivity extends AppCompatActivity
 
     private void cancelEncode()
     {
-        FFmpegUtil.cancelCall();
-
-        JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if(scheduler == null)
+        try
         {
-            Log.w(TAG, "Scheduler was null when canceling encode");
-            return;
+            ffmpegService.cancel();
         }
-
-        scheduler.cancelAll();
+        catch (RemoteException e)
+        {
+            Log.w(TAG, "Failed to cancel encoding", e);
+            e.printStackTrace();
+        }
 
         updateUiForVideoSettings();
     }
@@ -631,8 +634,10 @@ public class MainActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
+        Log.i(TAG, "Establishing messenger with service");
         // Start service and provide it a way to communicate with this class.
         Intent startServiceIntent = new Intent(this, FFmpegProcessService.class);
+        msgHandler = new IncomingMessageHandler(this);
         Messenger messengerIncoming = new Messenger(msgHandler);
         startServiceIntent.putExtra(MESSENGER_INTENT_KEY, messengerIncoming);
         startService(startServiceIntent);
