@@ -126,6 +126,11 @@ public class FFmpegUtil
         Log.d(TAG, message);
     }
 
+    public static boolean isFFmpegRunning()
+    {
+        return ffmpeg != null && ffmpeg.isCommandRunning();
+    }
+
     @NonNull
     private static String commandToString(String [] cmd)
     {
