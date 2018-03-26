@@ -415,7 +415,12 @@ public class MainActivity extends AppCompatActivity
             outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
         }
 
-        String filePrefix = "Video_Transcoder_Output";
+        String filePrefix = videoInfo.file.getName();
+        if(filePrefix.contains("."))
+        {
+            filePrefix = filePrefix.substring(0, filePrefix.lastIndexOf("."));
+        }
+
         String extension = "." + container.extension;
         String inputFilePath = videoInfo.file.getAbsolutePath();
 
