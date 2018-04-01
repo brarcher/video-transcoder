@@ -12,17 +12,17 @@ public class MediaInfo
     public final MediaContainer container;
     public final VideoCodec videoCodec;
     public final String videoResolution;
-    public final Integer videoBitrate;
+    public final Integer videoBitrateK;
     public final String videoFramerate;
     public final AudioCodec audioCodec;
     public final Integer audioSampleRate;
-    public final Integer audioBitrate;
+    public final Integer audioBitrateK;
     public final Integer audioChannels;
 
 
     public MediaInfo(File file, long durationMs, MediaContainer container, VideoCodec videoCodec,
-                     String videoResolution, Integer videoBitrate, String videoFramerate,
-                     AudioCodec audioCodec, Integer audioSampleRate, Integer audioBitrate,
+                     String videoResolution, Integer videoBitrateK, String videoFramerate,
+                     AudioCodec audioCodec, Integer audioSampleRate, Integer audioBitrateK,
                      Integer audioChannels)
     {
         this.file = file;
@@ -30,11 +30,11 @@ public class MediaInfo
         this.container = container;
         this.videoCodec = videoCodec;
         this.videoResolution = videoResolution;
-        this.videoBitrate = videoBitrate;
+        this.videoBitrateK = videoBitrateK;
         this.videoFramerate = videoFramerate;
         this.audioCodec = audioCodec;
         this.audioSampleRate = audioSampleRate;
-        this.audioBitrate = audioBitrate;
+        this.audioBitrateK = audioBitrateK;
         this.audioChannels = audioChannels;
     }
 }

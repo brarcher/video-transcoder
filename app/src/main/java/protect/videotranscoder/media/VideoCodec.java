@@ -30,11 +30,14 @@ public enum VideoCodec
     @Nullable
     public static VideoCodec fromName(String name)
     {
-        for(VideoCodec item : values())
+        if(name != null)
         {
-            if(item.ffmpegName.equals(name))
+            for (VideoCodec item : values())
             {
-                return item;
+                if (item.ffmpegName.equals(name))
+                {
+                    return item;
+                }
             }
         }
 

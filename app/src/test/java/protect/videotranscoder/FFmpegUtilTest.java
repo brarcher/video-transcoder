@@ -24,102 +24,424 @@ public class FFmpegUtilTest
     {
         File file = new File("/dev/null");
 
-        String string = "Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'ExampleVideo.mp4'\n" +
-                        "Metadata:\n" +
-                        "major_brand     : mp42\n" +
-                        "minor_version   : 0\n" +
-                        "compatible_brands: isommp42\n" +
-                        "creation_time   : 2018-01-02 00:09:32\n" +
-                        "com.android.version: 7.1.2\n" +
-                        "Duration: 00:02:22.86, start: 0.000000, bitrate: 4569 kb/s\n" +
-                        "Stream #0:0(eng): Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p(tv, bt709), 1080x1920, 4499 kb/s, SAR 1:1 DAR 9:16, 19.01 fps, 90k tbr, 90k tbn, 180k tbc (default)\n" +
-                        "Metadata:\n" +
-                        "creation_time   : 2018-01-02 00:09:32\n" +
-                        "handler_name    : VideoHandle\n" +
-                        "Stream #0:1(eng): Audio: aac (LC) (mp4a / 0x6134706D), 22050 Hz, mono, fltp, 63 kb/s (default)\n" +
-                        "Metadata:\n" +
-                        "creation_time   : 2018-01-02 00:09:32\n" +
-                        "handler_name    : SoundHandle\n";
-
+        String string = "{\n" +
+                "    \"streams\": [\n" +
+                "        {\n" +
+                "            \"index\": 0,\n" +
+                "            \"codec_name\": \"mp3\",\n" +
+                "            \"codec_long_name\": \"MP3 (MPEG audio layer 3)\",\n" +
+                "            \"codec_type\": \"audio\",\n" +
+                "            \"codec_time_base\": \"1/44100\",\n" +
+                "            \"codec_tag_string\": \"[0][0][0][0]\",\n" +
+                "            \"codec_tag\": \"0x0000\",\n" +
+                "            \"sample_fmt\": \"s16p\",\n" +
+                "            \"sample_rate\": \"44100\",\n" +
+                "            \"channels\": 2,\n" +
+                "            \"channel_layout\": \"stereo\",\n" +
+                "            \"bits_per_sample\": 0,\n" +
+                "            \"r_frame_rate\": \"0/0\",\n" +
+                "            \"avg_frame_rate\": \"0/0\",\n" +
+                "            \"time_base\": \"1/14112000\",\n" +
+                "            \"start_pts\": 353600,\n" +
+                "            \"start_time\": \"0.025057\",\n" +
+                "            \"duration_ts\": 63109324800,\n" +
+                "            \"duration\": \"4472.032653\",\n" +
+                "            \"bit_rate\": \"128000\",\n" +
+                "            \"disposition\": {\n" +
+                "                \"default\": 0,\n" +
+                "                \"dub\": 0,\n" +
+                "                \"original\": 0,\n" +
+                "                \"comment\": 0,\n" +
+                "                \"lyrics\": 0,\n" +
+                "                \"karaoke\": 0,\n" +
+                "                \"forced\": 0,\n" +
+                "                \"hearing_impaired\": 0,\n" +
+                "                \"visual_impaired\": 0,\n" +
+                "                \"clean_effects\": 0,\n" +
+                "                \"attached_pic\": 0\n" +
+                "            },\n" +
+                "            \"tags\": {\n" +
+                "                \"encoder\": \"Lavc57.48\"\n" +
+                "            }\n" +
+                "        }\n" +
+                "    ],\n" +
+                "    \"format\": {\n" +
+                "        \"filename\": \"/Users/test/Downloads/recording.mp3\",\n" +
+                "        \"nb_streams\": 1,\n" +
+                "        \"nb_programs\": 0,\n" +
+                "        \"format_name\": \"mp3\",\n" +
+                "        \"format_long_name\": \"MP2/3 (MPEG audio layer 2/3)\",\n" +
+                "        \"start_time\": \"0.025057\",\n" +
+                "        \"duration\": \"4472.032653\",\n" +
+                "        \"size\": \"71553077\",\n" +
+                "        \"bit_rate\": \"128000\",\n" +
+                "        \"probe_score\": 51,\n" +
+                "        \"tags\": {\n" +
+                "            \"major_brand\": \"dash\",\n" +
+                "            \"minor_version\": \"0\",\n" +
+                "            \"compatible_brands\": \"iso6mp41\",\n" +
+                "            \"encoder\": \"Lavf57.41.100\"\n" +
+                "        }\n" +
+                "    }\n"
+                + "}";
         MediaInfo info = FFmpegUtil.parseMediaInfo(file, string);
 
         assertEquals(file, info.file);
-        assertEquals( (2*60+22)*1000 + 86, info.durationMs);
+        assertEquals( 4472032, info.durationMs);
+        assertEquals(MediaContainer.MP3, info.container);
+        assertEquals(null, info.videoCodec);
+        assertEquals(null, info.videoResolution);
+        assertEquals(Integer.valueOf(0), info.videoBitrateK);
+        assertEquals(null, info.videoFramerate);
+        assertEquals(AudioCodec.MP3, info.audioCodec);
+        assertEquals(Integer.valueOf(44100), info.audioSampleRate);
+        assertEquals(Integer.valueOf(128), info.audioBitrateK);
+        assertEquals(Integer.valueOf(2), info.audioChannels);
+
+
+        string = "{\n" +
+                "    \"streams\": [\n" +
+                "        {\n" +
+                "            \"index\": 0,\n" +
+                "            \"codec_name\": \"h264\",\n" +
+                "            \"codec_long_name\": \"H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10\",\n" +
+                "            \"profile\": \"Constrained Baseline\",\n" +
+                "            \"codec_type\": \"video\",\n" +
+                "            \"codec_time_base\": \"12864731/489240000\",\n" +
+                "            \"codec_tag_string\": \"avc1\",\n" +
+                "            \"codec_tag\": \"0x31637661\",\n" +
+                "            \"width\": 1080,\n" +
+                "            \"height\": 1920,\n" +
+                "            \"coded_width\": 1080,\n" +
+                "            \"coded_height\": 1920,\n" +
+                "            \"has_b_frames\": 0,\n" +
+                "            \"sample_aspect_ratio\": \"1:1\",\n" +
+                "            \"display_aspect_ratio\": \"9:16\",\n" +
+                "            \"pix_fmt\": \"yuv420p\",\n" +
+                "            \"level\": 40,\n" +
+                "            \"color_range\": \"tv\",\n" +
+                "            \"color_space\": \"bt709\",\n" +
+                "            \"color_transfer\": \"bt709\",\n" +
+                "            \"color_primaries\": \"bt709\",\n" +
+                "            \"chroma_location\": \"left\",\n" +
+                "            \"refs\": 1,\n" +
+                "            \"is_avc\": \"true\",\n" +
+                "            \"nal_length_size\": \"4\",\n" +
+                "            \"r_frame_rate\": \"180000/2\",\n" +
+                "            \"avg_frame_rate\": \"244620000/12864731\",\n" +
+                "            \"time_base\": \"1/90000\",\n" +
+                "            \"start_pts\": 0,\n" +
+                "            \"start_time\": \"0.000000\",\n" +
+                "            \"duration_ts\": 12864731,\n" +
+                "            \"duration\": \"142.941456\",\n" +
+                "            \"bit_rate\": \"4499166\",\n" +
+                "            \"bits_per_raw_sample\": \"8\",\n" +
+                "            \"nb_frames\": \"2718\",\n" +
+                "            \"disposition\": {\n" +
+                "                \"default\": 1,\n" +
+                "                \"dub\": 0,\n" +
+                "                \"original\": 0,\n" +
+                "                \"comment\": 0,\n" +
+                "                \"lyrics\": 0,\n" +
+                "                \"karaoke\": 0,\n" +
+                "                \"forced\": 0,\n" +
+                "                \"hearing_impaired\": 0,\n" +
+                "                \"visual_impaired\": 0,\n" +
+                "                \"clean_effects\": 0,\n" +
+                "                \"attached_pic\": 0\n" +
+                "            },\n" +
+                "            \"tags\": {\n" +
+                "                \"creation_time\": \"2018-01-02 00:09:32\",\n" +
+                "                \"language\": \"eng\",\n" +
+                "                \"handler_name\": \"VideoHandle\"\n" +
+                "            }\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"index\": 1,\n" +
+                "            \"codec_name\": \"aac\",\n" +
+                "            \"codec_long_name\": \"AAC (Advanced Audio Coding)\",\n" +
+                "            \"profile\": \"LC\",\n" +
+                "            \"codec_type\": \"audio\",\n" +
+                "            \"codec_time_base\": \"1/22050\",\n" +
+                "            \"codec_tag_string\": \"mp4a\",\n" +
+                "            \"codec_tag\": \"0x6134706d\",\n" +
+                "            \"sample_fmt\": \"fltp\",\n" +
+                "            \"sample_rate\": \"22050\",\n" +
+                "            \"channels\": 1,\n" +
+                "            \"channel_layout\": \"mono\",\n" +
+                "            \"bits_per_sample\": 0,\n" +
+                "            \"r_frame_rate\": \"0/0\",\n" +
+                "            \"avg_frame_rate\": \"0/0\",\n" +
+                "            \"time_base\": \"1/44100\",\n" +
+                "            \"start_pts\": 0,\n" +
+                "            \"start_time\": \"0.000000\",\n" +
+                "            \"duration_ts\": 6286221,\n" +
+                "            \"duration\": \"142.544694\",\n" +
+                "            \"bit_rate\": \"63860\",\n" +
+                "            \"nb_frames\": \"3064\",\n" +
+                "            \"disposition\": {\n" +
+                "                \"default\": 1,\n" +
+                "                \"dub\": 0,\n" +
+                "                \"original\": 0,\n" +
+                "                \"comment\": 0,\n" +
+                "                \"lyrics\": 0,\n" +
+                "                \"karaoke\": 0,\n" +
+                "                \"forced\": 0,\n" +
+                "                \"hearing_impaired\": 0,\n" +
+                "                \"visual_impaired\": 0,\n" +
+                "                \"clean_effects\": 0,\n" +
+                "                \"attached_pic\": 0\n" +
+                "            },\n" +
+                "            \"tags\": {\n" +
+                "                \"creation_time\": \"2018-01-02 00:09:32\",\n" +
+                "                \"language\": \"eng\",\n" +
+                "                \"handler_name\": \"SoundHandle\"\n" +
+                "            }\n" +
+                "        }\n" +
+                "    ],\n" +
+                "    \"format\": {\n" +
+                "        \"filename\": \"/Users/test/Downloads/ScreenRecord-2018-01-01-19-07-10.mp4\",\n" +
+                "        \"nb_streams\": 2,\n" +
+                "        \"nb_programs\": 0,\n" +
+                "        \"format_name\": \"mov,mp4,m4a,3gp,3g2,mj2\",\n" +
+                "        \"format_long_name\": \"QuickTime / MOV\",\n" +
+                "        \"start_time\": \"0.000000\",\n" +
+                "        \"duration\": \"142.862000\",\n" +
+                "        \"size\": \"81603639\",\n" +
+                "        \"bit_rate\": \"4569648\",\n" +
+                "        \"probe_score\": 100,\n" +
+                "        \"tags\": {\n" +
+                "            \"major_brand\": \"mp42\",\n" +
+                "            \"minor_version\": \"0\",\n" +
+                "            \"compatible_brands\": \"isommp42\",\n" +
+                "            \"creation_time\": \"2018-01-02 00:09:32\",\n" +
+                "            \"com.android.version\": \"7.1.2\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}\n";
+
+        info = FFmpegUtil.parseMediaInfo(file, string);
+
+        assertEquals(file, info.file);
+        assertEquals( 142862, info.durationMs);
         assertEquals(MediaContainer.MP4, info.container);
         assertEquals(VideoCodec.H264, info.videoCodec);
         assertEquals("1080x1920", info.videoResolution);
-        assertEquals(Integer.valueOf(4499), info.videoBitrate);
+        assertEquals(Integer.valueOf(4499), info.videoBitrateK);
         assertEquals("19.01", info.videoFramerate);
         assertEquals(AudioCodec.AAC, info.audioCodec);
         assertEquals(Integer.valueOf(22050), info.audioSampleRate);
-        assertEquals(Integer.valueOf(63), info.audioBitrate);
+        assertEquals(Integer.valueOf(63), info.audioBitrateK);
         assertEquals(Integer.valueOf(1), info.audioChannels);
 
-        string = "libavutil      55. 17.103 / 55. 17.103\n" +
-                "libavcodec     57. 24.102 / 57. 24.102\n" +
-                "libavformat    57. 25.100 / 57. 25.100\n" +
-                "libavdevice    57.  0.101 / 57.  0.101\n" +
-                "libavfilter     6. 31.100 /  6. 31.100\n" +
-                "libswscale      4.  0.100 /  4.  0.100\n" +
-                "libswresample   2.  0.101 /  2.  0.101\n" +
-                "libpostproc    54.  0.100 / 54.  0.100\n" +
-                "Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/storage/self/primary/Movies/cut_video.mp4':\n" +
-                "Metadata:\n" +
-                "  major_brand     : isom\n" +
-                "  minor_version   : 512\n" +
-                "  compatible_brands: isomiso2mp41\n" +
-                "  encoder         : Lavf57.25.100\n" +
-                "Duration: 00:00:10.05, start: 0.035420, bitrate: 754 kb/s\n" +
-                "  Stream #0:0(und): Video: mpeg4 (Simple Profile) (mp4v / 0x7634706D), yuv420p, 320x240 [SAR 1:1 DAR 4:3], 705 kb/s, 25 fps, 25 tbr, 12800 tbn, 25 tbc (default)\n" +
-                "  Metadata:\n" +
-                "    handler_name    : VideoHandler\n" +
-                "  Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 22050 Hz, stereo, fltp, 47 kb/s (default)\n" +
-                "  Metadata:\n" +
-                "    handler_name    : SoundHandler";
+        string = "{\n" +
+                "    \"streams\": [\n" +
+                "        {\n" +
+                "            \"index\": 0,\n" +
+                "            \"codec_name\": \"h264\",\n" +
+                "            \"codec_long_name\": \"H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10\",\n" +
+                "            \"profile\": \"Main\",\n" +
+                "            \"codec_type\": \"video\",\n" +
+                "            \"codec_time_base\": \"1/50\",\n" +
+                "            \"codec_tag_string\": \"[0][0][0][0]\",\n" +
+                "            \"codec_tag\": \"0x0000\",\n" +
+                "            \"width\": 640,\n" +
+                "            \"height\": 360,\n" +
+                "            \"coded_width\": 640,\n" +
+                "            \"coded_height\": 360,\n" +
+                "            \"has_b_frames\": 0,\n" +
+                "            \"sample_aspect_ratio\": \"1:1\",\n" +
+                "            \"display_aspect_ratio\": \"16:9\",\n" +
+                "            \"pix_fmt\": \"yuv420p\",\n" +
+                "            \"level\": 30,\n" +
+                "            \"chroma_location\": \"left\",\n" +
+                "            \"refs\": 1,\n" +
+                "            \"is_avc\": \"true\",\n" +
+                "            \"nal_length_size\": \"4\",\n" +
+                "            \"r_frame_rate\": \"25/1\",\n" +
+                "            \"avg_frame_rate\": \"25/1\",\n" +
+                "            \"time_base\": \"1/1000\",\n" +
+                "            \"start_pts\": 0,\n" +
+                "            \"start_time\": \"0.000000\",\n" +
+                "            \"bits_per_raw_sample\": \"8\",\n" +
+                "            \"disposition\": {\n" +
+                "                \"default\": 0,\n" +
+                "                \"dub\": 0,\n" +
+                "                \"original\": 0,\n" +
+                "                \"comment\": 0,\n" +
+                "                \"lyrics\": 0,\n" +
+                "                \"karaoke\": 0,\n" +
+                "                \"forced\": 0,\n" +
+                "                \"hearing_impaired\": 0,\n" +
+                "                \"visual_impaired\": 0,\n" +
+                "                \"clean_effects\": 0,\n" +
+                "                \"attached_pic\": 0\n" +
+                "            }\n" + "        },\n" +
+                "        {\n" +
+                "            \"index\": 1,\n" +
+                "            \"codec_name\": \"aac\",\n" +
+                "            \"codec_long_name\": \"AAC (Advanced Audio Coding)\",\n" +
+                "            \"profile\": \"LC\",\n" +
+                "            \"codec_type\": \"audio\",\n" +
+                "            \"codec_time_base\": \"1/44100\",\n" +
+                "            \"codec_tag_string\": \"[0][0][0][0]\",\n" +
+                "            \"codec_tag\": \"0x0000\",\n" +
+                "            \"sample_fmt\": \"fltp\",\n" +
+                "            \"sample_rate\": \"48000\",\n" +
+                "            \"channels\": 6,\n" +
+                "            \"channel_layout\": \"5.1\",\n" +
+                "            \"bits_per_sample\": 0,\n" +
+                "            \"r_frame_rate\": \"0/0\",\n" +
+                "            \"avg_frame_rate\": \"0/0\",\n" +
+                "            \"time_base\": \"1/1000\",\n" +
+                "            \"start_pts\": 3,\n" +
+                "            \"start_time\": \"0.003000\",\n" +
+                "            \"disposition\": {\n" +
+                "                \"default\": 0,\n" +
+                "                \"dub\": 0,\n" +
+                "                \"original\": 0,\n" +
+                "                \"comment\": 0,\n" +
+                "                \"lyrics\": 0,\n" +
+                "                \"karaoke\": 0,\n" +
+                "                \"forced\": 0,\n" +
+                "                \"hearing_impaired\": 0,\n" +
+                "                \"visual_impaired\": 0,\n" +
+                "                \"clean_effects\": 0,\n" +
+                "                \"attached_pic\": 0\n" +
+                "            }\n" +
+                "        }\n" +
+                "    ],\n" +
+                "    \"format\": {\n" +
+                "        \"filename\": \"/Users/test/Downloads/big_buck_bunny_360p_1mb.flv\",\n" +
+                "        \"nb_streams\": 2,\n" +
+                "        \"nb_programs\": 0,\n" +
+                "        \"format_name\": \"flv\",\n" +
+                "        \"format_long_name\": \"FLV (Flash Video)\",\n" +
+                "        \"start_time\": \"0.000000\",\n" +
+                "        \"duration\": \"6.893000\",\n" +
+                "        \"size\": \"1048720\",\n" +
+                "        \"bit_rate\": \"1217142\",\n" +
+                "        \"probe_score\": 100,\n" +
+                "        \"tags\": {\n" +
+                "            \"encoder\": \"Lavf53.24.2\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+
 
         info = FFmpegUtil.parseMediaInfo(file, string);
 
         assertEquals(file, info.file);
-        assertEquals( (10)*1000 + 5, info.durationMs);
-        assertEquals(MediaContainer.MP4, info.container);
-        assertEquals(VideoCodec.MPEG4, info.videoCodec);
-        assertEquals("320x240", info.videoResolution);
-        assertEquals(Integer.valueOf(705), info.videoBitrate);
-        assertEquals("25", info.videoFramerate);
-        assertEquals(AudioCodec.AAC, info.audioCodec);
-        assertEquals(Integer.valueOf(22050), info.audioSampleRate);
-        assertEquals(Integer.valueOf(47), info.audioBitrate);
-        assertEquals(Integer.valueOf(2), info.audioChannels);
-
-        string = "Input #0, flv, from 'SampleVideo_360x240_1mb.flv':\n" +
-                "  Metadata:\n" + "    encoder         : Lavf53.24.2\n" +
-                "  Duration: 00:00:10.64, start: 0.000000, bitrate: 792 kb/s\n" +
-                "    Stream #0:0: Audio: aac (LC), 48000 Hz, 5.1, fltp\n" +
-                "    Stream #0:1: Video: flv1, yuv420p, 320x240, 25 fps, 25 tbr, 1k tbn";
-
-        info = FFmpegUtil.parseMediaInfo(file, string);
-
-        assertEquals(file, info.file);
-        assertEquals( (10)*1000 + 64, info.durationMs);
+        assertEquals( 6893, info.durationMs);
         assertEquals(MediaContainer.FLV, info.container);
-        assertEquals(null, info.videoCodec);
-        assertEquals("320x240", info.videoResolution);
-        assertEquals(Integer.valueOf(692), info.videoBitrate); // This is guessed from total bitrate
+        assertEquals(VideoCodec.H264, info.videoCodec);
+        assertEquals("640x360", info.videoResolution);
+        assertEquals(Integer.valueOf(1117), info.videoBitrateK); // This is guessed from total bitrate
         assertEquals("25", info.videoFramerate);
         assertEquals(AudioCodec.AAC, info.audioCodec);
         assertEquals(Integer.valueOf(48000), info.audioSampleRate);
-        assertEquals(null, info.audioBitrate);
+        assertEquals(null, info.audioBitrateK);
         assertEquals(Integer.valueOf(2), info.audioChannels);
 
-        string = "Input #0, flv, from 'SampleVideo_360x240_1mb.flv':\n" +
-                "  Metadata:\n" + "    encoder         : Lavf53.24.2\n" +
-                "  Duration: 00:00:10.64, start: 0.000000, bitrate: 792 kb/s\n" +
-                "    Stream #0:0: Audio: aac (LC), 48000 Hz, 5.1, fltp, 92 kb/s (default)\n" +
-                "    Stream #0:1: Video: flv1, yuv420p, 320x240, 25 fps, 25 tbr, 1k tbn";
+
+        string = "{\n" +
+                "    \"streams\": [\n" +
+                "        {\n" +
+                "            \"index\": 0,\n" +
+                "            \"codec_name\": \"h264\",\n" +
+                "            \"codec_long_name\": \"H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10\",\n" +
+                "            \"profile\": \"Main\",\n" +
+                "            \"codec_type\": \"video\",\n" +
+                "            \"codec_time_base\": \"1/50\",\n" +
+                "            \"codec_tag_string\": \"[0][0][0][0]\",\n" +
+                "            \"codec_tag\": \"0x0000\",\n" +
+                "            \"width\": 640,\n" +
+                "            \"height\": 360,\n" +
+                "            \"coded_width\": 640,\n" +
+                "            \"coded_height\": 360,\n" +
+                "            \"has_b_frames\": 0,\n" +
+                "            \"sample_aspect_ratio\": \"1:1\",\n" +
+                "            \"display_aspect_ratio\": \"16:9\",\n" +
+                "            \"pix_fmt\": \"yuv420p\",\n" +
+                "            \"level\": 30,\n" +
+                "            \"chroma_location\": \"left\",\n" +
+                "            \"refs\": 1,\n" +
+                "            \"is_avc\": \"true\",\n" +
+                "            \"nal_length_size\": \"4\",\n" +
+                "            \"r_frame_rate\": \"25/1\",\n" +
+                "            \"avg_frame_rate\": \"25/1\",\n" +
+                "            \"time_base\": \"1/1000\",\n" +
+                "            \"start_pts\": 0,\n" +
+                "            \"start_time\": \"0.000000\",\n" +
+                "            \"bits_per_raw_sample\": \"8\",\n" +
+                "            \"disposition\": {\n" +
+                "                \"default\": 0,\n" +
+                "                \"dub\": 0,\n" +
+                "                \"original\": 0,\n" +
+                "                \"comment\": 0,\n" +
+                "                \"lyrics\": 0,\n" +
+                "                \"karaoke\": 0,\n" +
+                "                \"forced\": 0,\n" +
+                "                \"hearing_impaired\": 0,\n" +
+                "                \"visual_impaired\": 0,\n" +
+                "                \"clean_effects\": 0,\n" +
+                "                \"attached_pic\": 0\n" +
+                "            }\n" + "        },\n" +
+                "        {\n" +
+                "            \"index\": 1,\n" +
+                "            \"codec_name\": \"aac\",\n" +
+                "            \"codec_long_name\": \"AAC (Advanced Audio Coding)\",\n" +
+                "            \"profile\": \"LC\",\n" +
+                "            \"codec_type\": \"audio\",\n" +
+                "            \"codec_time_base\": \"1/44100\",\n" +
+                "            \"codec_tag_string\": \"[0][0][0][0]\",\n" +
+                "            \"codec_tag\": \"0x0000\",\n" +
+                "            \"sample_fmt\": \"fltp\",\n" +
+                "            \"sample_rate\": \"48000\",\n" +
+                "            \"channels\": 6,\n" +
+                "            \"channel_layout\": \"5.1\",\n" +
+                "            \"bits_per_sample\": 0,\n" +
+                "            \"r_frame_rate\": \"0/0\",\n" +
+                "            \"avg_frame_rate\": \"0/0\",\n" +
+                "            \"time_base\": \"1/1000\",\n" +
+                "            \"start_pts\": 3,\n" +
+                "            \"start_time\": \"0.003000\",\n" +
+                "            \"bit_rate\": 517000,\n" + // Not actually from this file, just added here for the tests
+                "            \"disposition\": {\n" +
+                "                \"default\": 0,\n" +
+                "                \"dub\": 0,\n" +
+                "                \"original\": 0,\n" +
+                "                \"comment\": 0,\n" +
+                "                \"lyrics\": 0,\n" +
+                "                \"karaoke\": 0,\n" +
+                "                \"forced\": 0,\n" +
+                "                \"hearing_impaired\": 0,\n" +
+                "                \"visual_impaired\": 0,\n" +
+                "                \"clean_effects\": 0,\n" +
+                "                \"attached_pic\": 0\n" +
+                "            }\n" +
+                "        }\n" +
+                "    ],\n" +
+                "    \"format\": {\n" +
+                "        \"filename\": \"/Users/test/Downloads/big_buck_bunny_360p_1mb.flv\",\n" +
+                "        \"nb_streams\": 2,\n" +
+                "        \"nb_programs\": 0,\n" +
+                "        \"format_name\": \"flv\",\n" +
+                "        \"format_long_name\": \"FLV (Flash Video)\",\n" +
+                "        \"start_time\": \"0.000000\",\n" +
+                "        \"duration\": \"6.893000\",\n" +
+                "        \"size\": \"1048720\",\n" +
+                "        \"bit_rate\": \"1217142\",\n" +
+                "        \"probe_score\": 100,\n" +
+                "        \"tags\": {\n" +
+                "            \"encoder\": \"Lavf53.24.2\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
 
         info = FFmpegUtil.parseMediaInfo(file, string);
 
-        assertEquals(Integer.valueOf(700), info.videoBitrate); // This is guessed from total and audio bitrate
+        assertEquals(Integer.valueOf(700), info.videoBitrateK); // This is guessed from total and audio bitrate
     }
 
     @Test
