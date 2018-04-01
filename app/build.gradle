@@ -12,8 +12,8 @@ android {
         applicationId "protect.videoeditor"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 6
-        versionName "0.6"
+        versionCode 7
+        versionName "0.7a"
     }
     buildTypes {
         release {
