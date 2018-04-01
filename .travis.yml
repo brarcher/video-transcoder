@@ -1,6 +1,11 @@
 language: android
 sudo: true
 
+android:
+  components:
+    - android-22
+    - sys-img-armeabi-v7a-android-22
+
 install:
 - echo y | android update sdk -u -a -t tools
 - echo y | android update sdk -u -a -t platform-tools
@@ -8,8 +13,17 @@ install:
 - yes | sdkmanager "platforms;android-27"
 - echo y | android update sdk -u -a -t extra-google-m2repository
 - echo y | android update sdk -u -a -t extra-android-m2repository
+- git clone https://github.com/brarcher/ffmpeg-static.git --depth 1
+- sudo mv ffmpeg-static/ffprobe /usr/bin
 
-script: ./gradlew assembleRelease testReleaseUnitTest lintRelease findbugs
+script:
+- ./gradlew assembleRelease testReleaseUnitTest lintRelease findbugs
+- echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a --sdcard 50M
+- emulator -avd test -no-skin -no-audio -no-window &
+- android-wait-for-emulator
+- adb shell input keyevent 82 &
+- ./gradlew installDebug
+- python2 app/src/test/shell/test.py
 
 after_failure:
 - cat app/build/reports/findbugs/findbugs.html
