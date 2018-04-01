@@ -374,7 +374,7 @@ public class MainActivity extends AppCompatActivity
         fileChooser.show();
     }
 
-    private List<String> getFfmpegEncodingArgs(String inputFilePath, int startTimeSec, int endTimeSec, int durationSec,
+    private List<String> getFfmpegEncodingArgs(String inputFilePath, Integer startTimeSec, Integer endTimeSec, Integer durationSec,
                                                MediaContainer container, VideoCodec videoCodec, Integer videoBitrate,
                                                String resolution, String fps, AudioCodec audioCodec, Integer audioSampleRate,
                                                String audioChannel, Integer audioBitrate, String destinationFilePath)
@@ -388,14 +388,14 @@ public class MainActivity extends AppCompatActivity
         command.add("-i");
         command.add(inputFilePath);
 
-        if (startTimeSec != 0)
+        if (startTimeSec != null && startTimeSec != 0)
         {
             // Start time offset
             command.add("-ss");
             command.add(Integer.toString(startTimeSec));
         }
 
-        if(durationSec != endTimeSec)
+        if(durationSec != null && endTimeSec != null && durationSec.equals(endTimeSec) == false)
         {
             // Duration of media file
             command.add("-t");
@@ -472,6 +472,34 @@ public class MainActivity extends AppCompatActivity
         return command;
     }
 
+    private void startEncode(String inputFilePath, int startTimeSec, int endTimeSec, int durationSec,
+                             MediaContainer container, VideoCodec videoCodec, Integer videoBitrate,
+                             String resolution, String fps, AudioCodec audioCodec, Integer audioSampleRate,
+                             String audioChannel, Integer audioBitrate, String destinationFilePath)
+    {
+        List<String> args = getFfmpegEncodingArgs(inputFilePath, startTimeSec, endTimeSec, durationSec,
+                container, videoCodec, videoBitrate, resolution, fps, audioCodec, audioSampleRate,
+                audioChannel, audioBitrate, destinationFilePath);
+
+        updateUiForEncoding();
+
+        boolean success = false;
+        try
+        {
+            Log.d(TAG, "Sending encode request to service");
+            success = ffmpegService.startEncode(args, destinationFilePath, container.mimetype, durationSec*1000);
+        }
+        catch (RemoteException e)
+        {
+            Log.w(TAG, "Failed to send encode request to service", e);
+        }
+
+        if(success == false)
+        {
+            updateUiForVideoSettings();
+        }
+    }
+
     private void startEncode()
     {
         MediaContainer container = (MediaContainer)containerSpinner.getSelectedItem();
@@ -529,27 +557,9 @@ public class MainActivity extends AppCompatActivity
         int endTimeSec = rangeSeekBar.getSelectedMaxValue().intValue();
         int durationSec = endTimeSec - startTimeSec;
 
-        List<String> args = getFfmpegEncodingArgs(inputFilePath, startTimeSec, endTimeSec, durationSec,
-                container, videoCodec, videoBitrate, resolution, fps, audioCodec, audioSampleRate,
-                audioChannel, audioBitrate, destination.getAbsolutePath());
-
-        updateUiForEncoding();
-
-        boolean success = false;
-        try
-        {
-            Log.d(TAG, "Sending encode request to service");
-            success = ffmpegService.startEncode(args, destination.getAbsolutePath(), container.mimetype, durationSec*1000);
-        }
-        catch (RemoteException e)
-        {
-            Log.w(TAG, "Failed to send encode request to service", e);
-        }
-
-        if(success == false)
-        {
-            updateUiForVideoSettings();
-        }
+        startEncode(inputFilePath, startTimeSec, endTimeSec, durationSec, container, videoCodec,
+                                    videoBitrate, resolution, fps, audioCodec, audioSampleRate, audioChannel,
+                                    audioBitrate, destination.getAbsolutePath());
     }
 
     private void updateUiForEncoding()
