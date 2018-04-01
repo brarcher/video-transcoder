@@ -374,6 +374,104 @@ public class MainActivity extends AppCompatActivity
         fileChooser.show();
     }
 
+    private List<String> getFfmpegEncodingArgs(String inputFilePath, int startTimeSec, int endTimeSec, int durationSec,
+                                               MediaContainer container, VideoCodec videoCodec, Integer videoBitrate,
+                                               String resolution, String fps, AudioCodec audioCodec, Integer audioSampleRate,
+                                               String audioChannel, Integer audioBitrate, String destinationFilePath)
+    {
+        List<String> command = new LinkedList<>();
+
+        // If the output exists, overwrite it
+        command.add("-y");
+
+        // Input file
+        command.add("-i");
+        command.add(inputFilePath);
+
+        if (startTimeSec != 0)
+        {
+            // Start time offset
+            command.add("-ss");
+            command.add(Integer.toString(startTimeSec));
+        }
+
+        if(durationSec != endTimeSec)
+        {
+            // Duration of media file
+            command.add("-t");
+            command.add(Integer.toString(durationSec));
+        }
+
+        if (container.supportedVideoCodecs.size() > 0)
+        {
+            // These options only apply when not using GIF
+            if (videoCodec != VideoCodec.GIF)
+            {
+                // Video codec
+                command.add("-vcodec");
+                command.add(videoCodec.ffmpegName);
+
+                // Video bitrate
+                command.add("-b:v");
+                command.add(videoBitrate + "k");
+            }
+
+            // Frame size
+            command.add("-s");
+            command.add(resolution);
+
+            // Frame rate
+            command.add("-r");
+            command.add(fps);
+        } else
+        {
+            // No video
+            command.add("-vn");
+        }
+
+        if (container.supportedAudioCodecs.size() > 0 && audioCodec != AudioCodec.NONE)
+        {
+            // Audio codec
+            command.add("-acodec");
+            command.add(audioCodec.ffmpegName);
+
+            if (audioCodec == AudioCodec.VORBIS)
+            {
+                // The vorbis encode is experimental, and needs other
+                // flags to enable
+                command.add("-strict");
+                command.add("-2");
+            }
+
+            // Sample rate
+            command.add("-ar");
+            command.add(Integer.toString(audioSampleRate));
+
+            // Channels
+            command.add("-ac");
+            command.add(audioChannel);
+
+            // Audio bitrate
+            command.add("-b:a");
+            command.add(audioBitrate + "k");
+        } else
+        {
+            // No audio
+            command.add("-an");
+        }
+
+        if (container == MediaContainer.GIF)
+        {
+            command.add("-filter_complex");
+            command.add("fps=" + fps + ",split [o1] [o2];[o1] palettegen [p]; [o2] fifo [o3];[o3] [p] paletteuse");
+        }
+
+        // Output file
+        command.add(destinationFilePath);
+
+        return command;
+    }
+
     private void startEncode()
     {
         MediaContainer container = (MediaContainer)containerSpinner.getSelectedItem();
@@ -415,21 +513,7 @@ public class MainActivity extends AppCompatActivity
             outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
         }
 
-        if(outputDir.exists() == false)
-        {
-            boolean result = outputDir.mkdirs();
-            if(result == false)
-            {
-                Log.w(TAG, "Unable to create destination dir: " + outputDir.getAbsolutePath());
-            }
-        }
-
-        String filePrefix = videoInfo.file.getName();
-        if(filePrefix.contains("."))
-        {
-            filePrefix = filePrefix.substring(0, filePrefix.lastIndexOf("."));
-        }
-
+        String filePrefix = "Video_Transcoder_Output";
         String extension = "." + container.extension;
         String inputFilePath = videoInfo.file.getAbsolutePath();
 
@@ -441,100 +525,13 @@ public class MainActivity extends AppCompatActivity
             destination = new File(outputDir, filePrefix + "_" + fileNo + extension);
         }
 
-        List<String> command = new LinkedList<>();
-
-        // If the output exists, overwrite it
-        command.add("-y");
-
-        // Input file
-        command.add("-i");
-        command.add(inputFilePath);
-
         int startTimeSec = rangeSeekBar.getSelectedMinValue().intValue();
-        if(startTimeSec != 0)
-        {
-            // Start time offset
-            command.add("-ss");
-            command.add(Integer.toString(startTimeSec));
-        }
-
         int endTimeSec = rangeSeekBar.getSelectedMaxValue().intValue();
         int durationSec = endTimeSec - startTimeSec;
-        if( (videoInfo.durationMs)/1000 != endTimeSec)
-        {
-            // Duration of media file
-            command.add("-t");
-            command.add(Integer.toString(durationSec));
-        }
 
-        if(container.supportedVideoCodecs.size() > 0)
-        {
-            // These options only apply when not using GIF
-            if(videoCodec != VideoCodec.GIF)
-            {
-                // Video codec
-                command.add("-vcodec");
-                command.add(videoCodec.ffmpegName);
-
-                // Video bitrate
-                command.add("-b:v");
-                command.add(videoBitrate + "k");
-            }
-
-            // Frame size
-            command.add("-s");
-            command.add(resolution);
-
-            // Frame rate
-            command.add("-r");
-            command.add(fps);
-        }
-        else
-        {
-            // No video
-            command.add("-vn");
-        }
-
-        if(container.supportedAudioCodecs.size() > 0 && audioCodec != AudioCodec.NONE)
-        {
-            // Audio codec
-            command.add("-acodec");
-            command.add(audioCodec.ffmpegName);
-
-            if(audioCodec == AudioCodec.VORBIS)
-            {
-                // The vorbis encode is experimental, and needs other
-                // flags to enable
-                command.add("-strict");
-                command.add("-2");
-            }
-
-            // Sample rate
-            command.add("-ar");
-            command.add(Integer.toString(audioSampleRate));
-
-            // Channels
-            command.add("-ac");
-            command.add(audioChannel);
-
-            // Audio bitrate
-            command.add("-b:a");
-            command.add(audioBitrate + "k");
-        }
-        else
-        {
-            // No audio
-            command.add("-an");
-        }
-
-        if(container == MediaContainer.GIF)
-        {
-            command.add("-filter_complex");
-            command.add("fps=" + fps + ",split [o1] [o2];[o1] palettegen [p]; [o2] fifo [o3];[o3] [p] paletteuse");
-        }
-
-        // Output file
-        command.add(destination.getAbsolutePath());
+        List<String> args = getFfmpegEncodingArgs(inputFilePath, startTimeSec, endTimeSec, durationSec,
+                container, videoCodec, videoBitrate, resolution, fps, audioCodec, audioSampleRate,
+                audioChannel, audioBitrate, destination.getAbsolutePath());
 
         updateUiForEncoding();
 
@@ -542,7 +539,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             Log.d(TAG, "Sending encode request to service");
-            success = ffmpegService.startEncode(command, destination.getAbsolutePath(), container.mimetype, durationSec*1000);
+            success = ffmpegService.startEncode(args, destination.getAbsolutePath(), container.mimetype, durationSec*1000);
         }
         catch (RemoteException e)
         {
