@@ -44,6 +44,7 @@ dependencies {
     compile 'commons-io:commons-io:2.5'
     compile group: 'com.google.guava', name: 'guava', version: '20.0'
     compile 'com.github.codekidX:storage-chooser:2.0.3'
+    implementation group: 'org.javatuples', name: 'javatuples', version: '1.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.8.11.1'
     testCompile 'junit:junit:4.12'
     testCompile "org.robolectric:robolectric:3.6.1"

@@ -27,8 +27,13 @@
     <string name="selectFileFirst">You must select a file to encode first.</string>
     <string name="videoBitrateValueInvalid">Video bitrate value is invalid, could not encode.</string>
     <string name="encodingNotification">Encoding <xliff:g id="input_filename">%s</xliff:g></string>
+    <string name="encodeStartConfirmation">Do you want to encode <xliff:g id="input_filename">%s</xliff:g> and output to <xliff:g id="output_filename">%s</xliff:g>?</string>
     <string name="transcodeSuccess">Encoding completed successfully. The file was written to:\n<xliff:g id="path">%s</xliff:g></string>
     <string name="transcodeFailed">Encoding failed: <xliff:g id="failure_message">%s</xliff:g></string>
+    <string name="cannotEncodeFile">Cannot encode file: <xliff:g id="failure_description">%s</xliff:g></string>
+    <string name="couldNotFindFileSubmsg">could not find input file</string>
+    <string name="fieldMissingError"><xliff:g id="field_name">%s</xliff:g> missing</string>
+    <string name="fieldMissingOrInvalidError"><xliff:g id="field_name">%s</xliff:g> missing or invalid</string>
 
     <string name="writePermissionExplanation">This application needs access to storage in order to read and write media files. Without this access, the application cannot transcode.</string>
     <string name="permissionRequestAgain">Request again</string>
