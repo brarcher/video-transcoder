@@ -304,6 +304,8 @@ public class MainActivity extends AppCompatActivity
         int tmpAudioBitrateK = intent.getIntExtra("audioBitrateK", -1);
         final Integer audioBitrateK = tmpAudioBitrateK != -1 ? tmpAudioBitrateK : null;
 
+        boolean skipDialog = intent.getBooleanExtra("skipDialog", false);
+
         List<Triplet<Object, Integer, String>> nullChecks = new LinkedList<>();
         nullChecks.add(new Triplet<>((Object)inputFilePath, R.string.fieldMissingError, "inputFilePath"));
         nullChecks.add(new Triplet<>((Object)destinationFilePath, R.string.fieldMissingError, "outputFilePath"));
@@ -338,6 +340,32 @@ public class MainActivity extends AppCompatActivity
 
         String message = String.format(getString(R.string.encodeStartConfirmation), inputFilePath, destinationFilePath);
 
+        DialogInterface.OnClickListener positiveButtonListener = new DialogInterface.OnClickListener()
+        {
+            public void onClick(final DialogInterface dialog, int which)
+            {
+                FFmpegUtil.getMediaDetails(new File(inputFilePath), new ResultCallbackHandler<MediaInfo>()
+                {
+                    @Override
+                    public void onResult(MediaInfo result)
+                    {
+                        if(result != null)
+                        {
+                            startEncode(inputFilePath, 0, (int)(result.durationMs/1000), container, videoCodec, videoBitrateK,
+                                    resolution, fps, audioCodec, audioSampleRate, audioChannel, audioBitrateK, destinationFilePath);
+                        }
+                        else
+                        {
+                            String message = String.format(getString(R.string.transcodeFailed), getString(R.string.couldNotFindFileSubmsg));
+                            Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+                            finish();
+                            dialog.dismiss();
+                        }
+                    }
+                });
+            }
+        };
+
         AlertDialog dialog = new AlertDialog.Builder(this)
             .setMessage(message)
             .setCancelable(false)
@@ -350,33 +378,15 @@ public class MainActivity extends AppCompatActivity
                     dialog.dismiss();
                 }
             })
-            .setPositiveButton(R.string.encode, new DialogInterface.OnClickListener()
-            {
-                public void onClick(final DialogInterface dialog, int which)
-                {
-                    FFmpegUtil.getMediaDetails(new File(inputFilePath), new ResultCallbackHandler<MediaInfo>()
-                    {
-                        @Override
-                        public void onResult(MediaInfo result)
-                        {
-                            if(result != null)
-                            {
-                                startEncode(inputFilePath, 0, (int)(result.durationMs/1000), container, videoCodec, videoBitrateK,
-                                        resolution, fps, audioCodec, audioSampleRate, audioChannel, audioBitrateK, destinationFilePath);
-                            }
-                            else
-                            {
-                                String message = String.format(getString(R.string.transcodeFailed), getString(R.string.couldNotFindFileSubmsg));
-                                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-                                finish();
-                                dialog.dismiss();
-                            }
-                        }
-                    });
-                }
-            }).create();
+            .setPositiveButton(R.string.encode, positiveButtonListener).create();
 
         dialog.show();
+
+        if(skipDialog)
+        {
+            positiveButtonListener.onClick(dialog, 0);
+            dialog.dismiss();
+        }
     }
 
     private void showUnsupportedExceptionDialog()
@@ -1277,6 +1287,16 @@ public class MainActivity extends AppCompatActivity
                                               final String mimetype)
         {
             Log.d(TAG, "Encode result: " + result);
+
+            Intent intent = mainActivity.getIntent();
+            final String action = intent.getAction();
+            boolean skipDialog = intent.getBooleanExtra("skipDialog", false);
+
+            if(skipDialog)
+            {
+                mainActivity.finish();
+                return;
+            }
 
             String message;
 
