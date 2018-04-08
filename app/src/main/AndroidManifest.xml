@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name=".provider.ExportFileProvider"
             android:grantUriPermissions="true"
             android:exported="false"
             android:authorities="${applicationId}">
