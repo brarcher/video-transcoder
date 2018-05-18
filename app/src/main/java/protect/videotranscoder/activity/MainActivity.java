@@ -1406,7 +1406,7 @@ public class MainActivity extends AppCompatActivity
             .put("FFmpeg Android", "https://github.com/bravobit/FFmpeg-Android")
             .put("Guava", "https://github.com/google/guava")
             .put("Crystal Range Seekbar", "https://github.com/syedowaisali/crystal-range-seekbar")
-            .put("Storage Chooser", "https://github.com/codekidX/storage-chooser")
+            .put("NoNonsense-FilePicker", "https://github.com/spacecowboy/NoNonsense-FilePicker")
             .put("javatuples", "https://www.javatuples.org/")
             .put("jackson-databind", "https://github.com/FasterXML/jackson-databind")
             .build();
