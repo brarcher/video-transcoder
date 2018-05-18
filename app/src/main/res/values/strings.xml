@@ -9,6 +9,8 @@
 
     <string name="ok">OK</string>
     <string name="sendLabel">Send&#8230;</string>
+    <string name="share_dialog_title">Share with</string>
+    <string name="share">Share</string>
 
     <string name="basicSettingsTitle">Basic Settings</string>
     <string name="container">Container</string>
@@ -54,4 +56,21 @@
     <string name="app_revision_fmt">Revision Information: <xliff:g id="app_revision_url">%s</xliff:g></string>
     <string name="app_libraries"><xliff:g id="app_name">%s</xliff:g> uses the following third-party libraries: <xliff:g id="app_libraries_list">%s</xliff:g></string>
     <string name="app_resources"><xliff:g id="app_name">%s</xliff:g> uses the following third-party resources: <xliff:g id="app_resources_list">%s</xliff:g></string>
+
+    <!-- error strings -->
+    <string name="app_ui_crash">App/UI crashed</string>
+    <string name="send_email_title">Send Email</string>
+
+    <!-- error activity -->
+    <string name="sorry_string">Sorry, that should not have happened.</string>
+    <string name="error_report_button_text">Report error via e-mail</string>
+    <string name="error_snackbar_message">Sorry, some errors occurred.</string>
+    <string name="error_snackbar_action">REPORT</string>
+    <string name="what_device_headline">Info:</string>
+    <string name="what_happened_headline">What happened:</string>
+    <string name="info_labels">What:\\nRequest:\\nContent Lang:\\nService:\\nGMT Time:\\nPackage:\\nVersion:\\nOS version:</string>
+    <string name="your_comment">Your comment (in English):</string>
+    <string name="error_details_headline">Details:</string>
+    <string name="error_report_title">Error report</string>
+
 </resources>
