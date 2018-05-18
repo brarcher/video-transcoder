@@ -356,7 +356,8 @@ public class MainActivity extends AppCompatActivity
                     {
                         if(result != null)
                         {
-                            startEncode(inputFilePath, 0, (int)(result.durationMs/1000), container, videoCodec, videoBitrateK,
+                            int durationSec = (int)(result.durationMs/1000);
+                            startEncode(inputFilePath, 0, durationSec, durationSec, container, videoCodec, videoBitrateK,
                                     resolution, fps, audioCodec, audioSampleRate, audioChannel, audioBitrateK, destinationFilePath);
                         }
                         else
@@ -521,7 +522,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private List<String> getFfmpegEncodingArgs(String inputFilePath, Integer startTimeSec, Integer endTimeSec,
+    private List<String> getFfmpegEncodingArgs(String inputFilePath, Integer startTimeSec, Integer endTimeSec, Integer fullDurationSec,
                                                MediaContainer container, VideoCodec videoCodec, Integer videoBitrateK,
                                                String resolution, String fps, AudioCodec audioCodec, Integer audioSampleRate,
                                                String audioChannel, Integer audioBitrateK, String destinationFilePath)
@@ -544,13 +545,13 @@ public class MainActivity extends AppCompatActivity
 
         if(startTimeSec != null && endTimeSec != null)
         {
-            int durationSec = endTimeSec - startTimeSec;
+            int subDurationSec = endTimeSec - startTimeSec;
 
-            if (durationSec != endTimeSec)
+            if (fullDurationSec != subDurationSec)
             {
                 // Duration of media file
                 command.add("-t");
-                command.add(Integer.toString(durationSec));
+                command.add(Integer.toString(subDurationSec));
             }
         }
 
@@ -625,12 +626,12 @@ public class MainActivity extends AppCompatActivity
         return command;
     }
 
-    private void startEncode(String inputFilePath, Integer startTimeSec, Integer endTimeSec,
+    private void startEncode(String inputFilePath, Integer startTimeSec, Integer endTimeSec, Integer fullDurationSec,
                              MediaContainer container, VideoCodec videoCodec, Integer videoBitrateK,
                              String resolution, String fps, AudioCodec audioCodec, Integer audioSampleRate,
                              String audioChannel, Integer audioBitrateK, String destinationFilePath)
     {
-        List<String> args = getFfmpegEncodingArgs(inputFilePath, startTimeSec, endTimeSec,
+        List<String> args = getFfmpegEncodingArgs(inputFilePath, startTimeSec, endTimeSec, fullDurationSec,
                 container, videoCodec, videoBitrateK, resolution, fps, audioCodec, audioSampleRate,
                 audioChannel, audioBitrateK, destinationFilePath);
 
@@ -710,7 +711,9 @@ public class MainActivity extends AppCompatActivity
         int startTimeSec = rangeSeekBar.getSelectedMinValue().intValue();
         int endTimeSec = rangeSeekBar.getSelectedMaxValue().intValue();
 
-        startEncode(inputFilePath, startTimeSec, endTimeSec, container, videoCodec,
+        int durationSec = (int)(videoInfo.durationMs/1000);
+
+        startEncode(inputFilePath, startTimeSec, endTimeSec, durationSec, container, videoCodec,
                     videoBitrateK, resolution, fps, audioCodec, audioSampleRate, audioChannel,
                     audioBitrateK, destination.getAbsolutePath());
     }
