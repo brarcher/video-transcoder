@@ -185,7 +185,7 @@ def ffprobe(filename):
     stdout, stderr = p.communicate()
     rc = p.wait()
     if rc != 0:
-        raise Exception("ffprobe failed with " + str(rc) + " on " + filename + ":\n" + stderr)
+        raise Exception("ffprobe failed with " + str(rc) + " on " + filename + ":\n" + stdout + "\n" + stderr)
     data = json.loads(stdout)
     return data
 

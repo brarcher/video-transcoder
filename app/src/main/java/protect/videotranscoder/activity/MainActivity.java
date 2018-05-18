@@ -1,6 +1,7 @@
 package protect.videotranscoder.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,11 +38,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.codekidlabs.storagechooser.StorageChooser;
 import com.crystal.crystalrangeseekbar.interfaces.OnRangeSeekbarChangeListener;
 import com.google.common.collect.ImmutableMap;
 
 import com.crystal.crystalrangeseekbar.widgets.CrystalRangeSeekbar;
+import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.nononsenseapps.filepicker.Utils;
+
 import org.javatuples.Triplet;
 
 import java.io.File;
@@ -80,6 +83,8 @@ public class MainActivity extends AppCompatActivity
     public static final String OUTPUT_MIMETYPE = BuildConfig.APPLICATION_ID + ".OUTPUT_MIMETYPE";
 
     private static final int READ_WRITE_PERMISSION_REQUEST = 1;
+
+    private static final int SELECT_FILE_REQUEST = 2;
 
     final List<Integer> BASIC_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
             R.id.basicSettingsText,
@@ -483,30 +488,37 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Opening gallery for uploading video
+     * Opening gallery for selecting video file
      */
     private void selectVideo()
     {
-        final StorageChooser fileChooser = new StorageChooser.Builder()
-                .withActivity(MainActivity.this)
-                .withFragmentManager(getFragmentManager())
-                .allowCustomPath(true)
-                .setType(StorageChooser.FILE_PICKER)
-                .disableMultiSelect()
-                .build();
+        Intent i = new Intent(this, FilePickerActivity.class);
 
-        // get path that the user has chosen
-        fileChooser.setOnSelectListener(new StorageChooser.OnSelectListener()
+        i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
+        i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
+        i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+
+        i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+
+        startActivityForResult(i, SELECT_FILE_REQUEST);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+    {
+        if (requestCode == SELECT_FILE_REQUEST && resultCode == Activity.RESULT_OK)
         {
-            @Override
-            public void onSelect(String filePath)
-            {
-                Log.i(TAG, "Selected file: " + filePath);
-                setSelectMediaFile(filePath);
-            }
-        });
+            // Use the provided utility method to parse the result
+            List<Uri> files = Utils.getSelectedFilesFromResult(intent);
 
-        fileChooser.show();
+            // There should be at most once result
+            if(files.size() > 0)
+            {
+                File file = Utils.getFileForUri(files.get(0));
+
+                Log.i(TAG, "Selected file: " + file.getAbsolutePath());
+                setSelectMediaFile(file.getAbsolutePath());
+            }
+        }
     }
 
     private List<String> getFfmpegEncodingArgs(String inputFilePath, Integer startTimeSec, Integer endTimeSec,
@@ -1394,7 +1406,7 @@ public class MainActivity extends AppCompatActivity
             .put("FFmpeg Android", "https://github.com/bravobit/FFmpeg-Android")
             .put("Guava", "https://github.com/google/guava")
             .put("Crystal Range Seekbar", "https://github.com/syedowaisali/crystal-range-seekbar")
-            .put("Storage Chooser", "https://github.com/codekidX/storage-chooser")
+            .put("NoNonsense-FilePicker", "https://github.com/spacecowboy/NoNonsense-FilePicker")
             .put("javatuples", "https://www.javatuples.org/")
             .put("jackson-databind", "https://github.com/FasterXML/jackson-databind")
             .build();
