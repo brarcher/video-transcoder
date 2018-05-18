@@ -1412,6 +1412,7 @@ public class MainActivity extends AppCompatActivity
             .put("NoNonsense-FilePicker", "https://github.com/spacecowboy/NoNonsense-FilePicker")
             .put("javatuples", "https://www.javatuples.org/")
             .put("jackson-databind", "https://github.com/FasterXML/jackson-databind")
+            .put("ACRA", "https://github.com/ACRA/acra")
             .build();
 
         final Map<String, String> USED_ASSETS = ImmutableMap.of
