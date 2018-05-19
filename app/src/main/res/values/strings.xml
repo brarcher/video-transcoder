@@ -73,4 +73,6 @@
     <string name="error_details_headline">Details:</string>
     <string name="error_report_title">Error report</string>
 
+    <string name="notificationChannelName">VideoTranscoder Encoding Service</string>
+
 </resources>
