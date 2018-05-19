@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -76,6 +77,9 @@ import protect.videotranscoder.service.MessageId;
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "VideoTranscoder";
+
+    private static final String SHARED_PREFS_KEY = "protect.videotranscoder";
+    private static final String PICKER_DIR_PREF = "picker-start-path";
 
     public static final String MESSENGER_INTENT_KEY = BuildConfig.APPLICATION_ID + ".MESSENGER_INTENT_KEY";
     public static final String FFMPEG_OUTPUT_FILE = BuildConfig.APPLICATION_ID + ".FFMPEG_OUTPUT_FILE";
@@ -499,8 +503,10 @@ public class MainActivity extends AppCompatActivity
         i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
         i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
 
-        i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+        SharedPreferences prefs = getSharedPreferences(SHARED_PREFS_KEY, MODE_PRIVATE);
+        String searchFolder = prefs.getString(PICKER_DIR_PREF, Environment.getExternalStorageDirectory().getPath());
 
+        i.putExtra(FilePickerActivity.EXTRA_START_PATH, searchFolder);
         startActivityForResult(i, SELECT_FILE_REQUEST);
     }
 
@@ -515,6 +521,12 @@ public class MainActivity extends AppCompatActivity
             if(files.size() > 0)
             {
                 File file = Utils.getFileForUri(files.get(0));
+
+                // Save the directory where the file was selected, so the next
+                // file search will start in that directory.
+                String parentDir = file.getParent();
+                SharedPreferences prefs = getSharedPreferences(SHARED_PREFS_KEY, MODE_PRIVATE);
+                prefs.edit().putString(PICKER_DIR_PREF, parentDir).apply();
 
                 Log.i(TAG, "Selected file: " + file.getAbsolutePath());
                 setSelectMediaFile(file.getAbsolutePath());
