@@ -696,6 +696,15 @@ public class MainActivity extends AppCompatActivity
             outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
         }
 
+        if(outputDir.exists() == false)
+        {
+            boolean result = outputDir.mkdirs();
+            if(result == false)
+            {
+                Log.w(TAG, "Unable to create destination dir: " + outputDir.getAbsolutePath());
+            }
+        }
+
         String filePrefix = videoInfo.file.getName();
         if(filePrefix.contains("."))
         {
