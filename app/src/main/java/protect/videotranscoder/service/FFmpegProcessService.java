@@ -1,14 +1,20 @@
 package protect.videotranscoder.service;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -31,6 +37,7 @@ public class FFmpegProcessService extends Service
 {
     private static final String TAG = "VideoTranscoder";
     private static final int NOTIFICATION_ID = 1;
+    private static final String NOTIFICATION_CHANNEL_ID = TAG;
 
     private Messenger _activityMessenger;
 
@@ -183,8 +190,14 @@ public class FFmpegProcessService extends Service
     {
         String message = String.format(getString(R.string.encodingNotification), filename);
 
+        String channelId = "";
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            channelId = createNotificationChannel();
+        }
+
         NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this)
+                new NotificationCompat.Builder(this, channelId)
                         .setOngoing(true)
                         .setSmallIcon(R.drawable.encoding_notification)
                         .setContentTitle(getString(R.string.app_name))
@@ -198,6 +211,27 @@ public class FFmpegProcessService extends Service
         builder.setContentIntent(resultPendingIntent);
 
         startForeground(NOTIFICATION_ID, builder.build());
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private String createNotificationChannel()
+    {
+        String channelId = NOTIFICATION_CHANNEL_ID;
+        String channelName = getString(R.string.notificationChannelName);
+        NotificationChannel chan = new NotificationChannel(channelId,
+                channelName, NotificationManager.IMPORTANCE_LOW);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager service = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        if(service != null)
+        {
+            service.createNotificationChannel(chan);
+        }
+        else
+        {
+            Log.w(TAG, "Could not get NotificationManager");
+        }
+
+        return channelId;
     }
 
     private void clearNotification()
