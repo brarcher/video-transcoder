@@ -626,12 +626,6 @@ public class MainActivity extends AppCompatActivity
             command.add("-an");
         }
 
-        if (container == MediaContainer.GIF)
-        {
-            command.add("-filter_complex");
-            command.add("fps=" + fps + ",split [o1] [o2];[o1] palettegen [p]; [o2] fifo [o3];[o3] [p] paletteuse");
-        }
-
         // Output file
         command.add(destinationFilePath);
 
