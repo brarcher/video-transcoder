@@ -26,5 +26,6 @@ script:
 - python2 app/src/test/shell/test.py
 
 after_failure:
+- adb logcat -d -b main,system,events,crash
 - cat app/build/reports/findbugs/findbugs.html
 - cat app/build/reports/tests/debug/index.html
