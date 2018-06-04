@@ -54,6 +54,7 @@ dependencies {
     compile 'commons-io:commons-io:2.5'
     compile group: 'com.google.guava', name: 'guava', version: '20.0'
     compile 'com.nononsenseapps:filepicker:4.2.1'
+    implementation 'com.simplecityapps:recyclerview-fastscroll:1.0.9'
     implementation group: 'org.javatuples', name: 'javatuples', version: '1.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.8.11.1'
 

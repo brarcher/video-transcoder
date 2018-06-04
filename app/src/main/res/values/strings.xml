@@ -50,7 +50,7 @@
 
     <string name="about">About</string>
     <string name="app_copyright_fmt">Copyright 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
-    <string name="app_license">Licensed under the GPLv2.</string>
+    <string name="app_license">Licensed under the GPLv3.</string>
     <string name="about_title_fmt">About <xliff:g id="app_name">%s</xliff:g></string>
     <string name="debug_version_fmt">Version: <xliff:g id="version">%s</xliff:g></string>
     <string name="app_revision_fmt">Revision Information: <xliff:g id="app_revision_url">%s</xliff:g></string>
