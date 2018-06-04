@@ -71,6 +71,7 @@ import protect.videotranscoder.media.AudioCodec;
 import protect.videotranscoder.media.MediaContainer;
 import protect.videotranscoder.media.MediaInfo;
 import protect.videotranscoder.media.VideoCodec;
+import protect.videotranscoder.picker.FastScrollerFilePickerActivity;
 import protect.videotranscoder.service.FFmpegProcessService;
 import protect.videotranscoder.service.MessageId;
 
@@ -497,7 +498,7 @@ public class MainActivity extends AppCompatActivity
      */
     private void selectVideo()
     {
-        Intent i = new Intent(this, FilePickerActivity.class);
+        Intent i = new Intent(this, FastScrollerFilePickerActivity.class);
 
         i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
         i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
@@ -1433,6 +1434,7 @@ public class MainActivity extends AppCompatActivity
             .put("javatuples", "https://www.javatuples.org/")
             .put("jackson-databind", "https://github.com/FasterXML/jackson-databind")
             .put("ACRA", "https://github.com/ACRA/acra")
+            .put("RecyclerView-FastScroll", "https://github.com/timusus/RecyclerView-FastScroll")
             .build();
 
         final Map<String, String> USED_ASSETS = ImmutableMap.of
