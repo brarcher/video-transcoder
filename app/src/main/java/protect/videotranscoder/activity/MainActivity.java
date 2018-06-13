@@ -1437,24 +1437,12 @@ public class MainActivity extends AppCompatActivity
             .put("RecyclerView-FastScroll", "https://github.com/timusus/RecyclerView-FastScroll")
             .build();
 
-        final Map<String, String> USED_ASSETS = ImmutableMap.of
-        (
-            "Film by Mint Shirt", "https://thenounproject.com/term/film/395618/"
-        );
-
         StringBuilder libs = new StringBuilder().append("<ul>");
         for (Map.Entry<String, String> entry : USED_LIBRARIES.entrySet())
         {
             libs.append("<li><a href=\"").append(entry.getValue()).append("\">").append(entry.getKey()).append("</a></li>");
         }
         libs.append("</ul>");
-
-        StringBuilder resources = new StringBuilder().append("<ul>");
-        for (Map.Entry<String, String> entry : USED_ASSETS.entrySet())
-        {
-            resources.append("<li><a href=\"").append(entry.getValue()).append("\">").append(entry.getKey()).append("</a></li>");
-        }
-        resources.append("</ul>");
 
         String appName = getString(R.string.app_name);
         int year = Calendar.getInstance().get(Calendar.YEAR);
@@ -1492,9 +1480,7 @@ public class MainActivity extends AppCompatActivity
             "</p><hr/><p>" +
             getString(R.string.app_license) +
             "</p><hr/><p>" +
-            String.format(getString(R.string.app_libraries), appName, libs.toString()) +
-            "</p><hr/><p>" +
-            String.format(getString(R.string.app_resources), appName, resources.toString());
+            String.format(getString(R.string.app_libraries), appName, libs.toString());
 
         wv.loadDataWithBaseURL("file:///android_res/drawable/", html, "text/html", "utf-8", null);
         new AlertDialog.Builder(this)

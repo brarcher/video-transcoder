@@ -39,7 +39,3 @@ Windows:
 
 If you are interested in translating this application to another language, create a pull request with changes or find the project listing on  [Transifex](https://www.transifex.com/na-243/video-transcoder).
 
-# Thanks
-
-This application uses the following image:
-- [Film](https://thenounproject.com/term/film/395618/) by [Mint Shirt](https://thenounproject.com/mint10/)
