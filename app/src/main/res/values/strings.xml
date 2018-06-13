@@ -1,7 +1,7 @@
 <resources
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <string name="app_name">Video Transcoder</string>
+    <string name="app_name" translatable="false">Video Transcoder</string>
 
     <string name="selectVideo">Select\nVideo</string>
     <string name="encode">Encode</string>
