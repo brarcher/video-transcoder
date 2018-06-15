@@ -1,0 +1,75 @@
+<resources
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="selectVideo">Selectare\nvideo</string>
+    <string name="encode">Codare</string>
+    <string name="cancel">Anulare</string>
+
+    <string name="ok">Bine</string>
+    <string name="sendLabel">Trimite&#8230;</string>
+    <string name="share_dialog_title">Partajează cu</string>
+    <string name="share">Partajare</string>
+
+    <string name="basicSettingsTitle">Setări de bază</string>
+    <string name="container">Container</string>
+    <string name="videoSettingsTitle">Setări video</string>
+    <string name="codec">Codec</string>
+    <string name="fps">FPS</string>
+    <string name="resolution">Rezoluție</string>
+    <string name="bitrate">Rată de biți (kb/s)</string>
+    <string name="audioSettingsTitle">Setări audio</string>
+    <string name="sampleRate">Rată eșantionare (Hz)</string>
+    <string name="channels">Canale</string>
+
+    <string name="notSupportedTitle">Nu este suportat</string>
+    <string name="notSupportedMessage">Arhitectura procesorului dispozitivului dumneavoastră nu este compatibilă. Doar cea ARM este suportată.</string>
+
+    <string name="selectFileFirst">Trebuie să selectați mai întâi un fișier pentru codare.</string>
+    <string name="videoBitrateValueInvalid">Valoarea pentru rata de biți este invalidă, nu s-a putut face codarea.</string>
+    <string name="encodingNotification">Codare <xliff:g id="input_filename">%s</xliff:g></string>
+    <string name="encodeStartConfirmation">Doriți să codați <xliff:g id="input_filename">%s</xliff:g> și să îl scrieți în <xliff:g id="output_filename">%s</xliff:g>?</string>
+    <string name="transcodeSuccess">Codare finalizată cu succes. Fișierul a fost salvat în:\n<xliff:g id="path">%s</xliff:g></string>
+    <string name="transcodeFailed">Codarea a eșuat: <xliff:g id="failure_message">%s</xliff:g></string>
+    <string name="cannotEncodeFile">Nu s-a putut coda fișierul: <xliff:g id="failure_description">%s</xliff:g></string>
+    <string name="couldNotFindFileSubmsg">nu s-a putut găsii fișierul de intrare</string>
+    <string name="fieldMissingError"><xliff:g id="field_name">%s</xliff:g> lipsește</string>
+    <string name="fieldMissingOrInvalidError"><xliff:g id="field_name">%s</xliff:g> lipsește sau este invalid</string>
+
+    <string name="writePermissionExplanation">Această aplicație are nevoie de acces la spațiul de stocare pentru a citii și scrie fișiere video. Fără acest acces, aplicația nu poate face codarea.</string>
+    <string name="permissionRequestAgain">Cere din nou</string>
+
+    <string name="fileLocationLookupFailed">Nu s-a putut găsii locația fișierului</string>
+    <string name="encodeCanceled">Codarea a fost anulată</string>
+
+    <string name="codecSlowExcellent">Încet, Calitate excelentă</string>
+    <string name="codecFastGood">Rapid, Calitate bună</string>
+    <string name="codecFastOk">Rapid, Calitate OK</string>
+    <string name="codecFastLow">Rapid, Calitate scăzută</string>
+
+    <string name="about">Despre</string>
+    <string name="app_copyright_fmt">Drepturi de autor 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
+    <string name="app_license">Licențiat sub GPLv3.</string>
+    <string name="about_title_fmt">Despre <xliff:g id="app_name">%s</xliff:g></string>
+    <string name="debug_version_fmt">Versiune: <xliff:g id="version">%s</xliff:g></string>
+    <string name="app_revision_fmt">Informații revizie: <xliff:g id="app_revision_url">%s</xliff:g></string>
+    <string name="app_libraries"><xliff:g id="app_name">%s</xliff:g> folosește aceste librării externe: <xliff:g id="app_libraries_list">%s</xliff:g></string>
+    <string name="app_resources"><xliff:g id="app_name">%s</xliff:g> folosește aceste resurse externe: <xliff:g id="app_resources_list">%s</xliff:g></string>
+
+    <!-- error strings -->
+    <string name="app_ui_crash">Aplicația s-a oprit</string>
+    <string name="send_email_title">Trimite e-mail</string>
+
+    <!-- error activity -->
+    <string name="sorry_string">Ne pare rău, asta nu trebuia să se întâmple.</string>
+    <string name="error_report_button_text">Raportează eroarea prin e-mail</string>
+    <string name="error_snackbar_message">Ne pare rău, au avut loc niște erori</string>
+    <string name="error_snackbar_action">RAPORTEAZĂ</string>
+    <string name="what_device_headline">Informații:</string>
+    <string name="what_happened_headline">Ce s-a întâmplat:</string>
+    <string name="your_comment">Comentariul dumneavoastra (în engleză):</string>
+    <string name="error_details_headline">Detalii:</string>
+    <string name="error_report_title">Raport de eroare</string>
+
+    <string name="notificationChannelName">VideoTranscoder serviciu codare</string>
+
+</resources>
