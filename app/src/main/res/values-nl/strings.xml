@@ -1,0 +1,76 @@
+<resources
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="selectVideo">Video\nselecteren</string>
+    <string name="encode">Coderen</string>
+    <string name="cancel">Annuleren</string>
+
+    <string name="ok">Oké</string>
+    <string name="sendLabel">Versturen&#8230;</string>
+    <string name="share_dialog_title">Delen met</string>
+    <string name="share">Delen</string>
+
+    <string name="basicSettingsTitle">Basisinstellingen</string>
+    <string name="container">Container</string>
+    <string name="videoSettingsTitle">Video-instellingen</string>
+    <string name="codec">Codec</string>
+    <string name="fps">FPS</string>
+    <string name="resolution">Resolutie</string>
+    <string name="bitrate">Bitsnelheid (kb/s)</string>
+    <string name="audioSettingsTitle">Audio-instellingen</string>
+    <string name="sampleRate">Fragmentsnelheid (Hz)</string>
+    <string name="channels">Kanalen</string>
+
+    <string name="notSupportedTitle">Geen ondersteuning</string>
+    <string name="notSupportedMessage">De CPU-architectuur van dit apparaat wordt niet ondersteund; alleen ARM wordt ondersteund.</string>
+
+    <string name="selectFileFirst">Je moet eerst een te coderen bestand selecteren.</string>
+    <string name="videoBitrateValueInvalid">De video-bitsnelheid is ongeldig; het coderen is gestopt.</string>
+    <string name="encodingNotification">Bezig met coderen van <xliff:g id="input_filename">%s</xliff:g></string>
+    <string name="encodeStartConfirmation">Wil je <xliff:g id="input_filename">%s</xliff:g> coderen en de uitvoer schrijven naar <xliff:g id="output_filename">%s</xliff:g>?</string>
+    <string name="transcodeSuccess">Het coderen is voltooid. Het bestand is weggeschreven naar:\n<xliff:g id="path">%s</xliff:g></string>
+    <string name="transcodeFailed">Het coderen is mislukt: <xliff:g id="failure_message">%s</xliff:g></string>
+    <string name="cannotEncodeFile">Het bestand kan niet worden gecodeerd: <xliff:g id="failure_description">%s</xliff:g></string>
+    <string name="couldNotFindFileSubmsg">het invoerbestand kan niet worden gevonden</string>
+    <string name="fieldMissingError"><xliff:g id="field_name">%s</xliff:g> ontbreekt</string>
+    <string name="fieldMissingOrInvalidError"><xliff:g id="field_name">%s</xliff:g> ontbreekt of is ongeldig</string>
+
+    <string name="writePermissionExplanation">Deze app heeft toegang nodig tot je opslag om mediabestanden te kunnen lezen en wegschrijven. Zonder deze toegang kan de app niets coderen.</string>
+    <string name="permissionRequestAgain">Opnieuw verzoeken</string>
+
+    <string name="fileLocationLookupFailed">Het achterhalen van de locatie van het mediabestand is mislukt.</string>
+    <string name="encodeCanceled">De codering is geannuleerd</string>
+
+    <string name="codecSlowExcellent">Langzaam - uitstekende kwaliteit</string>
+    <string name="codecFastGood">Snel - goede kwaliteit</string>
+    <string name="codecFastOk">Snel - middelmatige kwaliteit</string>
+    <string name="codecFastLow">Snel - lage kwaliteit</string>
+
+    <string name="about">Over</string>
+    <string name="app_copyright_fmt">Copyright 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
+    <string name="app_license">Uitgebracht onder de GPLv3-licentie.</string>
+    <string name="about_title_fmt">Over <xliff:g id="app_name">%s</xliff:g></string>
+    <string name="debug_version_fmt">Versie: <xliff:g id="version">%s</xliff:g></string>
+    <string name="app_revision_fmt">Versie-informatie: <xliff:g id="app_revision_url">%s</xliff:g></string>
+    <string name="app_libraries"><xliff:g id="app_name">%s</xliff:g> gebruikt de volgende bibliotheken van derde partijen: <xliff:g id="app_libraries_list">%s</xliff:g></string>
+    <string name="app_resources"><xliff:g id="app_name">%s</xliff:g> gebruikt de volgende bronnen van derde partijen: <xliff:g id="app_resources_list">%s</xliff:g></string>
+
+    <!-- error strings -->
+    <string name="app_ui_crash">De app of werkomgeving is gecrasht</string>
+    <string name="send_email_title">E-mail versturen</string>
+
+    <!-- error activity -->
+    <string name="sorry_string">Sorry, dit had niet mogen gebeuren.</string>
+    <string name="error_report_button_text">Fout rapporteren per e-mail</string>
+    <string name="error_snackbar_message">Sorry, er zijn fouten opgetreden.</string>
+    <string name="error_snackbar_action">RAPPORTEREN</string>
+    <string name="what_device_headline">Informatie:</string>
+    <string name="what_happened_headline">Wat er gebeurde:</string>
+    <string name="info_labels">Wat:\\nVerzoek:\\nInhoudstaal:\\nDienst:\\nGMT-tijd:\\nPakket:\\nVersie:\\nBesturingssysteemversie:</string>
+    <string name="your_comment">Je opmerking (in het Engels):</string>
+    <string name="error_details_headline">Details:</string>
+    <string name="error_report_title">Foutrapportage</string>
+
+    <string name="notificationChannelName">VideoTranscoder-coderingsdienst</string>
+
+</resources>
