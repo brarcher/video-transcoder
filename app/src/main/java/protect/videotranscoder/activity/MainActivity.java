@@ -227,12 +227,8 @@ public class MainActivity extends AppCompatActivity
         bindService(serviceIntent, ffmpegServiceConnection, BIND_AUTO_CREATE);
     }
 
-    private void processSendIntent()
+    private void processSendIntent(Intent intent)
     {
-        Intent intent = getIntent();
-
-        // TODO: Permissions check first
-
         File outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
         File tmpFile = new File(outputDir, SEND_INTENT_TMP_FILENAME);
 
@@ -292,11 +288,15 @@ public class MainActivity extends AppCompatActivity
                     {
                         if(action.equals("protect.videotranscoder.ENCODE"))
                         {
-                            handleEncodeIntent(intent);
+                            getPermission(
+                                    (b) -> handleEncodeIntent(intent)
+                            );
                         }
                         if(Intent.ACTION_SEND.equals(action))
                         {
-                            processSendIntent();
+                            getPermission(
+                                    (b) -> processSendIntent(intent)
+                            );
                         }
                     }
                 }
@@ -325,16 +325,19 @@ public class MainActivity extends AppCompatActivity
         String action = intent.getAction();
         if(action != null && action.contains("ENCODE"))
         {
-            handleEncodeIntent(intent);
+            getPermission(
+                    (b) -> handleEncodeIntent(intent)
+            );
             return;
         }
 
         String type = intent.getType();
 
-        // TODO: Permissions check first
         if (Intent.ACTION_SEND.equals(action) && type != null)
         {
-            processSendIntent();
+            getPermission(
+                    (b) -> processSendIntent(intent)
+            );
             return;
         }
     }
