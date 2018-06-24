@@ -504,7 +504,7 @@ public class MainActivity extends AppCompatActivity
 
         int hasWriteExternalStoragePermission = ActivityCompat.checkSelfPermission(this, writeExternalStorage);
         int hasReadExternalStoragePermission = ActivityCompat.checkSelfPermission(this, readExternalStorage);
-        List<String> permissions = new ArrayList<String>();
+        List<String> permissions = new ArrayList<>();
 
         if (hasWriteExternalStoragePermission != PackageManager.PERMISSION_GRANTED)
         {
