@@ -74,6 +74,7 @@ import protect.videotranscoder.media.VideoCodec;
 import protect.videotranscoder.picker.FastScrollerFilePickerActivity;
 import protect.videotranscoder.service.FFmpegProcessService;
 import protect.videotranscoder.service.MessageId;
+import protect.videotranscoder.task.UriSaveTask;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String SHARED_PREFS_KEY = "protect.videotranscoder";
     private static final String PICKER_DIR_PREF = "picker-start-path";
+    private static final String SEND_INTENT_TMP_FILENAME = TAG + "-send-intent-file.tmp";
 
     public static final String MESSENGER_INTENT_KEY = BuildConfig.APPLICATION_ID + ".MESSENGER_INTENT_KEY";
     public static final String FFMPEG_OUTPUT_FILE = BuildConfig.APPLICATION_ID + ".FFMPEG_OUTPUT_FILE";
@@ -227,6 +229,42 @@ public class MainActivity extends AppCompatActivity
         bindService(serviceIntent, ffmpegServiceConnection, BIND_AUTO_CREATE);
     }
 
+    private void processSendIntent()
+    {
+        Intent intent = getIntent();
+
+        // TODO: Permissions check first
+
+        File outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
+        File tmpFile = new File(outputDir, SEND_INTENT_TMP_FILENAME);
+
+        Uri dataUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+
+        ResultCallbackHandler<Boolean> callback = result ->
+        {
+            if(result)
+            {
+                Log.i(TAG, "Copied file from share intent: " + tmpFile.getAbsolutePath());
+                setSelectMediaFile(tmpFile.getAbsolutePath());
+            }
+            else
+            {
+                Log.w(TAG, "Failed to received file from send intent");
+                Toast.makeText(this, R.string.failedToReceiveSharedData, Toast.LENGTH_LONG).show();
+            }
+        };
+
+        if(dataUri != null)
+        {
+            UriSaveTask saveTask = new UriSaveTask(this, dataUri, tmpFile, callback);
+            saveTask.execute();
+        }
+        else
+        {
+            callback.onResult(false);
+        }
+    }
+
     private ServiceConnection ffmpegServiceConnection = new ServiceConnection()
     {
         @Override
@@ -252,9 +290,16 @@ public class MainActivity extends AppCompatActivity
                 if(intent != null)
                 {
                     String action = intent.getAction();
-                    if(action != null && action.equals("protect.videotranscoder.ENCODE"))
+                    if(action != null)
                     {
-                        handleEncodeIntent(intent);
+                        if(action.equals("protect.videotranscoder.ENCODE"))
+                        {
+                            handleEncodeIntent(intent);
+                        }
+                        if(Intent.ACTION_SEND.equals(action))
+                        {
+                            processSendIntent();
+                        }
                     }
                 }
             }
@@ -283,6 +328,16 @@ public class MainActivity extends AppCompatActivity
         if(action != null && action.contains("ENCODE"))
         {
             handleEncodeIntent(intent);
+            return;
+        }
+
+        String type = intent.getType();
+
+        // TODO: Permissions check first
+        if (Intent.ACTION_SEND.equals(action) && type != null)
+        {
+            processSendIntent();
+            return;
         }
     }
 

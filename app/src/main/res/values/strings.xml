@@ -75,4 +75,7 @@
 
     <string name="notificationChannelName">VideoTranscoder Encoding Service</string>
 
+    <string name="receivingSharedData">Receiving shared data…</string>
+    <string name="failedToReceiveSharedData">Failed to receive shared data</string>
+
 </resources>
