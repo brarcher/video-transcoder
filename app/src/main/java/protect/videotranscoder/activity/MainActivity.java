@@ -147,8 +147,6 @@ public class MainActivity extends AppCompatActivity
     private MediaInfo videoInfo;
 
     private IFFmpegProcessService ffmpegService;
-    // Handler for incoming messages from the service.
-    private IncomingMessageHandler msgHandler;
 
     // A callback when a permission check is attempted and succeeds.
     private ResultCallbackHandler<Boolean> permissionSuccessCallback;
@@ -904,7 +902,8 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "Establishing messenger with service");
         // Start service and provide it a way to communicate with this class.
         Intent startServiceIntent = new Intent(this, FFmpegProcessService.class);
-        msgHandler = new IncomingMessageHandler(this);
+        // Handler for incoming messages from the service.
+        IncomingMessageHandler msgHandler = new IncomingMessageHandler(this);
         Messenger messengerIncoming = new Messenger(msgHandler);
         startServiceIntent.putExtra(MESSENGER_INTENT_KEY, messengerIncoming);
         startService(startServiceIntent);
