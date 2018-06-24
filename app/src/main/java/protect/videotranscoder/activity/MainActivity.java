@@ -373,22 +373,22 @@ public class MainActivity extends AppCompatActivity
         boolean skipDialog = intent.getBooleanExtra("skipDialog", false);
 
         List<Triplet<Object, Integer, String>> nullChecks = new LinkedList<>();
-        nullChecks.add(new Triplet<>((Object)inputFilePath, R.string.fieldMissingError, "inputFilePath"));
-        nullChecks.add(new Triplet<>((Object)destinationFilePath, R.string.fieldMissingError, "outputFilePath"));
-        nullChecks.add(new Triplet<>((Object)container, R.string.fieldMissingOrInvalidError, "mediaContainer"));
+        nullChecks.add(new Triplet<>(inputFilePath, R.string.fieldMissingError, "inputFilePath"));
+        nullChecks.add(new Triplet<>(destinationFilePath, R.string.fieldMissingError, "outputFilePath"));
+        nullChecks.add(new Triplet<>(container, R.string.fieldMissingOrInvalidError, "mediaContainer"));
         if(container != null && container.supportedVideoCodecs.size() > 0)
         {
-            nullChecks.add(new Triplet<>((Object)videoCodec, R.string.fieldMissingOrInvalidError, "videoCodec"));
-            nullChecks.add(new Triplet<>((Object)videoBitrateK, R.string.fieldMissingError, "videoBitrateK missing"));
-            nullChecks.add(new Triplet<>((Object)resolution, R.string.fieldMissingError, "resolution"));
-            nullChecks.add(new Triplet<>((Object)fps, R.string.fieldMissingError, "fps"));
+            nullChecks.add(new Triplet<>(videoCodec, R.string.fieldMissingOrInvalidError, "videoCodec"));
+            nullChecks.add(new Triplet<>(videoBitrateK, R.string.fieldMissingError, "videoBitrateK missing"));
+            nullChecks.add(new Triplet<>(resolution, R.string.fieldMissingError, "resolution"));
+            nullChecks.add(new Triplet<>(fps, R.string.fieldMissingError, "fps"));
         }
         if(container != null && container.supportedAudioCodecs.size() > 0)
         {
-            nullChecks.add(new Triplet<>((Object)audioCodec, R.string.fieldMissingOrInvalidError, "audioCodec"));
-            nullChecks.add(new Triplet<>((Object)audioSampleRate, R.string.fieldMissingError, "audioSampleRate"));
-            nullChecks.add(new Triplet<>((Object)audioChannel, R.string.fieldMissingError, "audioChannel"));
-            nullChecks.add(new Triplet<>((Object)audioBitrateK, R.string.fieldMissingError, "audioBitrateK"));
+            nullChecks.add(new Triplet<>(audioCodec, R.string.fieldMissingOrInvalidError, "audioCodec"));
+            nullChecks.add(new Triplet<>(audioSampleRate, R.string.fieldMissingError, "audioSampleRate"));
+            nullChecks.add(new Triplet<>(audioChannel, R.string.fieldMissingError, "audioChannel"));
+            nullChecks.add(new Triplet<>(audioBitrateK, R.string.fieldMissingError, "audioBitrateK"));
         }
 
         for(Triplet<Object, Integer, String> check : nullChecks)
