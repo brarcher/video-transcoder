@@ -84,6 +84,8 @@ public class MainActivity extends AppCompatActivity
     private static final String PICKER_DIR_PREF = "picker-start-path";
     private static final String SEND_INTENT_TMP_FILENAME = TAG + "-send-intent-file.tmp";
 
+    private static final File SEND_INTENT_TMP_FILE = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), SEND_INTENT_TMP_FILENAME);
+
     public static final String MESSENGER_INTENT_KEY = BuildConfig.APPLICATION_ID + ".MESSENGER_INTENT_KEY";
     public static final String FFMPEG_OUTPUT_FILE = BuildConfig.APPLICATION_ID + ".FFMPEG_OUTPUT_FILE";
     public static final String FFMPEG_FAILURE_MSG = BuildConfig.APPLICATION_ID + ".FFMPEG_FAILURE_MSG";
@@ -227,9 +229,6 @@ public class MainActivity extends AppCompatActivity
 
     private void processSendIntent(Intent intent)
     {
-        File outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
-        File tmpFile = new File(outputDir, SEND_INTENT_TMP_FILENAME);
-
         Uri dataUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
 
         String filename = null;
@@ -249,8 +248,8 @@ public class MainActivity extends AppCompatActivity
         {
             if(result)
             {
-                Log.i(TAG, "Copied file from share intent: " + tmpFile.getAbsolutePath());
-                setSelectMediaFile(tmpFile.getAbsolutePath(), actualBaseName);
+                Log.i(TAG, "Copied file from share intent: " + SEND_INTENT_TMP_FILE.getAbsolutePath());
+                setSelectMediaFile(SEND_INTENT_TMP_FILE.getAbsolutePath(), actualBaseName);
             }
             else
             {
@@ -261,7 +260,7 @@ public class MainActivity extends AppCompatActivity
 
         if(dataUri != null)
         {
-            UriSaveTask saveTask = new UriSaveTask(this, dataUri, tmpFile, callback);
+            UriSaveTask saveTask = new UriSaveTask(this, dataUri, SEND_INTENT_TMP_FILE, callback);
             saveTask.execute();
         }
         else
@@ -944,6 +943,22 @@ public class MainActivity extends AppCompatActivity
         // to call stopService() would keep it alive indefinitely.
         stopService(new Intent(this, FFmpegProcessService.class));
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        // If the tmp file for SEND intents still exists, remove it as it is no longer needed.
+        if(SEND_INTENT_TMP_FILE.exists())
+        {
+            boolean result = SEND_INTENT_TMP_FILE.delete();
+            if(result == false)
+            {
+                Log.w(TAG, "Failed to delete tmp SEND intent file on exit");
+            }
+        }
+
+        super.onDestroy();
     }
 
     private void setSpinnerSelection(Spinner spinner, VideoCodec value)
