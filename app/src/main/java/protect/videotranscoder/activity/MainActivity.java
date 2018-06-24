@@ -150,6 +150,9 @@ public class MainActivity extends AppCompatActivity
     // Handler for incoming messages from the service.
     private IncomingMessageHandler msgHandler;
 
+    // A callback when a permission check is attempted and succeeds.
+    private ResultCallbackHandler<Boolean> permissionSuccessCallback;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -188,14 +191,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                if (Build.VERSION.SDK_INT >= 23)
-                {
-                    getPermission();
-                }
-                else
-                {
-                    selectVideo();
-                }
+                getPermission(
+                    (b) -> selectVideo()
+                );
             }
         });
 
@@ -474,8 +472,18 @@ public class MainActivity extends AppCompatActivity
                 .show();
     }
 
-    private void getPermission()
+    /**
+     * Request read/write permissions, and if they are granted invokes a callback.
+     * @param successCallback
+     */
+    private void getPermission(ResultCallbackHandler<Boolean> successCallback)
     {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+        {
+            successCallback.onResult(true);
+            return;
+        }
+
         String[] params = null;
         String writeExternalStorage = Manifest.permission.WRITE_EXTERNAL_STORAGE;
         String readExternalStorage = Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -499,13 +507,15 @@ public class MainActivity extends AppCompatActivity
         }
         if (params != null && params.length > 0)
         {
+            permissionSuccessCallback = successCallback;
             ActivityCompat.requestPermissions(MainActivity.this,
                     params,
                     READ_WRITE_PERMISSION_REQUEST);
         }
         else
         {
-            selectVideo();
+            successCallback.onResult(true);
+            permissionSuccessCallback = null;
         }
     }
 
@@ -520,7 +530,8 @@ public class MainActivity extends AppCompatActivity
         {
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                selectVideo();
+                permissionSuccessCallback.onResult(true);
+                permissionSuccessCallback = null;
             }
             else
             {
@@ -540,7 +551,7 @@ public class MainActivity extends AppCompatActivity
                         public void onClick(DialogInterface dialog, int which)
                         {
                             dialog.dismiss();
-                            getPermission();
+                            getPermission(permissionSuccessCallback);
                         }
                     })
                     .show();
