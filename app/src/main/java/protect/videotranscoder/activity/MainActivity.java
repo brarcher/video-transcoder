@@ -232,12 +232,25 @@ public class MainActivity extends AppCompatActivity
 
         Uri dataUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
 
+        String filename = null;
+        String path = dataUri != null ? dataUri.getPath() : null;
+        if(path != null)
+        {
+            filename = new File(path).getName();
+            if(filename.contains("."))
+            {
+                filename = filename.substring(0, filename.lastIndexOf("."));
+            }
+        }
+
+        final String actualBaseName = filename;
+
         ResultCallbackHandler<Boolean> callback = result ->
         {
             if(result)
             {
                 Log.i(TAG, "Copied file from share intent: " + tmpFile.getAbsolutePath());
-                setSelectMediaFile(tmpFile.getAbsolutePath());
+                setSelectMediaFile(tmpFile.getAbsolutePath(), actualBaseName);
             }
             else
             {
@@ -597,7 +610,7 @@ public class MainActivity extends AppCompatActivity
                 prefs.edit().putString(PICKER_DIR_PREF, parentDir).apply();
 
                 Log.i(TAG, "Selected file: " + file.getAbsolutePath());
-                setSelectMediaFile(file.getAbsolutePath());
+                setSelectMediaFile(file.getAbsolutePath(), null);
             }
         }
     }
@@ -779,21 +792,17 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        String filePrefix = videoInfo.file.getName();
-        if(filePrefix.contains("."))
-        {
-            filePrefix = filePrefix.substring(0, filePrefix.lastIndexOf("."));
-        }
+        String fileBaseName = videoInfo.getFileBaseName();
 
         String extension = "." + container.extension;
         String inputFilePath = videoInfo.file.getAbsolutePath();
 
-        File destination = new File(outputDir, filePrefix + extension);
+        File destination = new File(outputDir, fileBaseName + extension);
         int fileNo = 0;
         while (destination.exists())
         {
             fileNo++;
-            destination = new File(outputDir, filePrefix + "_" + fileNo + extension);
+            destination = new File(outputDir, fileBaseName + "_" + fileNo + extension);
         }
 
         int startTimeSec = rangeSeekBar.getSelectedMinValue().intValue();
@@ -1168,7 +1177,7 @@ public class MainActivity extends AppCompatActivity
         setSpinnerSelection(audioChannelSpinner, Integer.toString(videoInfo.audioChannels));
     }
 
-    private void setSelectMediaFile(String path)
+    private void setSelectMediaFile(String path, String overrideBaseName)
     {
         videoView.setVideoPath(path);
         videoView.start();
@@ -1281,6 +1290,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 videoInfo = result;
+                videoInfo.setFileBaseName(overrideBaseName);
 
                 populateOptionDefaults();
             }

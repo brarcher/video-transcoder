@@ -19,6 +19,7 @@ public class MediaInfo
     public final Integer audioBitrateK;
     public final Integer audioChannels;
 
+    private String overrideBaseName;
 
     public MediaInfo(File file, long durationMs, MediaContainer container, VideoCodec videoCodec,
                      String videoResolution, Integer videoBitrateK, String videoFramerate,
@@ -36,5 +37,34 @@ public class MediaInfo
         this.audioSampleRate = audioSampleRate;
         this.audioBitrateK = audioBitrateK;
         this.audioChannels = audioChannels;
+    }
+
+    /**
+     * Determines the name of the file with the extension stripped.
+     * If the name has been overridden, that value is returned instead.
+     */
+    public String getFileBaseName()
+    {
+        String basename;
+
+        if(overrideBaseName == null)
+        {
+            basename = file.getName();
+            if(basename.contains("."))
+            {
+                basename = basename.substring(0, basename.lastIndexOf("."));
+            }
+        }
+        else
+        {
+            basename = overrideBaseName;
+        }
+
+        return basename;
+    }
+
+    public void setFileBaseName(String name)
+    {
+        overrideBaseName = name;
     }
 }
