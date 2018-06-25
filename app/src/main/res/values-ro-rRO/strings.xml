@@ -66,6 +66,7 @@
     <string name="error_snackbar_action">RAPORTEAZĂ</string>
     <string name="what_device_headline">Informații:</string>
     <string name="what_happened_headline">Ce s-a întâmplat:</string>
+    <string name="info_labels">Problema:\\nCerere:\\nLimba:\\nServiciul:\\nData GMT:\\nPackage:\\nVersion:\\nVersiune OS:</string>
     <string name="your_comment">Comentariul dumneavoastra (în engleză):</string>
     <string name="error_details_headline">Detalii:</string>
     <string name="error_report_title">Raport de eroare</string>
