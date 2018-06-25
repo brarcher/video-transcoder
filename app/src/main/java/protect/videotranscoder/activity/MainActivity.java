@@ -74,6 +74,7 @@ import protect.videotranscoder.media.VideoCodec;
 import protect.videotranscoder.picker.FastScrollerFilePickerActivity;
 import protect.videotranscoder.service.FFmpegProcessService;
 import protect.videotranscoder.service.MessageId;
+import protect.videotranscoder.task.UriSaveTask;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -81,6 +82,9 @@ public class MainActivity extends AppCompatActivity
 
     private static final String SHARED_PREFS_KEY = "protect.videotranscoder";
     private static final String PICKER_DIR_PREF = "picker-start-path";
+    private static final String SEND_INTENT_TMP_FILENAME = TAG + "-send-intent-file.tmp";
+
+    private static final File SEND_INTENT_TMP_FILE = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), SEND_INTENT_TMP_FILENAME);
 
     public static final String MESSENGER_INTENT_KEY = BuildConfig.APPLICATION_ID + ".MESSENGER_INTENT_KEY";
     public static final String FFMPEG_OUTPUT_FILE = BuildConfig.APPLICATION_ID + ".FFMPEG_OUTPUT_FILE";
@@ -145,8 +149,9 @@ public class MainActivity extends AppCompatActivity
     private MediaInfo videoInfo;
 
     private IFFmpegProcessService ffmpegService;
-    // Handler for incoming messages from the service.
-    private IncomingMessageHandler msgHandler;
+
+    // A callback when a permission check is attempted and succeeds.
+    private ResultCallbackHandler<Boolean> permissionSuccessCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -186,14 +191,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                if (Build.VERSION.SDK_INT >= 23)
-                {
-                    getPermission();
-                }
-                else
-                {
-                    selectVideo();
-                }
+                getPermission(
+                    (b) -> selectVideo()
+                );
             }
         });
 
@@ -227,6 +227,48 @@ public class MainActivity extends AppCompatActivity
         bindService(serviceIntent, ffmpegServiceConnection, BIND_AUTO_CREATE);
     }
 
+    private void processSendIntent(Intent intent)
+    {
+        Uri dataUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+
+        String filename = null;
+        String path = dataUri != null ? dataUri.getPath() : null;
+        if(path != null)
+        {
+            filename = new File(path).getName();
+            if(filename.contains("."))
+            {
+                filename = filename.substring(0, filename.lastIndexOf("."));
+            }
+        }
+
+        final String actualBaseName = filename;
+
+        ResultCallbackHandler<Boolean> callback = result ->
+        {
+            if(result)
+            {
+                Log.i(TAG, "Copied file from share intent: " + SEND_INTENT_TMP_FILE.getAbsolutePath());
+                setSelectMediaFile(SEND_INTENT_TMP_FILE.getAbsolutePath(), actualBaseName);
+            }
+            else
+            {
+                Log.w(TAG, "Failed to received file from send intent");
+                Toast.makeText(this, R.string.failedToReceiveSharedData, Toast.LENGTH_LONG).show();
+            }
+        };
+
+        if(dataUri != null)
+        {
+            UriSaveTask saveTask = new UriSaveTask(this, dataUri, SEND_INTENT_TMP_FILE, callback);
+            saveTask.execute();
+        }
+        else
+        {
+            callback.onResult(false);
+        }
+    }
+
     private ServiceConnection ffmpegServiceConnection = new ServiceConnection()
     {
         @Override
@@ -252,9 +294,20 @@ public class MainActivity extends AppCompatActivity
                 if(intent != null)
                 {
                     String action = intent.getAction();
-                    if(action != null && action.equals("protect.videotranscoder.ENCODE"))
+                    if(action != null)
                     {
-                        handleEncodeIntent(intent);
+                        if(action.equals("protect.videotranscoder.ENCODE"))
+                        {
+                            getPermission(
+                                    (b) -> handleEncodeIntent(intent)
+                            );
+                        }
+                        if(Intent.ACTION_SEND.equals(action))
+                        {
+                            getPermission(
+                                    (b) -> processSendIntent(intent)
+                            );
+                        }
                     }
                 }
             }
@@ -282,7 +335,20 @@ public class MainActivity extends AppCompatActivity
         String action = intent.getAction();
         if(action != null && action.contains("ENCODE"))
         {
-            handleEncodeIntent(intent);
+            getPermission(
+                    (b) -> handleEncodeIntent(intent)
+            );
+            return;
+        }
+
+        String type = intent.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null)
+        {
+            getPermission(
+                    (b) -> processSendIntent(intent)
+            );
+            return;
         }
     }
 
@@ -317,22 +383,22 @@ public class MainActivity extends AppCompatActivity
         boolean skipDialog = intent.getBooleanExtra("skipDialog", false);
 
         List<Triplet<Object, Integer, String>> nullChecks = new LinkedList<>();
-        nullChecks.add(new Triplet<>((Object)inputFilePath, R.string.fieldMissingError, "inputFilePath"));
-        nullChecks.add(new Triplet<>((Object)destinationFilePath, R.string.fieldMissingError, "outputFilePath"));
-        nullChecks.add(new Triplet<>((Object)container, R.string.fieldMissingOrInvalidError, "mediaContainer"));
+        nullChecks.add(new Triplet<>(inputFilePath, R.string.fieldMissingError, "inputFilePath"));
+        nullChecks.add(new Triplet<>(destinationFilePath, R.string.fieldMissingError, "outputFilePath"));
+        nullChecks.add(new Triplet<>(container, R.string.fieldMissingOrInvalidError, "mediaContainer"));
         if(container != null && container.supportedVideoCodecs.size() > 0)
         {
-            nullChecks.add(new Triplet<>((Object)videoCodec, R.string.fieldMissingOrInvalidError, "videoCodec"));
-            nullChecks.add(new Triplet<>((Object)videoBitrateK, R.string.fieldMissingError, "videoBitrateK missing"));
-            nullChecks.add(new Triplet<>((Object)resolution, R.string.fieldMissingError, "resolution"));
-            nullChecks.add(new Triplet<>((Object)fps, R.string.fieldMissingError, "fps"));
+            nullChecks.add(new Triplet<>(videoCodec, R.string.fieldMissingOrInvalidError, "videoCodec"));
+            nullChecks.add(new Triplet<>(videoBitrateK, R.string.fieldMissingError, "videoBitrateK missing"));
+            nullChecks.add(new Triplet<>(resolution, R.string.fieldMissingError, "resolution"));
+            nullChecks.add(new Triplet<>(fps, R.string.fieldMissingError, "fps"));
         }
         if(container != null && container.supportedAudioCodecs.size() > 0)
         {
-            nullChecks.add(new Triplet<>((Object)audioCodec, R.string.fieldMissingOrInvalidError, "audioCodec"));
-            nullChecks.add(new Triplet<>((Object)audioSampleRate, R.string.fieldMissingError, "audioSampleRate"));
-            nullChecks.add(new Triplet<>((Object)audioChannel, R.string.fieldMissingError, "audioChannel"));
-            nullChecks.add(new Triplet<>((Object)audioBitrateK, R.string.fieldMissingError, "audioBitrateK"));
+            nullChecks.add(new Triplet<>(audioCodec, R.string.fieldMissingOrInvalidError, "audioCodec"));
+            nullChecks.add(new Triplet<>(audioSampleRate, R.string.fieldMissingError, "audioSampleRate"));
+            nullChecks.add(new Triplet<>(audioChannel, R.string.fieldMissingError, "audioChannel"));
+            nullChecks.add(new Triplet<>(audioBitrateK, R.string.fieldMissingError, "audioBitrateK"));
         }
 
         for(Triplet<Object, Integer, String> check : nullChecks)
@@ -419,15 +485,25 @@ public class MainActivity extends AppCompatActivity
                 .show();
     }
 
-    private void getPermission()
+    /**
+     * Request read/write permissions, and if they are granted invokes a callback.
+     * @param successCallback
+     */
+    private void getPermission(ResultCallbackHandler<Boolean> successCallback)
     {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+        {
+            successCallback.onResult(true);
+            return;
+        }
+
         String[] params = null;
         String writeExternalStorage = Manifest.permission.WRITE_EXTERNAL_STORAGE;
         String readExternalStorage = Manifest.permission.READ_EXTERNAL_STORAGE;
 
         int hasWriteExternalStoragePermission = ActivityCompat.checkSelfPermission(this, writeExternalStorage);
         int hasReadExternalStoragePermission = ActivityCompat.checkSelfPermission(this, readExternalStorage);
-        List<String> permissions = new ArrayList<String>();
+        List<String> permissions = new ArrayList<>();
 
         if (hasWriteExternalStoragePermission != PackageManager.PERMISSION_GRANTED)
         {
@@ -444,13 +520,15 @@ public class MainActivity extends AppCompatActivity
         }
         if (params != null && params.length > 0)
         {
+            permissionSuccessCallback = successCallback;
             ActivityCompat.requestPermissions(MainActivity.this,
                     params,
                     READ_WRITE_PERMISSION_REQUEST);
         }
         else
         {
-            selectVideo();
+            successCallback.onResult(true);
+            permissionSuccessCallback = null;
         }
     }
 
@@ -465,7 +543,8 @@ public class MainActivity extends AppCompatActivity
         {
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                selectVideo();
+                permissionSuccessCallback.onResult(true);
+                permissionSuccessCallback = null;
             }
             else
             {
@@ -485,7 +564,7 @@ public class MainActivity extends AppCompatActivity
                         public void onClick(DialogInterface dialog, int which)
                         {
                             dialog.dismiss();
-                            getPermission();
+                            getPermission(permissionSuccessCallback);
                         }
                     })
                     .show();
@@ -530,7 +609,7 @@ public class MainActivity extends AppCompatActivity
                 prefs.edit().putString(PICKER_DIR_PREF, parentDir).apply();
 
                 Log.i(TAG, "Selected file: " + file.getAbsolutePath());
-                setSelectMediaFile(file.getAbsolutePath());
+                setSelectMediaFile(file.getAbsolutePath(), null);
             }
         }
     }
@@ -712,21 +791,17 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        String filePrefix = videoInfo.file.getName();
-        if(filePrefix.contains("."))
-        {
-            filePrefix = filePrefix.substring(0, filePrefix.lastIndexOf("."));
-        }
+        String fileBaseName = videoInfo.getFileBaseName();
 
         String extension = "." + container.extension;
         String inputFilePath = videoInfo.file.getAbsolutePath();
 
-        File destination = new File(outputDir, filePrefix + extension);
+        File destination = new File(outputDir, fileBaseName + extension);
         int fileNo = 0;
         while (destination.exists())
         {
             fileNo++;
-            destination = new File(outputDir, filePrefix + "_" + fileNo + extension);
+            destination = new File(outputDir, fileBaseName + "_" + fileNo + extension);
         }
 
         int startTimeSec = rangeSeekBar.getSelectedMinValue().intValue();
@@ -835,7 +910,8 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "Establishing messenger with service");
         // Start service and provide it a way to communicate with this class.
         Intent startServiceIntent = new Intent(this, FFmpegProcessService.class);
-        msgHandler = new IncomingMessageHandler(this);
+        // Handler for incoming messages from the service.
+        IncomingMessageHandler msgHandler = new IncomingMessageHandler(this);
         Messenger messengerIncoming = new Messenger(msgHandler);
         startServiceIntent.putExtra(MESSENGER_INTENT_KEY, messengerIncoming);
         startService(startServiceIntent);
@@ -867,6 +943,22 @@ public class MainActivity extends AppCompatActivity
         // to call stopService() would keep it alive indefinitely.
         stopService(new Intent(this, FFmpegProcessService.class));
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        // If the tmp file for SEND intents still exists, remove it as it is no longer needed.
+        if(SEND_INTENT_TMP_FILE.exists())
+        {
+            boolean result = SEND_INTENT_TMP_FILE.delete();
+            if(result == false)
+            {
+                Log.w(TAG, "Failed to delete tmp SEND intent file on exit");
+            }
+        }
+
+        super.onDestroy();
     }
 
     private void setSpinnerSelection(Spinner spinner, VideoCodec value)
@@ -1100,7 +1192,7 @@ public class MainActivity extends AppCompatActivity
         setSpinnerSelection(audioChannelSpinner, Integer.toString(videoInfo.audioChannels));
     }
 
-    private void setSelectMediaFile(String path)
+    private void setSelectMediaFile(String path, String overrideBaseName)
     {
         videoView.setVideoPath(path);
         videoView.start();
@@ -1213,6 +1305,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 videoInfo = result;
+                videoInfo.setFileBaseName(overrideBaseName);
 
                 populateOptionDefaults();
             }
