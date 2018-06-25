@@ -1,4 +1,77 @@
 <resources
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    </resources>
+    <string name="selectVideo">Selectionner\nVideo</string>
+    <string name="encode">Encoder</string>
+    <string name="cancel">Annuler</string>
+
+    <string name="ok">Ok</string>
+    <string name="sendLabel">Envoyer&#8230;</string>
+    <string name="share_dialog_title">Partager avec</string>
+    <string name="share">Partager</string>
+
+    <string name="basicSettingsTitle">Options Basiques</string>
+    <string name="container">Contenant </string>
+    <string name="videoSettingsTitle">Options Video</string>
+    <string name="codec">Codec</string>
+    <string name="fps"> PPS - Pied par seconde </string>
+    <string name="resolution">Resolution</string>
+    <string name="bitrate">Vitesse de Telechargement ( Kb/s)</string>
+    <string name="audioSettingsTitle">Options Audio</string>
+    <string name="sampleRate">Simple Fréquence (Hz)</string>
+    <string name="channels">Chaînes</string>
+
+    <string name="notSupportedTitle">Pas Supporté</string>
+    <string name="notSupportedMessage">L\'architecture du CPU de l\'appareil n\'st pas supportée .
+Seulement  ARM est supporté.</string>
+
+    <string name="selectFileFirst">Tu dois choisir un fichier à encoder.</string>
+    <string name="videoBitrateValueInvalid">La valeur Bitrate du video n\'est pas valide. N\'a pas pu encoder</string>
+    <string name="encodingNotification">Encodant <xliff:g id="input_filename">%s</xliff:g></string>
+    <string name="encodeStartConfirmation">Veux-tu encoder <xliff:g id="input_filename">%s</xliff:g> et sortir <xliff:g id="output_filename">%s</xliff:g> ?</string>
+    <string name="transcodeSuccess">Encodage complété avec succés . Le fichier est enregistré vers :\n<xliff:g id="path">%s</xliff:g></string>
+    <string name="transcodeFailed">Encodage a chutté: <xliff:g id="failure_message">%s</xliff:g></string>
+    <string name="cannotEncodeFile">Pas possible d\'encoder le fichier: <xliff:g id="failure_description">%s</xliff:g></string>
+    <string name="couldNotFindFileSubmsg">Ne peux pas trouver fichier d\'entrée</string>
+    <string name="fieldMissingError"><xliff:g id="field_name">%s</xliff:g> manquant</string>
+    <string name="fieldMissingOrInvalidError"><xliff:g id="field_name">%s</xliff:g> manquant ou invalid </string>
+
+    <string name="writePermissionExplanation">L\'application demande l\'accés à l\'éspace disque pour lire et ecrire sur des fichiers medias. Sans accés, l\'application ne peux pas transcoder.</string>
+    <string name="permissionRequestAgain">Demander à nouveau</string>
+
+    <string name="fileLocationLookupFailed">N\'a pas pu trouver la location du fichier media.</string>
+    <string name="encodeCanceled">L\'encodage est annulé</string>
+
+    <string name="codecSlowExcellent">Lent, Qualité excellente</string>
+    <string name="codecFastGood">Rapide, Qualité bonne</string>
+    <string name="codecFastOk">Rapide, Qualité moyenne</string>
+    <string name="codecFastLow">Rapide, Qualité faible</string>
+
+    <string name="about">A propos </string>
+    <string name="app_copyright_fmt">Droits d\'auteur 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
+    <string name="app_license">Licensé sous GPLv3.</string>
+    <string name="about_title_fmt">A propos <xliff:g id="app_name">%s</xliff:g></string>
+    <string name="debug_version_fmt">Version: <xliff:g id="version">%s</xliff:g></string>
+    <string name="app_revision_fmt">Revision Information: <xliff:g id="app_revision_url">%s</xliff:g></string>
+    <string name="app_libraries"><xliff:g id="app_name">%s</xliff:g> utilise ces bibliothèques tierces: <xliff:g id="app_libraries_list">%s</xliff:g></string>
+    <string name="app_resources"><xliff:g id="app_name">%s</xliff:g>utilise ces resources tierces: <xliff:g id="app_resources_list">%s</xliff:g></string>
+
+    <!-- error strings -->
+    <string name="app_ui_crash">L\' application s\'est arreté</string>
+    <string name="send_email_title">Envoyer Email</string>
+
+    <!-- error activity -->
+    <string name="sorry_string">Désolé, cela ne doit pas arriver.</string>
+    <string name="error_report_button_text">Rapporter l\'erreur via e-mail</string>
+    <string name="error_snackbar_message">Désolé, des erreurs ont survenues.</string>
+    <string name="error_snackbar_action">RAPPORTER</string>
+    <string name="what_device_headline">Info:</string>
+    <string name="what_happened_headline">Qu\'est-il arrivé:</string>
+    <string name="info_labels">Quoi:\\nDemande:\\nContenu Lang:\\nService:\\nGMT Temps:\\nPaquet:\\nVersion:\\nOS version:</string>
+    <string name="your_comment">Ton commentaire ( en Englais ):</string>
+    <string name="error_details_headline">Details:</string>
+    <string name="error_report_title">Rapport erreur</string>
+
+    <string name="notificationChannelName">Service VideoTranscoder Encoder </string>
+
+</resources>
