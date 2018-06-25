@@ -19,6 +19,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -583,8 +584,23 @@ public class MainActivity extends AppCompatActivity
         i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
         i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
 
-        SharedPreferences prefs = getSharedPreferences(SHARED_PREFS_KEY, MODE_PRIVATE);
-        String searchFolder = prefs.getString(PICKER_DIR_PREF, Environment.getExternalStorageDirectory().getPath());
+        String searchFolder;
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String fileSearchPath = prefs.getString("fileSearchPath", "last-used");
+
+        switch(fileSearchPath)
+        {
+            case "last-used":
+            default:
+                prefs = getSharedPreferences(SHARED_PREFS_KEY, MODE_PRIVATE);
+                searchFolder = prefs.getString(PICKER_DIR_PREF, Environment.getExternalStorageDirectory().getPath());
+                break;
+
+            case "external":
+                searchFolder = Environment.getExternalStorageDirectory().getPath();
+                break;
+        }
 
         i.putExtra(FilePickerActivity.EXTRA_START_PATH, searchFolder);
         startActivityForResult(i, SELECT_FILE_REQUEST);
@@ -1509,6 +1525,13 @@ public class MainActivity extends AppCompatActivity
         if(id == R.id.action_about)
         {
             displayAboutDialog();
+            return true;
+        }
+
+        if(id == R.id.action_settings)
+        {
+            Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(i);
             return true;
         }
 

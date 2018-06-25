@@ -78,4 +78,10 @@
     <string name="receivingSharedData">Receiving shared data…</string>
     <string name="failedToReceiveSharedData">Failed to receive shared data</string>
 
+    <string name="settings">Settings</string>
+    <string name="fileSearchPathSetting">File search path</string>
+    <string name="fileSearchPathSettingSummary">The path on the file system where the file browser will open when searching for a media file</string>
+    <string name="fileSearchPathSettingLastUsed">Last used path</string>
+    <string name="fileSearchPathSettingExternal">External storage</string>
+
 </resources>
