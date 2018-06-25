@@ -20,11 +20,13 @@
     <string name="audioSettingsTitle">Audio-instellingen</string>
     <string name="sampleRate">Fragmentsnelheid (Hz)</string>
     <string name="channels">Kanalen</string>
+    <string name="custom">Aangepast</string>
 
     <string name="notSupportedTitle">Geen ondersteuning</string>
     <string name="notSupportedMessage">De CPU-architectuur van dit apparaat wordt niet ondersteund; alleen ARM wordt ondersteund.</string>
 
     <string name="selectFileFirst">Je moet eerst een te coderen bestand selecteren.</string>
+    <string name="videoResolutionValueInvalid">De resolutie is ongeldig; het coderen is gestopt.</string>
     <string name="videoBitrateValueInvalid">De video-bitsnelheid is ongeldig; het coderen is gestopt.</string>
     <string name="encodingNotification">Bezig met coderen van <xliff:g id="input_filename">%s</xliff:g></string>
     <string name="encodeStartConfirmation">Wil je <xliff:g id="input_filename">%s</xliff:g> coderen en de uitvoer schrijven naar <xliff:g id="output_filename">%s</xliff:g>?</string>
@@ -72,5 +74,14 @@
     <string name="error_report_title">Foutrapportage</string>
 
     <string name="notificationChannelName">VideoTranscoder-coderingsdienst</string>
+
+    <string name="receivingSharedData">Bezig met ontvangen van gedeelde gegevens...</string>
+    <string name="failedToReceiveSharedData">Ontvangen van gedeelde gegevens is mislukt</string>
+
+    <string name="settings">Instellingen</string>
+    <string name="fileSearchPathSetting">Bestandszoekpad</string>
+    <string name="fileSearchPathSettingSummary">Het pad op het bestandssysteem waar de bestandsbeheerder geopend moet worden bij het zoeken naar een mediabestand</string>
+    <string name="fileSearchPathSettingLastUsed">Laatst gebruikt pad</string>
+    <string name="fileSearchPathSettingExternal">Externe opslag</string>
 
 </resources>
