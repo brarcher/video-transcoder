@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference     android:title="@string/fileSearchPathSetting"
+                        android:summary="@string/fileSearchPathSettingSummary"
+                        android:key="fileSearchPath"
+                        android:defaultValue="last-used"
+                        android:entries="@array/fileSearchPathSettingArray"
+                        android:entryValues="@array/fileSearchPathSettingValuesArray" />
+</PreferenceScreen>

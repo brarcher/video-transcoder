@@ -49,6 +49,10 @@
             android:name=".report.ErrorActivity"
             android:label="@string/app_name">
         </activity>
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/settings"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <provider
             android:name=".provider.ExportFileProvider"
             android:grantUriPermissions="true"
