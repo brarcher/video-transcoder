@@ -282,12 +282,31 @@
                     android:textSize="@dimen/inputSize"
                     android:drawSelectorOnTop="true" />
             </LinearLayout>
+
+            <!-- Resolution Custom-->
+            <RelativeLayout
+                android:id="@+id/resolutionCustomContainer"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/inputBackground"
+                android:layout_below="@id/resolutionContainer"
+                android:visibility="gone">
+                <EditText
+                    android:id="@+id/resolutionCustom"
+                    android:hint="1920×1080"
+                    android:layout_alignParentEnd="true"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/inputPadding"
+                    android:textSize="@dimen/inputSize"/>
+            </RelativeLayout>
             <View
                 android:id="@+id/resolutionContainerDivider"
                 android:layout_height="@dimen/inputBorderThickness"
                 android:layout_width="match_parent"
                 android:background="@color/inputBorder"
-                android:layout_below="@id/resolutionContainer"
+                android:layout_below="@id/resolutionCustomContainer"
                 android:visibility="gone"/>
 
             <!-- Video Bitrate -->
