@@ -22,11 +22,13 @@
     <string name="audioSettingsTitle">Audio Settings</string>
     <string name="sampleRate">Sample Rate (Hz)</string>
     <string name="channels">Channels</string>
+    <string name="custom">Custom</string>
 
     <string name="notSupportedTitle">Not Supported</string>
     <string name="notSupportedMessage">This device\'s CPU architecture is not supported. Only ARM is supported.</string>
 
     <string name="selectFileFirst">You must select a file to encode first.</string>
+    <string name="videoResolutionValueInvalid">Resolution value is invalid, could not encode.</string>
     <string name="videoBitrateValueInvalid">Video bitrate value is invalid, could not encode.</string>
     <string name="encodingNotification">Encoding <xliff:g id="input_filename">%s</xliff:g></string>
     <string name="encodeStartConfirmation">Do you want to encode <xliff:g id="input_filename">%s</xliff:g> and output to <xliff:g id="output_filename">%s</xliff:g>?</string>
