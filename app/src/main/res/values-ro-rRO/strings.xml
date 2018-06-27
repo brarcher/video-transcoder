@@ -20,7 +20,6 @@
     <string name="audioSettingsTitle">Setări audio</string>
     <string name="sampleRate">Rată eșantionare (Hz)</string>
     <string name="channels">Canale</string>
-
     <string name="notSupportedTitle">Nu este suportat</string>
     <string name="notSupportedMessage">Arhitectura procesorului dispozitivului dumneavoastră nu este compatibilă. Doar cea ARM este suportată.</string>
 
@@ -72,5 +71,14 @@
     <string name="error_report_title">Raport de eroare</string>
 
     <string name="notificationChannelName">VideoTranscoder serviciu codare</string>
+
+    <string name="receivingSharedData">Se primesc datele partajate...</string>
+    <string name="failedToReceiveSharedData">Eroare la primirea datelor partajate</string>
+
+    <string name="settings">Setări</string>
+    <string name="fileSearchPathSetting">Cale deschidere fișiere</string>
+    <string name="fileSearchPathSettingSummary">Calea inițială unde se va deschide browserul de fișiere pentru alegerea unui fisier media</string>
+    <string name="fileSearchPathSettingLastUsed">Ultimul director folosit</string>
+    <string name="fileSearchPathSettingExternal">Stocare externă</string>
 
 </resources>
