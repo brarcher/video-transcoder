@@ -20,6 +20,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
+import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -133,6 +134,7 @@ public class MainActivity extends AppCompatActivity
     private Spinner videoCodecSpinner;
     private Spinner fpsSpinner;
     private Spinner resolutionSpinner;
+    private EditText resolutionCustom;
     private EditText videoBitrateValue;
     private Spinner audioCodecSpinner;
     private Spinner audioBitrateSpinner;
@@ -181,6 +183,7 @@ public class MainActivity extends AppCompatActivity
         videoCodecSpinner = findViewById(R.id.videoCodecSpinner);
         fpsSpinner = findViewById(R.id.fpsSpinner);
         resolutionSpinner = findViewById(R.id.resolutionSpinner);
+        resolutionCustom = findViewById(R.id.resolutionCustom);
         videoBitrateValue = findViewById(R.id.videoBitrateValue);
         audioCodecSpinner = findViewById(R.id.audioCodecSpinner);
         audioBitrateSpinner = findViewById(R.id.audioBitrateSpinner);
@@ -776,6 +779,34 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
+        final String customString = getString(R.string.custom);
+
+        if(resolution.equals(customString))
+        {
+            resolution = resolutionCustom.getText().toString();
+            String [] split = resolution.split("x");
+            if(split.length != 2)
+            {
+                Toast.makeText(this, R.string.videoResolutionValueInvalid, Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            for(String value : split)
+            {
+                try
+                {
+                    // Check if the string can be parsed or not.
+                    Integer.parseInt(value);
+                }
+                catch(NumberFormatException e)
+                {
+                    Toast.makeText(this, R.string.videoResolutionValueInvalid, Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        }
+
+
         try
         {
             String videoBitrateKStr = videoBitrateValue.getText().toString();
@@ -1075,6 +1106,33 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        class SetCustomAdapter implements AdapterView.OnItemSelectedListener
+        {
+            private final String customString;
+            private final View customField;
+
+            public SetCustomAdapter(String customString, @IdRes int customFieldId)
+            {
+                this.customString = customString;
+                this.customField = findViewById(customFieldId);
+            }
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                String value = (String)parent.getItemAtPosition(position);
+                customField.setVisibility(value.equals(customString) ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+                // Nothing to do
+            }
+        }
+
+        final String customString = getString(R.string.custom);
+
         LinkedList<String> fps = new LinkedList<>(Arrays.asList("15", "24", "23.98", "25", "29.97", "30", "50"));
         if(videoInfo.videoFramerate != null && fps.contains(videoInfo.videoFramerate) == false)
         {
@@ -1116,7 +1174,9 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
+        resolution.addLast(customString);
         resolutionSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, resolution));
+        resolutionSpinner.setOnItemSelectedListener(new SetCustomAdapter(customString, R.id.resolutionCustomContainer));
 
         audioCodecSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {

@@ -20,7 +20,6 @@
     <string name="audioSettingsTitle">Options Audio</string>
     <string name="sampleRate">Simple Fréquence (Hz)</string>
     <string name="channels">Chaînes</string>
-
     <string name="notSupportedTitle">Pas Supporté</string>
     <string name="notSupportedMessage">L\'architecture du CPU de l\'appareil n\'st pas supportée .
 Seulement  ARM est supporté.</string>
@@ -74,4 +73,4 @@ Seulement  ARM est supporté.</string>
 
     <string name="notificationChannelName">Service VideoTranscoder Encoder </string>
 
-</resources>
+    </resources>
