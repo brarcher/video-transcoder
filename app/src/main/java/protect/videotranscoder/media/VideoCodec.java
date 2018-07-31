@@ -13,7 +13,11 @@ import protect.videotranscoder.R;
  */
 public enum VideoCodec
 {
-    H264("h264", "H.264", Collections.EMPTY_LIST, R.string.codecSlowExcellent),
+    // The 'preset' setting for h264 is changed from its default of 'medium'. The
+    // 'faster' setting reduces encoding times by ~73% while only reducing quality
+    // a near imperceptible amount. This seems like a good trade-off for encoding
+    // on a mobile devices where power usage is a concern.
+    H264("h264", "H.264", Arrays.asList("-preset", "faster"), R.string.codecSlowExcellent),
     MPEG4("mpeg4", "MPEG-4", Collections.EMPTY_LIST, R.string.codecFastGood),
     MPEG2("mpeg2video", "MPEG-2", Collections.EMPTY_LIST, R.string.codecFastOk),
     MPEG1("mpeg1video", "MPEG-1", Collections.EMPTY_LIST, R.string.codecFastLow),
