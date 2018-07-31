@@ -1137,7 +1137,7 @@ public class MainActivity extends AppCompatActivity
         }
         fpsSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, fps));
 
-        LinkedList<String> resolution = new LinkedList<>(Arrays.asList("176x144", "320x240", "480x360", "640x360", "640x480", "800x600", "960x720", "1024x768", "1280x720", "1920x1080", "2048x1080", "2048x858", "2560x1440", "2560x1600", "4096x2160"));
+        LinkedList<String> resolution = new LinkedList<>();
         if(videoInfo.videoResolution != null && resolution.contains(videoInfo.videoResolution) == false)
         {
             resolution.add(videoInfo.videoResolution);
