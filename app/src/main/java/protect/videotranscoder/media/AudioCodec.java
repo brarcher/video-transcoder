@@ -11,19 +11,23 @@ import java.util.List;
  */
 public enum AudioCodec
 {
-    AAC("aac", Arrays.asList("1", "2")),
-    MP3("mp3", Arrays.asList("1", "2")),
-    OPUS("libopus", Arrays.asList("1", "2")),
-    VORBIS("vorbis", Collections.singletonList("2")),
-    NONE("none", Collections.EMPTY_LIST),
+    AAC("aac", Collections.EMPTY_LIST, Arrays.asList("1", "2")),
+    MP3("mp3", Collections.EMPTY_LIST, Arrays.asList("1", "2")),
+    OPUS("libopus", Collections.EMPTY_LIST, Arrays.asList("1", "2")),
+
+    // The vorbis encode is experimental, and needs other flags to enable
+    VORBIS("vorbis", Arrays.asList("-strict", "-2"), Collections.singletonList("2")),
+    NONE("none", Collections.EMPTY_LIST, Collections.EMPTY_LIST),
     ;
 
     public final String ffmpegName;
+    public final List<String> extraFfmpegArgs;
     public final List<String> supportedChannels;
 
-    AudioCodec(String ffmpegName, List<String> supportedChannels)
+    AudioCodec(String ffmpegName, List<String> extraFfmpegArgs, List<String> supportedChannels)
     {
         this.ffmpegName = ffmpegName;
+        this.extraFfmpegArgs = extraFfmpegArgs;
         this.supportedChannels = Collections.unmodifiableList(supportedChannels);
     }
 

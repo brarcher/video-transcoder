@@ -2,6 +2,10 @@ package protect.videotranscoder.media;
 
 import android.support.annotation.Nullable;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import protect.videotranscoder.R;
 
 /**
@@ -9,21 +13,23 @@ import protect.videotranscoder.R;
  */
 public enum VideoCodec
 {
-    H264("h264", "H.264", R.string.codecSlowExcellent),
-    MPEG4("mpeg4", "MPEG-4", R.string.codecFastGood),
-    MPEG2("mpeg2video", "MPEG-2", R.string.codecFastOk),
-    MPEG1("mpeg1video", "MPEG-1", R.string.codecFastLow),
-    GIF("gif", "GIF", null),
+    H264("h264", "H.264", Collections.EMPTY_LIST, R.string.codecSlowExcellent),
+    MPEG4("mpeg4", "MPEG-4", Collections.EMPTY_LIST, R.string.codecFastGood),
+    MPEG2("mpeg2video", "MPEG-2", Collections.EMPTY_LIST, R.string.codecFastOk),
+    MPEG1("mpeg1video", "MPEG-1", Collections.EMPTY_LIST, R.string.codecFastLow),
+    GIF("gif", "GIF", Collections.EMPTY_LIST, null),
     ;
 
     public final String ffmpegName;
     public final String prettyName;
+    public final List<String> extraFfmpegArgs;
     public final Integer helperTextId;
 
-    VideoCodec(String ffmpegName, String prettyName, Integer helperTextId)
+    VideoCodec(String ffmpegName, String prettyName, List<String> extraFfmpegArgs, Integer helperTextId)
     {
         this.ffmpegName = ffmpegName;
         this.prettyName = prettyName;
+        this.extraFfmpegArgs = extraFfmpegArgs;
         this.helperTextId = helperTextId;
     }
 

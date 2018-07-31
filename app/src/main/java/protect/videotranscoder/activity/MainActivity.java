@@ -680,6 +680,8 @@ public class MainActivity extends AppCompatActivity
                 command.add(videoBitrateK + "k");
             }
 
+            command.addAll(videoCodec.extraFfmpegArgs);
+
             // Frame size
             command.add("-s");
             command.add(resolution);
@@ -699,13 +701,7 @@ public class MainActivity extends AppCompatActivity
             command.add("-acodec");
             command.add(audioCodec.ffmpegName);
 
-            if (audioCodec == AudioCodec.VORBIS)
-            {
-                // The vorbis encode is experimental, and needs other
-                // flags to enable
-                command.add("-strict");
-                command.add("-2");
-            }
+            command.addAll(audioCodec.extraFfmpegArgs);
 
             // Sample rate
             command.add("-ar");
