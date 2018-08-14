@@ -20,10 +20,13 @@
     <string name="audioSettingsTitle">Setări audio</string>
     <string name="sampleRate">Rată eșantionare (Hz)</string>
     <string name="channels">Canale</string>
+    <string name="custom">Personalizat</string>
+
     <string name="notSupportedTitle">Nu este suportat</string>
     <string name="notSupportedMessage">Arhitectura procesorului dispozitivului dumneavoastră nu este compatibilă. Doar cea ARM este suportată.</string>
 
     <string name="selectFileFirst">Trebuie să selectați mai întâi un fișier pentru codare.</string>
+    <string name="videoResolutionValueInvalid">Valoarea pentru rezoluție este invalidă, nu s-a putut face codarea.</string>
     <string name="videoBitrateValueInvalid">Valoarea pentru rata de biți este invalidă, nu s-a putut face codarea.</string>
     <string name="encodingNotification">Codare <xliff:g id="input_filename">%s</xliff:g></string>
     <string name="encodeStartConfirmation">Doriți să codați <xliff:g id="input_filename">%s</xliff:g> și să îl scrieți în <xliff:g id="output_filename">%s</xliff:g>?</string>
