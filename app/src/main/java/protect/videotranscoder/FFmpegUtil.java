@@ -363,134 +363,136 @@ public class FFmpegUtil
         try
         {
             JsonNode root = mapper.readTree(mediaDetailsJsonStr);
-
-            JsonNode format = root.get("format");
-            if(format != null)
+            if(root != null)
             {
-                JsonNode duration = format.get("duration");
-                if(duration != null)
-                {
-                    durationMs = (int)(duration.asDouble() * 1000);
-                }
 
-                JsonNode bitrate = format.get("bit_rate");
-                if(bitrate != null)
+                JsonNode format = root.get("format");
+                if(format != null)
                 {
-                    totalBitrateK = bitrate.asInt()/1000;
-                }
-
-                JsonNode formatName = format.get("format_name");
-                if(formatName != null)
-                {
-                    String formatNameStr = formatName.asText();
-
-                    for(MediaContainer item : MediaContainer.values())
+                    JsonNode duration = format.get("duration");
+                    if(duration != null)
                     {
-                        if(formatNameStr.contains(item.ffmpegName))
-                        {
-                            container = item;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            JsonNode streams = root.get("streams");
-            if(streams != null)
-            {
-                for(int index = 0; index < streams.size(); index++)
-                {
-                    JsonNode stream = streams.get(index);
-                    JsonNode codecType = stream.get("codec_type");
-                    if(codecType == null)
-                    {
-                        continue;
+                        durationMs = (int)(duration.asDouble() * 1000);
                     }
 
-                    if(codecType.asText().equals("video"))
+                    JsonNode bitrate = format.get("bit_rate");
+                    if(bitrate != null)
                     {
-                        JsonNode codecName = stream.get("codec_name");
-                        if(codecName == null)
-                        {
-                            continue;
-                        }
-                        videoCodec = VideoCodec.fromName(codecName.asText());
+                        totalBitrateK = bitrate.asInt()/1000;
+                    }
 
-                        JsonNode width = stream.get("width");
-                        JsonNode height = stream.get("height");
-                        if(width == null || height == null)
-                        {
-                            continue;
-                        }
-                        videoResolution = width + "x" + height;
+                    JsonNode formatName = format.get("format_name");
+                    if(formatName != null)
+                    {
+                        String formatNameStr = formatName.asText();
 
-                        // bit_rate may not always be available, so do not require it.
-                        JsonNode bitrate = stream.get("bit_rate");
-                        if(bitrate != null)
+                        for(MediaContainer item : MediaContainer.values())
                         {
-                            videoBitrateK = bitrate.asInt()/1000;
-                        }
-
-                        JsonNode frameRate = stream.get("avg_frame_rate");
-                        if(frameRate == null)
-                        {
-                            continue;
-                        }
-
-                        try
-                        {
-                            String frameRateStr = frameRate.asText();
-                            String [] frameRateSplit = frameRateStr.split("/");
-                            int frameRateNum = Integer.parseInt(frameRateSplit[0]);
-                            int frameRateDem = 1;
-                            if(frameRateSplit.length > 1)
+                            if(formatNameStr.contains(item.ffmpegName))
                             {
-                                frameRateDem = Integer.parseInt(frameRateSplit[1]);
-                            }
-
-                            double frameRateValue = frameRateNum/(double)frameRateDem;
-
-                            videoFramerate = String.format(Locale.US,"%.2f", frameRateValue);
-                            if(videoFramerate.contains(".00"))
-                            {
-                                videoFramerate = videoFramerate.replace(".00", "");
+                                container = item;
+                                break;
                             }
                         }
-                        catch(NumberFormatException e)
-                        {
-                            continue;
-                        }
                     }
+                }
 
-                    if(codecType.asText().equals("audio"))
+                JsonNode streams = root.get("streams");
+                if(streams != null)
+                {
+                    for (int index = 0; index < streams.size(); index++)
                     {
-                        JsonNode codecName = stream.get("codec_name");
-                        if(codecName == null)
+                        JsonNode stream = streams.get(index);
+                        JsonNode codecType = stream.get("codec_type");
+                        if (codecType == null)
                         {
                             continue;
                         }
-                        audioCodec = AudioCodec.fromName(codecName.asText());
 
-                        JsonNode sampleRate = stream.get("sample_rate");
-                        if(sampleRate == null)
+                        if (codecType.asText().equals("video"))
                         {
-                            continue;
-                        }
-                        audioSampleRate = sampleRate.asInt();
+                            JsonNode codecName = stream.get("codec_name");
+                            if (codecName == null)
+                            {
+                                continue;
+                            }
+                            videoCodec = VideoCodec.fromName(codecName.asText());
 
-                        // bit_rate may not always be available, so do not require it.
-                        JsonNode bitrate = stream.get("bit_rate");
-                        if(bitrate != null)
-                        {
-                            audioBitrateK = bitrate.asInt()/1000;
+                            JsonNode width = stream.get("width");
+                            JsonNode height = stream.get("height");
+                            if (width == null || height == null)
+                            {
+                                continue;
+                            }
+                            videoResolution = width + "x" + height;
+
+                            // bit_rate may not always be available, so do not require it.
+                            JsonNode bitrate = stream.get("bit_rate");
+                            if (bitrate != null)
+                            {
+                                videoBitrateK = bitrate.asInt() / 1000;
+                            }
+
+                            JsonNode frameRate = stream.get("avg_frame_rate");
+                            if (frameRate == null)
+                            {
+                                continue;
+                            }
+
+                            try
+                            {
+                                String frameRateStr = frameRate.asText();
+                                String[] frameRateSplit = frameRateStr.split("/");
+                                int frameRateNum = Integer.parseInt(frameRateSplit[0]);
+                                int frameRateDem = 1;
+                                if (frameRateSplit.length > 1)
+                                {
+                                    frameRateDem = Integer.parseInt(frameRateSplit[1]);
+                                }
+
+                                double frameRateValue = frameRateNum / (double) frameRateDem;
+
+                                videoFramerate = String.format(Locale.US, "%.2f", frameRateValue);
+                                if (videoFramerate.contains(".00"))
+                                {
+                                    videoFramerate = videoFramerate.replace(".00", "");
+                                }
+                            } catch (NumberFormatException e)
+                            {
+                                continue;
+                            }
                         }
 
-                        JsonNode channelLaoyout = stream.get("channel_layout");
-                        if(channelLaoyout == null)
+                        if (codecType.asText().equals("audio"))
                         {
-                            continue;
+                            JsonNode codecName = stream.get("codec_name");
+                            if (codecName == null)
+                            {
+                                continue;
+                            }
+                            audioCodec = AudioCodec.fromName(codecName.asText());
+
+                            JsonNode sampleRate = stream.get("sample_rate");
+                            if (sampleRate == null)
+                            {
+                                continue;
+                            }
+                            audioSampleRate = sampleRate.asInt();
+
+                            // bit_rate may not always be available, so do not require it.
+                            JsonNode bitrate = stream.get("bit_rate");
+                            if (bitrate != null)
+                            {
+                                audioBitrateK = bitrate.asInt() / 1000;
+                            }
+
+                            JsonNode channelLaoyout = stream.get("channel_layout");
+                            if (channelLaoyout == null)
+                            {
+                                continue;
+                            }
+                            audioChannels = channelLaoyout.asText().equals("mono") ? 1 : 2;
                         }
-                        audioChannels = channelLaoyout.asText().equals("mono") ? 1 : 2;
                     }
                 }
             }
