@@ -974,7 +974,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onResume();
 
-        if(isEncoding() == false)
+        if(isEncoding() == false && videoInfo != null)
         {
             startVideoPlayback(null);
         }
