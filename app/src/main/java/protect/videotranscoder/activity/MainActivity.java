@@ -777,7 +777,7 @@ public class MainActivity extends AppCompatActivity
 
         final String customString = getString(R.string.custom);
 
-        if(resolution.equals(customString))
+        if(resolution.equals(customString) && container.supportedVideoCodecs.size() > 0)
         {
             resolution = resolutionCustom.getText().toString();
             String [] split = resolution.split("x");
