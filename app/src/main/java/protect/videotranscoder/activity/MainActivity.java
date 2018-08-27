@@ -1299,9 +1299,6 @@ public class MainActivity extends AppCompatActivity
 
     private void setSelectMediaFile(String path, String overrideBaseName)
     {
-        videoView.setVideoPath(path);
-        videoView.start();
-
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
         {
             @Override
@@ -1402,6 +1399,8 @@ public class MainActivity extends AppCompatActivity
 
                 if(result != null)
                 {
+                    videoView.setVideoPath(uri);
+                    videoView.start();
 
                     videoInfo.setFileBaseName(overrideBaseName);
                     populateOptionDefaults();
