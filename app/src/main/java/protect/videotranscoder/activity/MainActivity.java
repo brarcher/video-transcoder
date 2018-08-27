@@ -1032,6 +1032,28 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void hideAllOptions()
+    {
+        for(int id : BASIC_SETTINGS_IDS)
+        {
+            findViewById(id).setVisibility(View.GONE);
+        }
+        for(int id : VIDEO_SETTINGS_IDS)
+        {
+            findViewById(id).setVisibility(View.GONE);
+        }
+        for(int id : AUDIO_SETTINGS_IDS)
+        {
+            findViewById(id).setVisibility(View.GONE);
+        }
+
+        encodeButton.setVisibility(View.GONE);
+        startJumpBack.setVisibility(View.GONE);
+        startJumpForward.setVisibility(View.GONE);
+        endJumpBack.setVisibility(View.GONE);
+        endJumpForward.setVisibility(View.GONE);
+    }
+
     private void populateOptionDefaults()
     {
         for(int id : BASIC_SETTINGS_IDS)
@@ -1371,26 +1393,25 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        final File videoFile = new File(path);
-
         FFmpegUtil.getMediaDetails(new File(path), new ResultCallbackHandler<MediaInfo>()
         {
             @Override
             public void onResult(MediaInfo result)
             {
-                if(result == null)
-                {
-                    Log.d(TAG, "Failed to query media file, filling in defaults");
-                    // Could not query the file, fill in what we know.
-                    result = new MediaInfo(videoFile, 0, MediaContainer.MP4, VideoCodec.MPEG4, "640x480",
-                        800, "25", AudioCodec.MP3,
-                        44100, 128, 2);
-                }
-
                 videoInfo = result;
-                videoInfo.setFileBaseName(overrideBaseName);
 
-                populateOptionDefaults();
+                if(result != null)
+                {
+
+                    videoInfo.setFileBaseName(overrideBaseName);
+                    populateOptionDefaults();
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this, R.string.invalidMediaFile, Toast.LENGTH_LONG).show();
+                    hideAllOptions();
+                    stopVideoPlayback();
+                }
             }
         });
     }
