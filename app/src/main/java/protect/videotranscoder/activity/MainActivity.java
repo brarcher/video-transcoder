@@ -111,6 +111,8 @@ public class MainActivity extends AppCompatActivity
             R.id.fpsContainerDivider,
             R.id.resolutionContainer,
             R.id.resolutionContainerDivider,
+            R.id.resolutionCustomContainer,
+            R.id.resolutionContainerDivider,
             R.id.videoBitrateContainer,
             R.id.videoBitrateContainerDivider));
     final List<Integer> AUDIO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
@@ -1117,7 +1119,16 @@ public class MainActivity extends AppCompatActivity
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
                 String value = (String)parent.getItemAtPosition(position);
-                customField.setVisibility(value.equals(customString) ? View.VISIBLE : View.GONE);
+                MediaContainer container = (MediaContainer)containerSpinner.getSelectedItem();
+
+                if(value.equals(customString) && container.supportedVideoCodecs.size() > 0)
+                {
+                    customField.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    customField.setVisibility(View.GONE);
+                }
             }
 
             @Override
