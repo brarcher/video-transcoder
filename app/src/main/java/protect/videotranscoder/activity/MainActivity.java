@@ -1399,6 +1399,7 @@ public class MainActivity extends AppCompatActivity
 
                 if(result != null)
                 {
+                    String uri = Uri.fromFile(new File(path)).toString();
                     videoView.setVideoPath(uri);
                     videoView.start();
 
