@@ -535,8 +535,14 @@ public class FFmpegUtil
             }
         }
 
-        MediaInfo info = new MediaInfo(mediaFile, durationMs, container, videoCodec, videoResolution,
-                videoBitrateK, videoFramerate, audioCodec, audioSampleRate, audioBitrateK, audioChannels);
+        MediaInfo info = null;
+
+        if(container != null && (videoCodec != null || audioCodec != null))
+        {
+            info = new MediaInfo(mediaFile, durationMs, container, videoCodec, videoResolution,
+                    videoBitrateK, videoFramerate, audioCodec, audioSampleRate, audioBitrateK, audioChannels);
+        }
+
         return info;
     }
 
