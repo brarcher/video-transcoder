@@ -509,7 +509,7 @@ public class FFmpegUtil
         }
         catch (IOException e)
         {
-            Log.w(TAG, "Failed to read media details for file : " + mediaFile.getAbsolutePath() + "\n" + mediaDetailsJsonStr);
+            Log.w(TAG, "Failed to read media details for file : " + mediaFile.getAbsolutePath() + "\n" + mediaDetailsJsonStr, e);
         }
 
         if(totalBitrateK != null)
