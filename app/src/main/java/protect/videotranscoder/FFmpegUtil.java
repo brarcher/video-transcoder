@@ -154,6 +154,16 @@ public class FFmpegUtil
             @Override
             public void onSuccess(String message)
             {
+                // On some systems some warnings are emitted right before the json, such as:
+                //   WARNING: linker: /data/data/protect.videoeditor/files/ffprobe: unused DT entry: type 0x6ffffffe arg 0x22c0
+                // Skip past this to the start of the json, if any exists.
+
+                int jsonStartIndex = message.indexOf('{');
+                if(jsonStartIndex != -1)
+                {
+                    message = message.substring(jsonStartIndex);
+                }
+
                 resultHandler.onResult(message);
             }
 
