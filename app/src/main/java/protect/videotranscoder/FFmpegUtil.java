@@ -154,6 +154,16 @@ public class FFmpegUtil
             @Override
             public void onSuccess(String message)
             {
+                // On some systems some warnings are emitted right before the json, such as:
+                //   WARNING: linker: /data/data/protect.videoeditor/files/ffprobe: unused DT entry: type 0x6ffffffe arg 0x22c0
+                // Skip past this to the start of the json, if any exists.
+
+                int jsonStartIndex = message.indexOf('{');
+                if(jsonStartIndex != -1)
+                {
+                    message = message.substring(jsonStartIndex);
+                }
+
                 resultHandler.onResult(message);
             }
 
@@ -499,7 +509,7 @@ public class FFmpegUtil
         }
         catch (IOException e)
         {
-            Log.w(TAG, "Failed to read media details for file : " + mediaFile.getAbsolutePath() + "\n" + mediaDetailsJsonStr);
+            Log.w(TAG, "Failed to read media details for file : " + mediaFile.getAbsolutePath() + "\n" + mediaDetailsJsonStr, e);
         }
 
         if(totalBitrateK != null)
@@ -525,8 +535,14 @@ public class FFmpegUtil
             }
         }
 
-        MediaInfo info = new MediaInfo(mediaFile, durationMs, container, videoCodec, videoResolution,
-                videoBitrateK, videoFramerate, audioCodec, audioSampleRate, audioBitrateK, audioChannels);
+        MediaInfo info = null;
+
+        if(container != null && (videoCodec != null || audioCodec != null))
+        {
+            info = new MediaInfo(mediaFile, durationMs, container, videoCodec, videoResolution,
+                    videoBitrateK, videoFramerate, audioCodec, audioSampleRate, audioBitrateK, audioChannels);
+        }
+
         return info;
     }
 

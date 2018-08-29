@@ -5,6 +5,7 @@ import os
 import json
 import collections
 import time
+from datetime import datetime
 
 ASSETS = os.path.dirname(os.path.realpath(__file__)) + os.sep + "assets"
 
@@ -18,11 +19,8 @@ def adb(args):
     if result != 0:
         raise Exception("adb failed with " + str(result) + ": " + str(cmd))
 
-def clearLogcat():
-    adb(["shell", "logcat", "-c"])
-
-def logcat():
-    p = subprocess.Popen(["adb", "logcat", "-d"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def logcat(sinceTime):
+    p = subprocess.Popen(["adb", "logcat", "-t", sinceTime], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
     rc = p.wait()
     if rc != 0:
@@ -40,12 +38,12 @@ def pushAsset(filename):
 
 def encodeVideoTest(test, output):
     pushAsset(test.filename)
-    clearLogcat()
+    startTime = datetime.now().strftime('%m-%d %H:%M:%S.000')
     encodeVideo(test.filename, output, test.mediaContainer, test.videoCodec, test.videoBitrateK, test.resolution, test.fps, test.audioCodec, test.audioSampleRate, test.audioBitrateK, test.audioChannel)
 
     logs = None
     for count in range(1, 300):
-        logs = logcat()
+        logs = logcat(startTime)
         if "Encode result" in logs:
             break
         time.sleep(1)
@@ -57,6 +55,7 @@ def encodeVideoTest(test, output):
         raise Exception("Failed to encode file: " + test.filename)
 
     pullFile(output)
+    removeFile(output)
 
 def encodeVideo(filename, output, mediaContainer, videoCodec, videoBitrateK, resolution, fps, audioCodec, audioSampleRate, audioBitrateK, audioChannel):
     args = []
@@ -121,12 +120,12 @@ def encodeVideo(filename, output, mediaContainer, videoCodec, videoBitrateK, res
 
 def encodeAudioTest(test, output):
     pushAsset(test.filename)
-    clearLogcat()
+    startTime = datetime.now().strftime('%m-%d %H:%M:%S.000')
     encodeAudio(test.filename, output, test.mediaContainer, test.audioCodec, test.audioSampleRate, test.audioBitrateK, test.audioChannel)
 
     logs = None
     for count in range(1, 300):
-        logs = logcat()
+        logs = logcat(startTime)
         if "Encode result" in logs:
             break
         time.sleep(1)
@@ -138,6 +137,7 @@ def encodeAudioTest(test, output):
         raise Exception("Failed to encode file: " + test.filename)
 
     pullFile(output)
+    removeFile(output)
 
 def encodeAudio(filename, output, mediaContainer, audioCodec, audioSampleRate, audioBitrateK, audioChannel):
     args = []

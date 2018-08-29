@@ -38,6 +38,7 @@
     <string name="couldNotFindFileSubmsg">could not find input file</string>
     <string name="fieldMissingError"><xliff:g id="field_name">%s</xliff:g> missing</string>
     <string name="fieldMissingOrInvalidError"><xliff:g id="field_name">%s</xliff:g> missing or invalid</string>
+    <string name="invalidMediaFile">The selected media file is invalid or not supported</string>
 
     <string name="writePermissionExplanation">This application needs access to storage in order to read and write media files. Without this access, the application cannot transcode.</string>
     <string name="permissionRequestAgain">Request again</string>
