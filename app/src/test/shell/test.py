@@ -57,6 +57,7 @@ def encodeVideoTest(test, output):
         raise Exception("Failed to encode file: " + test.filename)
 
     pullFile(output)
+    removeFile(output)
 
 def encodeVideo(filename, output, mediaContainer, videoCodec, videoBitrateK, resolution, fps, audioCodec, audioSampleRate, audioBitrateK, audioChannel):
     args = []
@@ -138,6 +139,7 @@ def encodeAudioTest(test, output):
         raise Exception("Failed to encode file: " + test.filename)
 
     pullFile(output)
+    removeFile(output)
 
 def encodeAudio(filename, output, mediaContainer, audioCodec, audioSampleRate, audioBitrateK, audioChannel):
     args = []
