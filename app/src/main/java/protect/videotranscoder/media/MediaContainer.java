@@ -13,6 +13,7 @@ import java.util.List;
 public enum MediaContainer
 {
     // Video and audio:
+    AVI("avi", "avi", "video/avi", Arrays.asList(VideoCodec.AVI), Arrays.asList(AudioCodec.MP3)),
     FLV("flv", "flv", "video/x-flv", Collections.singletonList(VideoCodec.H264), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3, AudioCodec.NONE)),
     MKV("matroska", "mkv", "video/x-matroska", Arrays.asList(VideoCodec.H264, VideoCodec.MPEG4, VideoCodec.MPEG2, VideoCodec.MPEG1), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3, AudioCodec.OPUS, AudioCodec.NONE)),
     MP4("mp4", "mp4", "video/mp4", Arrays.asList(VideoCodec.H264, VideoCodec.MPEG4, VideoCodec.MPEG2, VideoCodec.MPEG1), Arrays.asList(AudioCodec.AAC, AudioCodec.MP3, AudioCodec.NONE)),
