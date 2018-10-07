@@ -13,6 +13,8 @@ import protect.videotranscoder.R;
  */
 public enum VideoCodec
 {
+    // This is the built-in avi encoder instead of using the external libxvid library.
+    AVI("mpeg4", "AVI", Arrays.asList("-vtag", "xvid"), null),
     // The 'preset' setting for h264 is changed from its default of 'medium'. The
     // 'faster' setting reduces encoding times by ~73% while only reducing quality
     // a near imperceptible amount. This seems like a good trade-off for encoding
