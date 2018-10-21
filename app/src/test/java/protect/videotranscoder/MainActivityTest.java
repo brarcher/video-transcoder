@@ -59,6 +59,10 @@ public class MainActivityTest
     private static final MediaInfo FAKE_MP4_MEDIA_INFO = new MediaInfo(new File("/ROOT/file.mp4"), 0,
         MediaContainer.MP4, VideoCodec.H264, "100x100", 100, "10", AudioCodec.AAC,
         41000, 100, 2);
+    private static final MediaInfo FAKE_GIF_MEDIA_INFO = new MediaInfo(new File("/ROOT/file.mp4"), 0,
+            MediaContainer.GIF, VideoCodec.GIF, "100x100", 100, "10", AudioCodec.NONE,
+            0, 0, 0);
+
     private MockFFmpegService mockFFmpegService;
 
     class MockFFmpegService implements IFFmpegProcessService
@@ -314,4 +318,20 @@ public class MainActivityTest
 
         checkSelectedSettings(activity, FAKE_MP4_MEDIA_INFO);
     }
+
+    @Test
+    public void selectMp4ChangeToGif() throws Exception
+    {
+        Activity activity = Robolectric.setupActivity(MainActivity.class);
+
+        openFilePickerFromLoadSelectFile(activity, FAKE_MP4_MEDIA_INFO);
+
+        checkSelectedSettings(activity, FAKE_MP4_MEDIA_INFO);
+
+        Spinner containerSpinner = activity.findViewById(R.id.containerSpinner);
+        setSpinnerSelection(containerSpinner, MediaContainer.GIF.ffmpegName);
+
+        checkSelectedSettings(activity, FAKE_GIF_MEDIA_INFO);
+    }
+
 }

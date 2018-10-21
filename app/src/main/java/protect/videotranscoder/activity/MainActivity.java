@@ -1075,6 +1075,8 @@ public class MainActivity extends AppCompatActivity
         endJumpBack.setVisibility(View.VISIBLE);
         endJumpForward.setVisibility(View.VISIBLE);
 
+        final String customString = getString(R.string.custom);
+
         containerSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, MediaContainer.values()));
         containerSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
@@ -1087,6 +1089,11 @@ public class MainActivity extends AppCompatActivity
                 for(int resId : VIDEO_SETTINGS_IDS)
                 {
                     findViewById(resId).setVisibility(visibility);
+                }
+
+                if(resolutionSpinner.getSelectedItem().toString().equals(customString) == false)
+                {
+                    findViewById(R.id.resolutionCustomContainer).setVisibility(View.GONE);
                 }
 
                 visibility = container.supportedAudioCodecs.size() > 0 ? View.VISIBLE : View.GONE;
@@ -1159,8 +1166,6 @@ public class MainActivity extends AppCompatActivity
                 // Nothing to do
             }
         }
-
-        final String customString = getString(R.string.custom);
 
         LinkedList<String> fps = new LinkedList<>(Arrays.asList("15", "24", "23.98", "25", "29.97", "30", "50"));
         if(videoInfo.videoFramerate != null && fps.contains(videoInfo.videoFramerate) == false)
