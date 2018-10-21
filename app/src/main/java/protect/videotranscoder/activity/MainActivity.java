@@ -97,12 +97,12 @@ public class MainActivity extends AppCompatActivity
 
     private static final int SELECT_FILE_REQUEST = 2;
 
-    final List<Integer> BASIC_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Integer> BASIC_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
             R.id.basicSettingsText,
             R.id.basicSettingsTopDivider,
             R.id.containerTypeContainer,
             R.id.containerTypeContainerDivider));
-    final List<Integer> VIDEO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Integer> VIDEO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
             R.id.videoSettingsText,
             R.id.videoSettingsTextTopDivider,
             R.id.videoCodecContainer,
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity
             R.id.resolutionContainerDivider,
             R.id.videoBitrateContainer,
             R.id.videoBitrateContainerDivider));
-    final List<Integer> AUDIO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Integer> AUDIO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
             R.id.audioSettingsText,
             R.id.audioSettingsTextTopDivider,
             R.id.audioCodecContainer,
