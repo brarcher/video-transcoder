@@ -373,4 +373,31 @@ public class MainActivityTest
         // Ensure that encoding was attempted
         assertEquals(mockFFmpegService.encodeAttempts, 1);
     }
+
+    @Test
+    public void selectMp4PickInvalidOptions() throws Exception
+    {
+        Activity activity = Robolectric.setupActivity(MainActivity.class);
+
+        // Test invalid custom video resolution
+        openFilePickerFromLoadSelectFile(activity, FAKE_MP4_MEDIA_INFO);
+        checkSelectedSettings(activity, FAKE_MP4_MEDIA_INFO);
+        setSpinnerSelection(activity.findViewById(R.id.resolutionSpinner), activity.getString(R.string.custom));
+        ((EditText)activity.findViewById(R.id.resolutionCustom)).setText("invalid");
+        activity.findViewById(R.id.encode).performClick();
+        assertEquals(mockFFmpegService.encodeAttempts, 0);
+
+        // Test invalid video bitrate
+        openFilePickerFromLoadSelectFile(activity, FAKE_MP4_MEDIA_INFO);
+        checkSelectedSettings(activity, FAKE_MP4_MEDIA_INFO);
+        ((EditText)activity.findViewById(R.id.videoBitrateValue)).setText("invalid");
+        activity.findViewById(R.id.encode).performClick();
+        assertEquals(mockFFmpegService.encodeAttempts, 0);
+
+        // If a new video is selected, the defaults are reset and encoding will work
+        openFilePickerFromLoadSelectFile(activity, FAKE_MP4_MEDIA_INFO);
+        checkSelectedSettings(activity, FAKE_MP4_MEDIA_INFO);
+        activity.findViewById(R.id.encode).performClick();
+        assertEquals(mockFFmpegService.encodeAttempts, 1);
+    }
 }
