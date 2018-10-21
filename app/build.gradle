@@ -62,6 +62,10 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:3.8"
+    testImplementation "org.mockito:mockito-core:2.8.9"
+    testImplementation 'org.powermock:powermock-api-mockito2:1.7.4'
+    testImplementation "org.powermock:powermock-module-junit4-rule:1.7.4"
+    testImplementation "org.powermock:powermock-classloading-xstream:1.7.4"
 }
 
 task findbugs(type: FindBugs, dependsOn: 'assembleDebug') {
