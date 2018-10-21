@@ -80,6 +80,16 @@ public class MainActivityTest
         PowerMockito.when(IFFmpegProcessService.Stub.asInterface(any())).thenReturn(mockFFmpegService);
     }
 
+    private void checkVisibility(Activity activity, List<Integer> ids, int mode)
+    {
+        for(int index = 0; index < ids.size(); index++)
+        {
+            View view = activity.findViewById(ids.get(index));
+            assertNotNull(view);
+            assertEquals(view.getVisibility(), mode);
+        }
+    }
+
     @Test
     public void initiallyNothingLoaded() throws Exception
     {
@@ -94,6 +104,10 @@ public class MainActivityTest
         Button encode = activity.findViewById(R.id.encode);
         assertNotNull(encode);
         assertEquals(encode.getVisibility(), View.GONE);
+
+        checkVisibility(activity, MainActivity.BASIC_SETTINGS_IDS, View.GONE);
+        checkVisibility(activity, MainActivity.AUDIO_SETTINGS_IDS, View.GONE);
+        checkVisibility(activity, MainActivity.VIDEO_SETTINGS_IDS, View.GONE);
     }
 
     @Test
