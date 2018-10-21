@@ -67,10 +67,12 @@ public class MainActivityTest
 
     class MockFFmpegService implements IFFmpegProcessService
     {
+        int encodeAttempts = 0;
         @Override
         public boolean startEncode(List<String> args, String outputFile, String mimetype, int durationMs)
         {
-            return false;
+            encodeAttempts += 1;
+            return true;
         }
 
         @Override
@@ -334,4 +336,41 @@ public class MainActivityTest
         checkSelectedSettings(activity, FAKE_GIF_MEDIA_INFO);
     }
 
+    @Test
+    public void selectMp4EncodeMp4() throws Exception
+    {
+        Activity activity = Robolectric.setupActivity(MainActivity.class);
+
+        openFilePickerFromLoadSelectFile(activity, FAKE_MP4_MEDIA_INFO);
+
+        checkSelectedSettings(activity, FAKE_MP4_MEDIA_INFO);
+
+        activity.findViewById(R.id.encode).performClick();
+
+        // Ensure that encoding was attempted
+        assertEquals(mockFFmpegService.encodeAttempts, 1);
+    }
+
+    @Test
+    public void selectMp4SwitchGifInvalidVideoBitrateAttemptEncode() throws Exception
+    {
+        Activity activity = Robolectric.setupActivity(MainActivity.class);
+
+        openFilePickerFromLoadSelectFile(activity, FAKE_MP4_MEDIA_INFO);
+
+        checkSelectedSettings(activity, FAKE_MP4_MEDIA_INFO);
+
+        Spinner containerSpinner = activity.findViewById(R.id.containerSpinner);
+        setSpinnerSelection(containerSpinner, MediaContainer.GIF.ffmpegName);
+
+        EditText videoBitrate = activity.findViewById(R.id.videoBitrateValue);
+        videoBitrate.setText("Invalid");
+
+        // GIF should ignore the video bitrate, as it is not needed
+
+        activity.findViewById(R.id.encode).performClick();
+
+        // Ensure that encoding was attempted
+        assertEquals(mockFFmpegService.encodeAttempts, 1);
+    }
 }
