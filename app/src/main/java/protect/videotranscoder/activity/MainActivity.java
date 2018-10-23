@@ -97,12 +97,12 @@ public class MainActivity extends AppCompatActivity
 
     private static final int SELECT_FILE_REQUEST = 2;
 
-    final List<Integer> BASIC_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Integer> BASIC_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
             R.id.basicSettingsText,
             R.id.basicSettingsTopDivider,
             R.id.containerTypeContainer,
             R.id.containerTypeContainerDivider));
-    final List<Integer> VIDEO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Integer> VIDEO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
             R.id.videoSettingsText,
             R.id.videoSettingsTextTopDivider,
             R.id.videoCodecContainer,
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity
             R.id.resolutionContainerDivider,
             R.id.videoBitrateContainer,
             R.id.videoBitrateContainerDivider));
-    final List<Integer> AUDIO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Integer> AUDIO_SETTINGS_IDS = Collections.unmodifiableList(Arrays.asList(
             R.id.audioSettingsText,
             R.id.audioSettingsTextTopDivider,
             R.id.audioCodecContainer,
@@ -769,7 +769,7 @@ public class MainActivity extends AppCompatActivity
         Integer audioBitrateK = (Integer) audioBitrateSpinner.getSelectedItem();
         Integer audioSampleRate = (Integer) audioSampleRateSpinner.getSelectedItem();
         String audioChannel = (String) audioChannelSpinner.getSelectedItem();
-        int videoBitrateK;
+        int videoBitrateK = 0;
 
         if(videoInfo == null)
         {
@@ -804,11 +804,14 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-
         try
         {
-            String videoBitrateKStr = videoBitrateValue.getText().toString();
-            videoBitrateK = Integer.parseInt(videoBitrateKStr);
+            // Ignore video bitrate for GIF
+            if(container != MediaContainer.GIF)
+            {
+                String videoBitrateKStr = videoBitrateValue.getText().toString();
+                videoBitrateK = Integer.parseInt(videoBitrateKStr);
+            }
         }
         catch(NumberFormatException e)
         {
@@ -1075,6 +1078,8 @@ public class MainActivity extends AppCompatActivity
         endJumpBack.setVisibility(View.VISIBLE);
         endJumpForward.setVisibility(View.VISIBLE);
 
+        final String customString = getString(R.string.custom);
+
         containerSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_textview, MediaContainer.values()));
         containerSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
@@ -1087,6 +1092,11 @@ public class MainActivity extends AppCompatActivity
                 for(int resId : VIDEO_SETTINGS_IDS)
                 {
                     findViewById(resId).setVisibility(visibility);
+                }
+
+                if(resolutionSpinner.getSelectedItem().toString().equals(customString) == false)
+                {
+                    findViewById(R.id.resolutionCustomContainer).setVisibility(View.GONE);
                 }
 
                 visibility = container.supportedAudioCodecs.size() > 0 ? View.VISIBLE : View.GONE;
@@ -1159,8 +1169,6 @@ public class MainActivity extends AppCompatActivity
                 // Nothing to do
             }
         }
-
-        final String customString = getString(R.string.custom);
 
         LinkedList<String> fps = new LinkedList<>(Arrays.asList("15", "24", "23.98", "25", "29.97", "30", "50"));
         if(videoInfo.videoFramerate != null && fps.contains(videoInfo.videoFramerate) == false)

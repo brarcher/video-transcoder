@@ -1019,6 +1019,7 @@
     <dimen name="sp11">9sp</dimen>
     <dimen name="sp12">10sp</dimen>
     <dimen name="sp13">11sp</dimen>
+    <dimen name="sp13.5">11.5sp</dimen>
     <dimen name="sp14">12sp</dimen>
     <dimen name="sp15">13sp</dimen>
     <dimen name="sp16">14sp</dimen>
