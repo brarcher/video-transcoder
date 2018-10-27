@@ -1398,6 +1398,17 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener()
+        {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra)
+            {
+                Toast.makeText(MainActivity.this, R.string.mediaPlaybackFailed, Toast.LENGTH_LONG).show();
+                stopVideoPlayback();
+                return true;
+            }
+        });
+
         FFmpegUtil.getMediaDetails(new File(path), new ResultCallbackHandler<MediaInfo>()
         {
             @Override
