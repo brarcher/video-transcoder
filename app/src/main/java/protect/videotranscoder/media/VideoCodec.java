@@ -48,7 +48,7 @@ public enum VideoCodec
         {
             for (VideoCodec item : values())
             {
-                if (item.ffmpegName.equals(name))
+                if (item.ffmpegName.equals(name) || item.prettyName.equalsIgnoreCase(name))
                 {
                     return item;
                 }
