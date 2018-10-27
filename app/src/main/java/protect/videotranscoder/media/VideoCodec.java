@@ -23,6 +23,7 @@ public enum VideoCodec
     MPEG4("mpeg4", "MPEG-4", Collections.EMPTY_LIST, R.string.codecFastGood),
     MPEG2("mpeg2video", "MPEG-2", Collections.EMPTY_LIST, R.string.codecFastOk),
     MPEG1("mpeg1video", "MPEG-1", Collections.EMPTY_LIST, R.string.codecFastLow),
+    VP8("libvpx", "VP8", Collections.EMPTY_LIST, null),
     GIF("gif", "GIF", Collections.EMPTY_LIST, null),
     ;
 

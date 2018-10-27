@@ -5,11 +5,10 @@ import os
 import json
 import collections
 import time
-from datetime import datetime
 
 ASSETS = os.path.dirname(os.path.realpath(__file__)) + os.sep + "assets"
 
-VideoTest = collections.namedtuple("VideoTest", ["filename", "mediaContainer", "formatName", "extension", "videoCodec", "videoBitrateK", "resolution", "fps", "audioCodec", "audioCodecName", "audioSampleRate", "audioBitrateK", "audioChannel"])
+VideoTest = collections.namedtuple("VideoTest", ["filename", "mediaContainer", "formatName", "extension", "videoCodec", "ffmpegVideoCodecName", "videoBitrateK", "resolution", "fps", "audioCodec", "audioCodecName", "audioSampleRate", "audioBitrateK", "audioChannel"])
 AudioTest = collections.namedtuple("AudioTest", ["filename", "mediaContainer", "formatName", "extension", "audioCodec", "audioCodecName", "audioSampleRate", "audioBitrateK", "audioChannel"])
 
 def adb(args):
@@ -19,8 +18,15 @@ def adb(args):
     if result != 0:
         raise Exception("adb failed with " + str(result) + ": " + str(cmd))
 
-def logcat(sinceTime):
-    p = subprocess.Popen(["adb", "logcat", "-t", sinceTime], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def logcatClear():
+    p = subprocess.Popen(["adb", "logcat", "-c"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+    rc = p.wait()
+    if rc != 0:
+        raise Exception("logcat failed with " + str(rc) + ": " + stderr)
+
+def logcat():
+    p = subprocess.Popen(["adb", "logcat", "-d"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
     rc = p.wait()
     if rc != 0:
@@ -38,12 +44,13 @@ def pushAsset(filename):
 
 def encodeVideoTest(test, output):
     pushAsset(test.filename)
-    startTime = datetime.now().strftime('%m-%d %H:%M:%S.000')
+
+    logcatClear()
     encodeVideo(test.filename, output, test.mediaContainer, test.videoCodec, test.videoBitrateK, test.resolution, test.fps, test.audioCodec, test.audioSampleRate, test.audioBitrateK, test.audioChannel)
 
     logs = None
     for count in range(1, 300):
-        logs = logcat(startTime)
+        logs = logcat()
         if "Encode result" in logs:
             break
         time.sleep(1)
@@ -120,12 +127,13 @@ def encodeVideo(filename, output, mediaContainer, videoCodec, videoBitrateK, res
 
 def encodeAudioTest(test, output):
     pushAsset(test.filename)
-    startTime = datetime.now().strftime('%m-%d %H:%M:%S.000')
+
+    logcatClear()
     encodeAudio(test.filename, output, test.mediaContainer, test.audioCodec, test.audioSampleRate, test.audioBitrateK, test.audioChannel)
 
     logs = None
     for count in range(1, 300):
-        logs = logcat(startTime)
+        logs = logcat()
         if "Encode result" in logs:
             break
         time.sleep(1)
@@ -246,7 +254,7 @@ def verifyVideoStream(test, stream):
 
     resolution = str(width) + "x" + str(height)
 
-    if codecName != test.videoCodec:
+    if codecName != test.ffmpegVideoCodecName:
         raise Exception("Unexpected video codec: '%s' vs '%s'" % (test.videoCodec, codecName))
 
     if avgFrameRate != test.fps:
@@ -271,13 +279,14 @@ def verifyAudioStream(test, stream):
 
 
 
-# VideoTest = collections.namedtuple("VideoTest", ["filename", "mediaContainer", "formatName", "extension", "videoCodec", "videoBitrateK", "resolution", "fps", "audioCodec", "audioCodecName", "audioSampleRate", "audioBitrateK", "audioChannel"])
+# VideoTest = collections.namedtuple("VideoTest", ["filename", "mediaContainer", "formatName", "extension", "videoCodec", "ffmpegVideoCodecName", "videoBitrateK", "resolution", "fps", "audioCodec", "audioCodecName", "audioSampleRate", "audioBitrateK", "audioChannel"])
 videoTests = []
-videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "avi", "avi", "avi", "mpeg4", "2000", "360x240", "19", "mp3", "mp3", "22050", "100", "2"))
-videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "mp4", "mp4", "mp4", "h264", "2000", "360x240", "19", "aac", "aac", "22050", "100", "2"))
-videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "matroska", "matroska", "mkv", "h264", "2000", "180x120", "24", "aac", "aac", "22050", "50", "1"))
-videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "flv", "flv", "flv", "h264", "2000", "180x120", "24", "aac", "aac", "22050", "50", "1"))
-videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "gif", "gif", "gif", "gif", "2000", "360x240", "10", None, None, None, None, None))
+videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "avi", "avi", "avi", "mpeg4", "mpeg4", "2000", "360x240", "19", "mp3", "mp3", "22050", "100", "2"))
+videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "mp4", "mp4", "mp4", "h264", "h264", "2000", "360x240", "19", "aac", "aac", "22050", "100", "2"))
+videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "matroska", "matroska", "mkv", "h264", "h264", "2000", "180x120", "24", "aac", "aac", "22050", "50", "1"))
+videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "flv", "flv", "flv", "h264", "h264", "2000", "180x120", "24", "aac", "aac", "22050", "50", "1"))
+videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "webm", "webm", "webm", "libvpx", "vp8", "2000", "180x120", "24", "vorbis", "vorbis", "22050", "50", "2"))
+videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "gif", "gif", "gif", "gif", "gif", "2000", "360x240", "10", None, None, None, None, None))
 
 # AudioTest = collections.namedtuple("AudioTest", ["filename", "mediaContainer", "formatName", "extension", "audioCodec", "audioCodecName", "audioSampleRate", "audioBitrateK", "audioChannel"])
 audioTests = []
