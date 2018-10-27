@@ -34,7 +34,6 @@ Seulement  ARM est supporté.</string>
     <string name="couldNotFindFileSubmsg">Ne peux pas trouver fichier d\'entrée</string>
     <string name="fieldMissingError"><xliff:g id="field_name">%s</xliff:g> manquant</string>
     <string name="fieldMissingOrInvalidError"><xliff:g id="field_name">%s</xliff:g> manquant ou invalid </string>
-
     <string name="writePermissionExplanation">L\'application demande l\'accés à l\'éspace disque pour lire et ecrire sur des fichiers medias. Sans accés, l\'application ne peux pas transcoder.</string>
     <string name="permissionRequestAgain">Demander à nouveau</string>
 
