@@ -1,0 +1,88 @@
+<resources
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="selectVideo">Pilih\nVideo</string>
+    <string name="encode">Encode</string>
+    <string name="cancel">Batal</string>
+
+    <string name="ok">OKE</string>
+    <string name="sendLabel">Kirim&#8230;</string>
+    <string name="share_dialog_title">Bagikan dengan</string>
+    <string name="share">Bagikan</string>
+
+    <string name="basicSettingsTitle">Pengaturan Dasar</string>
+    <string name="container">Format</string>
+    <string name="videoSettingsTitle">Pengaturan Video</string>
+    <string name="codec">Codec</string>
+    <string name="fps">FPS</string>
+    <string name="resolution">Resolusi</string>
+    <string name="bitrate">Bitrate (kb/s)</string>
+    <string name="audioSettingsTitle">Pengaturan Audio</string>
+    <string name="sampleRate">Sample Rate (Hz)</string>
+    <string name="channels">Saluran</string>
+    <string name="custom">Kustom</string>
+
+    <string name="notSupportedTitle">Tidak Didukung</string>
+    <string name="notSupportedMessage">Arsitektur CPU perangkat ini tidak didukung. Hanya ARM yang didukung.</string>
+
+    <string name="selectFileFirst">Anda harus memilih file terlebih dahulu untuk meng-encode.</string>
+    <string name="videoResolutionValueInvalid">Nilai resolusi tidak valid, tidak dapat meng-encode.</string>
+    <string name="videoBitrateValueInvalid">Nilai bitrate video tidak valid, tidak dapat meng-encode.</string>
+    <string name="encodingNotification">Encoding <xliff:g id="input_filename">%s</xliff:g></string>
+    <string name="encodeStartConfirmation">Apakah Anda mau meng-encode <xliff:g id="input_filename">%s</xliff:g> dan menghasilkan output <xliff:g id="output_filename">%s</xliff:g>?</string>
+    <string name="transcodeSuccess">Berhasil meng-encoding. File ditulis di:\n<xliff:g id="path">%s</xliff:g></string>
+    <string name="transcodeFailed">Encoding gagal: <xliff:g id="failure_message">%s</xliff:g></string>
+    <string name="cannotEncodeFile">Tidak bisa meng-encode file: <xliff:g id="failure_description">%s</xliff:g></string>
+    <string name="couldNotFindFileSubmsg">Tidak dapat menemukan file input</string>
+    <string name="fieldMissingError"><xliff:g id="field_name">%s</xliff:g> hilang</string>
+    <string name="fieldMissingOrInvalidError"><xliff:g id="field_name">%s</xliff:g> hilang atau tidak valid</string>
+    <string name="invalidMediaFile">File media yang di pilih tidak valid atau tidak di dukung</string>
+
+    <string name="writePermissionExplanation">Aplikasi ini membutuhkan akses ke penyimpanan untuk membaca dan menulis file media. Tanpa akses ini, aplikasi ini tidak bisa melakukan transcode.</string>
+    <string name="permissionRequestAgain">Minta lagi</string>
+
+    <string name="fileLocationLookupFailed">Gagal menyelesaikan lokasi file media</string>
+    <string name="encodeCanceled">Encoding dibatalkan</string>
+
+    <string name="codecSlowExcellent">Lambat, Kualitas luar biasa</string>
+    <string name="codecFastGood">Cepat, Kualitas bagus</string>
+    <string name="codecFastOk">Cepat, Kualitas OKE</string>
+    <string name="codecFastLow">Cepat, Kualitas jelek</string>
+
+    <string name="about">Tentang</string>
+    <string name="app_copyright_fmt">Copyright 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
+    <string name="app_license">Dilisensikan di bawah GPLv3.</string>
+    <string name="about_title_fmt">Tentang <xliff:g id="app_name">%s</xliff:g></string>
+    <string name="debug_version_fmt">Versi: <xliff:g id="version">%s</xliff:g></string>
+    <string name="app_revision_fmt">Informasi Revisi: <xliff:g id="app_revision_url">%s</xliff:g></string>
+    <string name="app_libraries"><xliff:g id="app_name">%s</xliff:g> menggunakan pustaka pihak ketiga berikut: <xliff:g id="app_libraries_list">%s</xliff:g></string>
+    <string name="app_resources"><xliff:g id="app_name">%s</xliff:g> menggunakan sumber daya pihak ketiga berikut: <xliff:g id="app_resources_list">%s</xliff:g></string>
+
+    <!-- error strings -->
+    <string name="app_ui_crash">App/UI crashed</string>
+    <string name="send_email_title">Kirim Surel</string>
+
+    <!-- error activity -->
+    <string name="sorry_string">Maaf, itu seharusnya tidak terjadi.</string>
+    <string name="error_report_button_text">Laporkan kesalahan melalui surel</string>
+    <string name="error_snackbar_message">Maaf, beberapa kesalahan terjadi.</string>
+    <string name="error_snackbar_action">LAPORKAN</string>
+    <string name="what_device_headline">Info:</string>
+    <string name="what_happened_headline">Apa yang terjadi:</string>
+    <string name="info_labels">Apa:\\nPermintaan:\\nContent Lang:\\nServis:\\nWaktu GMT:\\nPaket:\\nVersi:\\nVersi OS:</string>
+    <string name="your_comment">Komentar Anda (dalam Bahasa Inggris):</string>
+    <string name="error_details_headline">Detail:</string>
+    <string name="error_report_title">Laporan kesalahan</string>
+
+    <string name="notificationChannelName">VideoTranscoder Encoding Service</string>
+
+    <string name="receivingSharedData">Menerima data yang dibagikan...</string>
+    <string name="failedToReceiveSharedData">Gagal menerima data yang dibagikan</string>
+
+    <string name="settings">Pengaturan</string>
+    <string name="fileSearchPathSetting">Jalur pencarian file</string>
+    <string name="fileSearchPathSettingSummary">Jalur pada sistem file dimana pencari file akan terbuka ketika mencari file media</string>
+    <string name="fileSearchPathSettingLastUsed">Jalur yang terakhir digunakan</string>
+    <string name="fileSearchPathSettingExternal">Penyimpanan eksternal</string>
+
+</resources>

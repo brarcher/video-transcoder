@@ -10,6 +10,8 @@ Do you want to encode videos on your phone into different formats, trim videos, 
 
 Video Transcoder is an application which uses the open source program FFmpeg to transcode video files from one format to another. By selecting the video to process, details for the video are provided and the desired settings can be configured.
 
+The following media containers are supported: Avi, Flv, Gif, Matroska, Mp3, Mp4, Ogg, Opus, WebM. Additionally, these are the supported video codecs: H.264, MPEG-1, MPEG-2, MPEG-4, VP8, VP9, Xvid.
+
 The application requires very few permissions, and never attempts to access the Internet.
 
 If there is any interest in improving this project, kindly submit a pull request with proposed changes.

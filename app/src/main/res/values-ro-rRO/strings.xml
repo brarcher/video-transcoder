@@ -36,6 +36,7 @@
     <string name="couldNotFindFileSubmsg">nu s-a putut găsii fișierul de intrare</string>
     <string name="fieldMissingError"><xliff:g id="field_name">%s</xliff:g> lipsește</string>
     <string name="fieldMissingOrInvalidError"><xliff:g id="field_name">%s</xliff:g> lipsește sau este invalid</string>
+    <string name="invalidMediaFile">Fișierul selectat nu este valid sau nu este suportat</string>
 
     <string name="writePermissionExplanation">Această aplicație are nevoie de acces la spațiul de stocare pentru a citii și scrie fișiere video. Fără acest acces, aplicația nu poate face codarea.</string>
     <string name="permissionRequestAgain">Cere din nou</string>

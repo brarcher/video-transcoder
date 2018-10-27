@@ -1,8 +1,8 @@
 <resources
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <string name="selectVideo">Video\nselecteren</string>
-    <string name="encode">Coderen</string>
+    <string name="selectVideo">Video\nkiezen</string>
+    <string name="encode">Converteren</string>
     <string name="cancel">Annuleren</string>
 
     <string name="ok">Oké</string>
@@ -25,23 +25,24 @@
     <string name="notSupportedTitle">Geen ondersteuning</string>
     <string name="notSupportedMessage">De CPU-architectuur van dit apparaat wordt niet ondersteund; alleen ARM wordt ondersteund.</string>
 
-    <string name="selectFileFirst">Je moet eerst een te coderen bestand selecteren.</string>
-    <string name="videoResolutionValueInvalid">De resolutie is ongeldig; het coderen is gestopt.</string>
-    <string name="videoBitrateValueInvalid">De video-bitsnelheid is ongeldig; het coderen is gestopt.</string>
-    <string name="encodingNotification">Bezig met coderen van <xliff:g id="input_filename">%s</xliff:g></string>
-    <string name="encodeStartConfirmation">Wil je <xliff:g id="input_filename">%s</xliff:g> coderen en de uitvoer schrijven naar <xliff:g id="output_filename">%s</xliff:g>?</string>
-    <string name="transcodeSuccess">Het coderen is voltooid. Het bestand is weggeschreven naar:\n<xliff:g id="path">%s</xliff:g></string>
-    <string name="transcodeFailed">Het coderen is mislukt: <xliff:g id="failure_message">%s</xliff:g></string>
-    <string name="cannotEncodeFile">Het bestand kan niet worden gecodeerd: <xliff:g id="failure_description">%s</xliff:g></string>
+    <string name="selectFileFirst">Je moet eerst een te converteren bestand kiezen.</string>
+    <string name="videoResolutionValueInvalid">De resolutie is ongeldig; het converteren is gestopt.</string>
+    <string name="videoBitrateValueInvalid">De video-bitsnelheid is ongeldig; het converteren is gestopt.</string>
+    <string name="encodingNotification">Bezig met converteren van <xliff:g id="input_filename">%s</xliff:g></string>
+    <string name="encodeStartConfirmation">Wil je <xliff:g id="input_filename">%s</xliff:g> converteren en de uitvoer wegschrijven naar <xliff:g id="output_filename">%s</xliff:g>?</string>
+    <string name="transcodeSuccess">Het converteren is voltooid. Het bestand is weggeschreven naar:\n<xliff:g id="path">%s</xliff:g></string>
+    <string name="transcodeFailed">Het converteren is mislukt: <xliff:g id="failure_message">%s</xliff:g></string>
+    <string name="cannotEncodeFile">Het bestand kan niet worden geconverteerd: <xliff:g id="failure_description">%s</xliff:g></string>
     <string name="couldNotFindFileSubmsg">het invoerbestand kan niet worden gevonden</string>
     <string name="fieldMissingError"><xliff:g id="field_name">%s</xliff:g> ontbreekt</string>
     <string name="fieldMissingOrInvalidError"><xliff:g id="field_name">%s</xliff:g> ontbreekt of is ongeldig</string>
+    <string name="invalidMediaFile">Het gekozen mediabestand is ongeldig of wordt niet ondersteund</string>
 
-    <string name="writePermissionExplanation">Deze app heeft toegang nodig tot je opslag om mediabestanden te kunnen lezen en wegschrijven. Zonder deze toegang kan de app niets coderen.</string>
+    <string name="writePermissionExplanation">Deze app heeft toegang nodig tot je opslag om mediabestanden te kunnen inlezen en wegschrijven. Zonder deze toegang kan de app niets converteren.</string>
     <string name="permissionRequestAgain">Opnieuw verzoeken</string>
 
     <string name="fileLocationLookupFailed">Het achterhalen van de locatie van het mediabestand is mislukt.</string>
-    <string name="encodeCanceled">De codering is geannuleerd</string>
+    <string name="encodeCanceled">Het converteren is geannuleerd</string>
 
     <string name="codecSlowExcellent">Langzaam - uitstekende kwaliteit</string>
     <string name="codecFastGood">Snel - goede kwaliteit</string>
@@ -73,10 +74,10 @@
     <string name="error_details_headline">Details:</string>
     <string name="error_report_title">Foutrapportage</string>
 
-    <string name="notificationChannelName">VideoTranscoder-coderingsdienst</string>
+    <string name="notificationChannelName">VideoTranscoder-converteerdienst</string>
 
     <string name="receivingSharedData">Bezig met ontvangen van gedeelde gegevens...</string>
-    <string name="failedToReceiveSharedData">Ontvangen van gedeelde gegevens is mislukt</string>
+    <string name="failedToReceiveSharedData">Ontvangen van gedeelde gegevens mislukt</string>
 
     <string name="settings">Instellingen</string>
     <string name="fileSearchPathSetting">Bestandszoekpad</string>

@@ -1,0 +1,88 @@
+<resources
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="selectVideo">Seleziona\nvideo</string>
+    <string name="encode">Codifica</string>
+    <string name="cancel">Annulla</string>
+
+    <string name="ok">OK</string>
+    <string name="sendLabel">Invia&#8230;</string>
+    <string name="share_dialog_title">Condividi con</string>
+    <string name="share">Condividi</string>
+
+    <string name="basicSettingsTitle">Impostazioni di base</string>
+    <string name="container">Contenitore</string>
+    <string name="videoSettingsTitle">Impostazioni video</string>
+    <string name="codec">Codec</string>
+    <string name="fps">FPS</string>
+    <string name="resolution">Risoluzione</string>
+    <string name="bitrate">Bitrate (kb/s)</string>
+    <string name="audioSettingsTitle">Impostazioni audio</string>
+    <string name="sampleRate">Sample Rate (Hz)</string>
+    <string name="channels">Canali</string>
+    <string name="custom">Personalizzata</string>
+
+    <string name="notSupportedTitle">Non supportato</string>
+    <string name="notSupportedMessage">L\'architettura della CPU di questo dispositivo non è supportata. Solo quella ARM lo è.</string>
+
+    <string name="selectFileFirst">È necessario selezionare un file da codificare.</string>
+    <string name="videoResolutionValueInvalid">La risoluzione non è valida, impossibile procedere con la codifica.</string>
+    <string name="videoBitrateValueInvalid">Il bitrate del video non è valido, impossibile procedere con la codifica.</string>
+    <string name="encodingNotification">Codifica <xliff:g id="input_filename">%s</xliff:g></string>
+    <string name="encodeStartConfirmation">Vuoi che <xliff:g id="input_filename">%s</xliff:g> sia convertito in <xliff:g id="output_filename">%s</xliff:g>?</string>
+    <string name="transcodeSuccess">La codifica è stata completata con successo. Il file è stato scritto in:\n<xliff:g id="path">%s</xliff:g></string>
+    <string name="transcodeFailed">Codifica non riuscita: <xliff:g id="failure_message">%s</xliff:g></string>
+    <string name="cannotEncodeFile">Impossibile codificare il file: <xliff:g id="failure_description">%s</xliff:g></string>
+    <string name="couldNotFindFileSubmsg">Impossibile trovare il file sorgente</string>
+    <string name="fieldMissingError"><xliff:g id="field_name">%s</xliff:g> mancante</string>
+    <string name="fieldMissingOrInvalidError"><xliff:g id="field_name">%s</xliff:g> mancante o non valido</string>
+    <string name="invalidMediaFile">Il file multimediale selezionato non è valido o non è supportato</string>
+
+    <string name="writePermissionExplanation">Questa applicazione necessita dell\'autorizzazione all\'archiviazione per poter leggere e scrivere file multimediali. Senza di essa, l\'applicazione non può convertire.</string>
+    <string name="permissionRequestAgain">Chiedi di nuovo</string>
+
+    <string name="fileLocationLookupFailed">Impossibile trovare il percorso del file multimediale</string>
+    <string name="encodeCanceled">La codifica è stata annullata</string>
+
+    <string name="codecSlowExcellent">Lento, qualità eccellente</string>
+    <string name="codecFastGood">Veloce, qualità buona</string>
+    <string name="codecFastOk">Veloce, qualità media</string>
+    <string name="codecFastLow">Veloce, qualità bassa</string>
+
+    <string name="about">Informazioni</string>
+    <string name="app_copyright_fmt">Copyright 2018-<xliff:g>%d</xliff:g> Branden Archer</string>
+    <string name="app_license">Reso disponibile nei termini della licenza GPLv3.</string>
+    <string name="about_title_fmt">Informazioni su <xliff:g id="app_name">%s</xliff:g></string>
+    <string name="debug_version_fmt">Versione: <xliff:g id="version">%s</xliff:g></string>
+    <string name="app_revision_fmt">Informazioni sulla revisione: <xliff:g id="app_revision_url">%s</xliff:g></string>
+    <string name="app_libraries"><xliff:g id="app_name">%s</xliff:g> usa le seguenti librerie di terze parti: <xliff:g id="app_libraries_list">%s</xliff:g></string>
+    <string name="app_resources"><xliff:g id="app_name">%s</xliff:g> usa le seguenti risorse di terze parti: <xliff:g id="app_resources_list">%s</xliff:g></string>
+
+    <!-- error strings -->
+    <string name="app_ui_crash">L\'applicazione si è arrestata</string>
+    <string name="send_email_title">Invia e-mail</string>
+
+    <!-- error activity -->
+    <string name="sorry_string">Spiacente, non sarebbe dovuto accadere.</string>
+    <string name="error_report_button_text">Segnala l\'errore tramite e-mail</string>
+    <string name="error_snackbar_message">Spiacente, si sono verificati errori.</string>
+    <string name="error_snackbar_action">SEGNALA</string>
+    <string name="what_device_headline">Informazioni:</string>
+    <string name="what_happened_headline">Cosa è successo:</string>
+    <string name="info_labels">Cosa:\\nRichiesta:\\nLingua:\\nServizio:\\nOrario GMT:\\nPacchetto:\\nVersione:\\nVersione OS:</string>
+    <string name="your_comment">Il tuo commento (in inglese):</string>
+    <string name="error_details_headline">Dettagli:</string>
+    <string name="error_report_title">Segnalazione errore</string>
+
+    <string name="notificationChannelName">VideoTranscoder servizio di codifica</string>
+
+    <string name="receivingSharedData">Ricezione dati condivisi...</string>
+    <string name="failedToReceiveSharedData">Impossibile ricevere dati condivisi</string>
+
+    <string name="settings">Impostazioni</string>
+    <string name="fileSearchPathSetting">Percorso di ricerca file</string>
+    <string name="fileSearchPathSettingSummary">Il percorso del file system in cui il browser di file si aprirà durante la ricerca di un file multimediale</string>
+    <string name="fileSearchPathSettingLastUsed">Ultimo percorso utilizzato</string>
+    <string name="fileSearchPathSettingExternal">Memoria esterna</string>
+
+</resources>
