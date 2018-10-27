@@ -285,8 +285,10 @@ videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "avi", "avi", "avi", 
 videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "mp4", "mp4", "mp4", "h264", "h264", "2000", "360x240", "19", "aac", "aac", "22050", "100", "2"))
 videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "matroska", "matroska", "mkv", "h264", "h264", "2000", "180x120", "24", "aac", "aac", "22050", "50", "1"))
 videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "matroska", "matroska", "mkv", "libvpx", "vp8", "2000", "180x120", "24", "aac", "aac", "22050", "50", "1"))
+videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "matroska", "matroska", "mkv", "libvpx-vp9", "vp9", "2000", "180x120", "24", "aac", "aac", "22050", "50", "1"))
 videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "flv", "flv", "flv", "h264", "h264", "2000", "180x120", "24", "aac", "aac", "22050", "50", "1"))
 videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "webm", "webm", "webm", "libvpx", "vp8", "2000", "180x120", "24", "vorbis", "vorbis", "22050", "50", "2"))
+videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "webm", "webm", "webm", "libvpx-vp9", "vp9", "2000", "180x120", "24", "vorbis", "vorbis", "22050", "50", "2"))
 videoTests.append(VideoTest("SampleVideo_360x240_1mb.mp4", "gif", "gif", "gif", "gif", "gif", "2000", "360x240", "10", None, None, None, None, None))
 
 # AudioTest = collections.namedtuple("AudioTest", ["filename", "mediaContainer", "formatName", "extension", "audioCodec", "audioCodecName", "audioSampleRate", "audioBitrateK", "audioChannel"])
