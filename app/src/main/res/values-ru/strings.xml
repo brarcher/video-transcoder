@@ -1,0 +1,85 @@
+<resources
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+
+    <string name="selectVideo">Выберите видео</string>
+    <string name="encode">Кодировка</string>
+    <string name="cancel">Отмена</string>
+
+    <string name="ok">Хорошо</string>
+    <string name="sendLabel">Отправка...</string>
+    <string name="share_dialog_title">Поделиться с</string>
+    <string name="share">Поделиться</string>
+
+    <string name="basicSettingsTitle">Базовые настройки</string>
+    <string name="container">Контейнер</string>
+    <string name="videoSettingsTitle">Настройки видео</string>
+    <string name="codec">Кодек</string>
+    <string name="fps">FPS</string>
+    <string name="resolution">Разрешение</string>
+    <string name="bitrate">Битрейт (кбит/с)</string>
+    <string name="audioSettingsTitle">Настройки аудио</string>
+    <string name="sampleRate">Частота дискретизации (Гц)</string>
+    <string name="channels">Каналы</string>
+    <string name="custom">Изготовленный на заказ</string>
+
+    <string name="notSupportedTitle">Не поддерживается</string>
+    <string name="notSupportedMessage">Архитектура процессора этого устройства не поддерживается. Поддерживается только ARM.</string>
+
+    <string name="selectFileFirst">Вы должны выбрать файл для кодирования в первую очередь.</string>
+    <string name="videoResolutionValueInvalid">Значение разрешения недопустимо, не может быть закодировано.</string>
+    <string name="videoBitrateValueInvalid">Неверное значение битрейта видео, не может быть закодировано.</string>
+    <string name="encodingNotification">Кодирование &lt;xliff:g id=\"input_filename\" &gt;%s&lt;/xliff:g&gt;</string>
+    <string name="encodeStartConfirmation">Ты хочешь кодировать &lt;xliff:g id=\"input_filename\" &gt;%s&lt;/xliff:g&gt; and output to &lt;xliff:g id=\"output_filename\" &gt;%s&lt;/xliff:g&gt;?</string>
+    <string name="transcodeSuccess">Кодирование завершено успешно. Файл был записан:\n
+ &lt;xliff:g id=\"path\" &gt;%s&lt;/xliff:g&gt;</string>
+    <string name="transcodeFailed">Кодировка не удалась: &lt;xliff:g id=\"failure_message\" &gt;%s&lt;/xliff:g&gt;</string>
+    <string name="cannotEncodeFile">Невозможно закодировать файл: &lt;xliff:g id=\"failure_description\" &gt;%s&lt;/xliff:g&gt;</string>
+    <string name="couldNotFindFileSubmsg">не удалось найти входной файл</string>
+    <string name="fieldMissingError">&lt;xliff:g id=\"field_name\" &gt;%s&lt;/xliff:g&gt; отсутствует</string>
+    <string name="fieldMissingOrInvalidError">&lt;xliff:g id=\"field_name\" &gt;%s&lt;/xliff:g&gt; отсутствует или недействителен</string>
+    <string name="invalidMediaFile">Выбранный медиа-файл недействителен или не поддерживается</string>
+
+    <string name="writePermissionExplanation">Это приложение нуждается в доступе к хранилищу для чтения и записи медиа-файлов. Без этого доступа приложение не может транскодировать.</string>
+    <string name="permissionRequestAgain">Запросить снова</string>
+
+    <string name="fileLocationLookupFailed">Не удалось определить местоположение медиа файла</string>
+    <string name="encodeCanceled">Кодировка отменена</string>
+
+    <string name="codecSlowExcellent">Медленно, качество отличное</string>
+    <string name="codecFastGood">Быстро, качество хорошее</string>
+    <string name="codecFastOk">Быстро, Качество нормальное</string>
+    <string name="codecFastLow">Быстро, Качество низкое</string>
+
+    <string name="about">О программе</string>
+    <string name="app_license">Лицензировано под GPLv3.</string>
+    <string name="about_title_fmt">О &lt;xliff:g id=\"app_name\" &gt;%s&lt;/xliff:g&gt;</string>
+    <string name="debug_version_fmt">Версия: &lt;xliff:g id=\"version\" &gt;%s&lt;/xliff:g&gt;</string>
+
+    <!-- error strings -->
+    <string name="app_ui_crash">Сбой приложения/пользовательского интерфейса</string>
+    <string name="send_email_title">Отправить письмо</string>
+
+    <!-- error activity -->
+    <string name="sorry_string">Извините, этого не должно было случиться.</string>
+    <string name="error_report_button_text">Сообщить об ошибке по электронной почте</string>
+    <string name="error_snackbar_message">Извините, произошли некоторые ошибки.</string>
+    <string name="error_snackbar_action">Отчёт</string>
+    <string name="what_device_headline">Информация:</string>
+    <string name="what_happened_headline">Что случилось:</string>
+    <string name="your_comment">Ваш комментарий (на английском):</string>
+    <string name="error_details_headline">Детали:</string>
+    <string name="error_report_title">Отчёт об ошибке</string>
+
+    <string name="notificationChannelName">Служба кодирования ВидеоТранскодер</string>
+
+    <string name="receivingSharedData">Получение общих данных ...</string>
+    <string name="failedToReceiveSharedData">Не удалось получить общие данные</string>
+
+    <string name="settings">Настройки</string>
+    <string name="fileSearchPathSetting">Путь поиска файлов</string>
+    <string name="fileSearchPathSettingSummary">Путь в файловой системе, где открывается файловый браузер при поиске медиа-файла</string>
+    <string name="fileSearchPathSettingLastUsed">Путь последнего использования</string>
+    <string name="fileSearchPathSettingExternal">Внешнее хранилище</string>
+
+</resources>
