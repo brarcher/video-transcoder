@@ -1,6 +1,7 @@
 package protect.videotranscoder;
 
 import android.content.Context;
+import android.graphics.Movie;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -252,6 +253,12 @@ public class FFmpegUtil
             public void onResult(String mediaDetailsJsonStr)
             {
                 MediaInfo info = parseMediaInfo(mediaFile, mediaDetailsJsonStr);
+
+                if(info != null)
+                {
+                    info = mediaInfoFixup(info);
+                }
+
                 resultHandler.onResult(info);
             }
         });
@@ -541,6 +548,23 @@ public class FFmpegUtil
         {
             info = new MediaInfo(mediaFile, durationMs, container, videoCodec, videoResolution,
                     videoBitrateK, videoFramerate, audioCodec, audioSampleRate, audioBitrateK, audioChannels);
+        }
+
+        return info;
+    }
+
+    private static MediaInfo mediaInfoFixup(MediaInfo info)
+    {
+        if(info.container != null && info.container == MediaContainer.GIF)
+        {
+            // ffprobe will not report the duration of GIF files. The duration will
+            // need to be determined another way
+
+            Movie gifMovie = Movie.decodeFile(info.file.getAbsolutePath());
+            int durationMs = gifMovie.duration();
+
+            info = new MediaInfo(info.file, durationMs, info.container, info.videoCodec, info.videoResolution,
+                    info.videoBitrateK, info.videoFramerate, info.audioCodec, info.audioSampleRate, info.audioBitrateK, info.audioChannels);
         }
 
         return info;
