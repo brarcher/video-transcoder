@@ -37,7 +37,7 @@ Seul ARM est supporté.</string>
     <string name="writePermissionExplanation">L\'application demande l\'accès au stockage afin de permettre la lecture/écriture des fichiers vidéos. Sans accès, l\'application ne peux pas transcoder.</string>
     <string name="permissionRequestAgain">Demander à nouveau</string>
 
-    <string name="fileLocationLookupFailed">N\'a pas pu trouver l'emplacement du fichier media.</string>
+    <string name="fileLocationLookupFailed">N\'a pas pu trouver l\'emplacement du fichier média.</string>
     <string name="encodeCanceled">L\'encodage est annulé</string>
 
     <string name="codecSlowExcellent">Lent, Qualité excellente</string>
