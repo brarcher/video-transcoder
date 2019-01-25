@@ -14,7 +14,7 @@
     <string name="container">Contenant </string>
     <string name="videoSettingsTitle">Options Video</string>
     <string name="codec">Codec</string>
-    <string name="fps"> PPS - Pied par seconde </string>
+    <string name="fps"> IPS - Images par seconde </string>
     <string name="resolution">Resolution</string>
     <string name="bitrate">Vitesse de Telechargement ( Kb/s)</string>
     <string name="audioSettingsTitle">Options Audio</string>
