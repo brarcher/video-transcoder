@@ -14,8 +14,6 @@ The following media containers are supported: Avi, Flv, Gif, Matroska, Mp3, Mp4,
 
 The application requires very few permissions, and never attempts to access the Internet.
 
-If there is any interest in improving this project, kindly submit a pull request with proposed changes.
-
 # Screenshots
 
 [<img src="https://github.com/brarcher/video-transcoder/raw/master/metadata/en-US/images/phoneScreenshots/screenshot-01.png" width=250>](https://github.com/brarcher/video-transcoder/raw/master/metadata/en-US/images/phoneScreenshots/screenshot-01.png)
@@ -41,3 +39,5 @@ Windows:
 
 If you are interested in translating this application to another language, find the project listing on  [Transifex](https://www.transifex.com/na-243/video-transcoder).
 
+# Note from Developer
+The developer is currently on hiatus from the project. Questions and pull requests may not be looked at for some time. Apologies in advance.
