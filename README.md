@@ -35,9 +35,5 @@ Windows:
 ./gradlew.bat build
 ```
 
-# Translating
-
-If you are interested in translating this application to another language, find the project listing on  [Transifex](https://www.transifex.com/na-243/video-transcoder).
-
 # Note from Developer
 The developer is currently on hiatus from the project. Questions and pull requests may not be looked at for some time. Apologies in advance.
