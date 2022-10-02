@@ -36,4 +36,4 @@ Windows:
 ```
 
 # Note from Developer
-The developer is currently on hiatus from the project. Questions and pull requests may not be looked at for some time. Apologies in advance.
+This app is currently looking for a volunteer to take over development. If you are interested, please reach out.
