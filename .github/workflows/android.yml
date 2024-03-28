@@ -1,10 +1,18 @@
 name: Android CI
-
+# Build only on master branch changes in some directory
+# to avoid unecessary energy using for GitHub machines
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'app/**'
+      - 'gradle/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [ master ]
+    paths:
+      - 'app/**'
+      - 'gradle/**'
 
 jobs:
   build:
@@ -20,6 +28,11 @@ jobs:
         java-version: '8'
     - name: Build
       run: ./gradlew assembleRelease
+    - name: Save artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Video-Transcoder.apk
+        path: bin/protect.videoeditor-UNSIGNED.apk
     - name: Check lint
       run: ./gradlew lintRelease
     - name: Run unit tests
