@@ -32,7 +32,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Video-Transcoder.apk
-        path: app/build/outputs/apk/app-release.apk
+        path: app/build/outputs/apk/release/app-release.apk
     - name: Check lint
       run: ./gradlew lintRelease
     - name: Run unit tests
